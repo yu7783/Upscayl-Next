@@ -24,7 +24,7 @@
     "electronLanguages": ["en"],
     "x64ArchFiles": "*",
     "type": "distribution",
-    "icon": "build/icon.icns",
+    "icon": "build/icon.png",
     "category": "public.app-category.photography",
     "identity": null,
     "target": ["dir"]

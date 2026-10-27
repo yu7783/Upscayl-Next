@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Представляємо Upscayl Cloud!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Представляємо Upscayl-Next Cloud!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Поставте нам зірку на GitHub 😁",
     "DESCRIPTION": "Збільшення зображень з ШІ"
   },
   "FOOTER": {
-    "NEWS_TITLE": "НОВИНИ UPSCAYL",
-    "COPYRIGHT": "Всі права захищено ©",
+    "NEWS_TITLE": "НОВИНИ UPSCAYL-NEXT",
     "TITLE": "Від ",
-    "LINK_TITLE": "Команди Upscayl"
+    "LINK_TITLE": "Команди Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Налаштування",
-    "CHANGE_LANGUAGE": { "TITLE": "Змінити мову" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Змінити мову"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Стиснення зображень",
       "DESCRIPTION": "Стиснення PNG є безвтратним, тому воно може не значно зменшити розмір файлу, а вищі значення стиснення можуть вплинути на продуктивність. Стиснення JPG та WebP є втратним."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ID відеокарти",
-      "DESCRIPTION": "Будь ласка, прочитайте документацію Upscayl для додаткової інформації.",
+      "DESCRIPTION": "Будь ласка, прочитайте документацію Upscayl-Next для додаткової інформації.",
       "ADDITIONAL_DESCRIPTION": "Увімкніть режим продуктивності у Windows для кращих результатів."
     },
     "IMAGE_FORMAT": {
@@ -65,7 +76,7 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "ПЕРЕЗАПИСУВАТИ ПОПЕРЕДНЄ ЗБІЛЬШЕННЯ",
-      "DESCRIPTION": "Якщо увімкнено, Upscayl буде обробляти зображення знову замість прямого завантаження."
+      "DESCRIPTION": "Якщо увімкнено, Upscayl-Next буде обробляти зображення знову замість прямого завантаження."
     },
     "RESET_SETTINGS": {
       "BUTTON_TITLE": "СКИНУТИ НАЛАШТУВАННЯ",
@@ -76,18 +87,14 @@
       "DESCRIPTION": "Якщо увімкнено, тека виводу буде запам'ятовуватися між сесіями."
     },
     "AUTO_UPDATE": {
-      "TITLE": "АВТООНОВЛЕННЯ UPSCAYL",
+      "TITLE": "АВТООНОВЛЕННЯ UPSCAYL-NEXT",
       "DESCRIPTION": "Якщо увімкнено, додаток перевірятиме наявність оновлень та сповіщатиме вас."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "ДОПОМОГТИ ПОКРАЩИТИ UPSCAYL",
-      "DESCRIPTION": "Якщо увімкнено, Upscayl збиратиме анонімні дані використання для покращення інтерфейсу та функцій додатку."
-    },
     "THEME": {
-      "TITLE": "ТЕМА UPSCAYL"
+      "TITLE": "ТЕМА UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "МОВА UPSCAYL"
+      "TITLE": "МОВА UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "ВЛАСНИЙ РОЗМІР ТАЙЛУ",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "ВИМКНУТИ СПОВІЩЕННЯ",
-      "DESCRIPTION": "Якщо увімкнено, Upscayl не надсилатиме системні сповіщення про успіх чи помилки."
+      "DESCRIPTION": "Якщо увімкнено, Upscayl-Next не надсилатиме системні сповіщення про успіх чи помилки."
     },
     "SUPPORT": {
       "TITLE": "Виникли проблеми?",
@@ -108,12 +115,22 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Системна інформація"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Пакетний Upscayl",
+      "TITLE": "Пакетний Upscayl-Next",
       "DESCRIPTION": "Це дозволить вам обробити всі файли в теці одночасно"
     },
     "FILE_SELECTION": {
@@ -130,11 +147,11 @@
       "ZOOM": "Масштаб",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Стандартний",
+          "NAME": "Upscayl-Next Стандартний",
           "DESCRIPTION": "Підходить для більшості зображень."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Легкий",
+          "NAME": "Upscayl-Next Легкий",
           "DESCRIPTION": "Підходить для більшості зображень. Швидке збільшення з мінімальною втратою якості."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Подвійний Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Подвійний Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Увімкніть цю опцію для подвійної обробки зображення. Зауважте, що це може значно збільшити час обробки та можливі проблеми з продуктивністю для масштабів більше 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Крок 3",
-      "MAC_APP_STORE_ALERT": "Через обмеження безпеки MacOS App Store, Upscayl вимагає вибору теки виводу щоразу при запуску.\n\nЩоб уникнути цього, ви можете зберегти теку виводу за замовчуванням у вкладці 'Налаштування' Upscayl.",
+      "MAC_APP_STORE_ALERT": "Через обмеження безпеки MacOS App Store, Upscayl-Next вимагає вибору теки виводу щоразу при запуску.\n\nЩоб уникнути цього, ви можете зберегти теку виводу за замовчуванням у вкладці 'Налаштування' Upscayl-Next.",
       "NOT_SELECTED": "Не обрано",
       "DEFAULT_IMG_PATH": "За замовчуванням - шлях до зображення",
       "DEFAULT_FOLDER_PATH": "За замовчуванням - шлях до теки",
@@ -193,8 +212,14 @@
       "LAST_USED_AT": "Останнє використання"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Виконується пакетна обробка:",
-      "IN_PROGRESS_TITLE": "Виконуємо магію Upscayl...",
+      "IN_PROGRESS_TITLE": "Виконуємо магію Upscayl-Next...",
       "STOP_BUTTON_TITLE": "СТОП"
     },
     "RESET_BUTTON_TITLE": "Скинути",
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Помилка виконання",
-      "DESCRIPTION": "Upscayl зіткнувся з помилкою. Можливо, виконуваний файл не зміг правильно виконати команди. Спробуйте перевірити логи для отримання додаткової інформації. Ви можете створити issue на GitHub репозиторії Upscayl для допомоги."
+      "DESCRIPTION": "Upscayl-Next зіткнувся з помилкою. Можливо, виконуваний файл не зміг правильно виконати команди. Спробуйте перевірити логи для отримання додаткової інформації. Ви можете створити issue на GitHub репозиторії Upscayl-Next для допомоги."
     },
     "GENERIC_ERROR": {
       "TITLE": "Помилка"
@@ -277,13 +302,13 @@
       "TITLE": "Попередження про метадані",
       "DESCRIPTION": "На деяких системах метадані можуть не відображатися в форматах, відмінних від JPG. За потреби використовуйте спеціальні інструменти для перегляду метаданих."
     }
-  },    
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Скоро!",
     "CATCHY_PHRASE_1": "Більше жодних помилок, проблем з обладнанням, компромісів з якістю чи довгого очікування!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl будь-де, будь-коли, на будь-якому пристрої\n☁️ Не потрібна відеокарта чи потужне обладнання\n👩 Покращення облич\n🦋 Понад 10 моделей на вибір\n🏎 У 5 разів швидше за десктопну версію\n🎞 Обробка відео\n💰 Комерційне використання\n😴 Обробка під час вашого сну",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next будь-де, будь-коли, на будь-якому пристрої\n☁️ Не потрібна відеокарта чи потужне обладнання\n👩 Покращення облич\n🦋 Понад 10 моделей на вибір\n🏎 У 5 разів швидше за десктопну версію\n🎞 Обробка відео\n💰 Комерційне використання\n😴 Обробка під час вашого сну",
     "ALREADY_REGISTERED_ALERT": "Дякуємо, {name}! Схоже, ваша електронна пошта вже зареєстрована :D Якщо це не так, будь ласка, спробуйте ще раз.",
-    "ADD_SUCCESS": "Дякуємо за приєднання до списку очікування! Ми повідомимо вас, коли Upscayl Cloud буде готовий.",
+    "ADD_SUCCESS": "Дякуємо за приєднання до списку очікування! Ми повідомимо вас, коли Upscayl-Next Cloud буде готовий.",
     "INCORRECT_FIELDS_ALERT": "Будь ласка, заповніть всі поля правильно.",
     "JOIN_WAITLIST": "Приєднатися до списку очікування",
     "DONT_SHOW_AGAIN": "БІЛЬШЕ НЕ ПОКАЗУВАТИ"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Почати",
     "SETTINGS_NOTE": "Ви завжди можете змінити ці налаштування пізніше.",
     "STEP_1": {
-      "TITLE": "Ласкаво просимо до Upscayl 🎉",
+      "TITLE": "Ласкаво просимо до Upscayl-Next 🎉",
       "DESCRIPTION": "Давайте налаштуємо все за кілька швидких кроків."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Налаштуйте початкові параметри."
     },
     "STEP_3": {
-      "TITLE": "Як користуватися Upscayl? 🚀",
+      "TITLE": "Як користуватися Upscayl-Next? 🚀",
       "DESCRIPTION": "Подивіться це коротке відео, щоб дізнатися про нові функції."
     },
     "STEP_4": {
       "TITLE": "Все готово! 🎉",
-      "DESCRIPTION": "Ви готові почати покращувати зображення з Upscayl!"
+      "DESCRIPTION": "Ви готові почати покращувати зображення з Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

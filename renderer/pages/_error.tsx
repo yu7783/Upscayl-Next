@@ -1,6 +1,6 @@
 import ResetButton from "@/components/main-content/reset-button";
 import { ResetSettingsButton } from "@/components/sidebar/settings-tab/reset-settings-button";
-import { SkullIcon } from "lucide-react";
+import { SkullIcon } from "../components/icons/original-icons";
 
 function Error({ statusCode }) {
   return (

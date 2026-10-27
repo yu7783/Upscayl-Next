@@ -7,7 +7,7 @@ const autoUpdate = (event: UpdateDownloadedEvent) => {
   const dialogOpts: MessageBoxOptions = {
     type: "info",
     buttons: ["Install update", "No Thanks", "Check Release Notes"],
-    title: "New Upscayl Update",
+    title: "New Upscayl-Next Update",
     message: event.releaseName as string,
     detail:
       "A new version has been downloaded. Restart the application to apply the updates.",
@@ -19,8 +19,10 @@ const autoUpdate = (event: UpdateDownloadedEvent) => {
   if (dialogResponse === 0) {
     autoUpdater.quitAndInstall();
   } else if (dialogResponse === 2) {
+    const version = String(event.version);
     shell.openExternal(
-      "https://github.com/upscayl/upscayl/releases/tag/v" + event.version
+      "https://github.com/yu7783/Upscayl-Next/releases/tag/" +
+        (version.startsWith("v") ? version : "v" + version)
     );
     dialog.showMessageBoxSync(dialogOpts);
   } else {

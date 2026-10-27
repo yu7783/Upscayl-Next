@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon } from "../icons/original-icons";
 import React from "react";
 
 const SidebarToggleButton = ({

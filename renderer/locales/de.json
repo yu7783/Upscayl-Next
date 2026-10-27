@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Lass mich dir Upscayl Cloud vorstellen!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Lass mich dir Upscayl-Next Cloud vorstellen!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Gib uns einen Stern auf GitHub 😁",
     "DESCRIPTION": "KI-Bild-Upscaler"
   },
   "FOOTER": {
-    "NEWS_TITLE": "NEUES ZU UPSCAYL",
-    "COPYRIGHT": "Copyright ©",
+    "NEWS_TITLE": "NEUES ZU UPSCAYL-NEXT",
     "TITLE": "Vom ",
-    "LINK_TITLE": "Upscayl-Team"
+    "LINK_TITLE": "Upscayl-Next-Team"
   },
   "SETTINGS": {
     "TITLE": "Einstellungen",
-    "CHANGE_LANGUAGE": { "TITLE": "Sprache ändern" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Sprache ändern"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Bildkompression",
       "DESCRIPTION": "PNG-Kompression ist verlustfrei, daher reduziert sie die Dateigröße möglicherweise nicht signifikant und höhere Komprimierungswerte können die Leistung beeinträchtigen. JPG- und WebP-Kompression sind verlustbehaftet."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU-ID",
-      "DESCRIPTION": "Bitte lies die Upscayl-Dokumentation. Darin findest du weitere Informationen.",
+      "DESCRIPTION": "Bitte lies die Upscayl-Next-Dokumentation. Darin findest du weitere Informationen.",
       "ADDITIONAL_DESCRIPTION": "Aktiviere den Leistungsmodus unter Windows. So erhältst du bessere Ergebnisse."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Bildskala",
-      "DESCRIPTION": "Alles über 4X (außer 16X Double Upscayl) skaliert das Bild nur und verwendet kein KI-Upscaling.",
+      "DESCRIPTION": "Alles über 4X (außer 16X Double Upscayl-Next) skaliert das Bild nur und verwendet kein KI-Upscaling.",
       "WARNING": "Alles über 5X kann auf einigen Geräten Leistungsprobleme verursachen!",
       "ADDITIONAL_WARNING": "Dies kann auf einigen Geräten Leistungsprobleme verursachen!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "VORHERIGEN UPSCALE ÜBERSCHREIBEN",
-      "DESCRIPTION": "Wenn diese Option aktiviert ist, verarbeitet Upscayl das Bild erneut, anstatt es direkt zu laden."
+      "DESCRIPTION": "Wenn diese Option aktiviert ist, verarbeitet Upscayl-Next das Bild erneut, anstatt es direkt zu laden."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "UPSCAYL ZURÜCKSETZEN",
-      "ALERT": "Upscayl wurde zurückgesetzt. Bitte starte die App neu."
+      "BUTTON_TITLE": "UPSCAYL-NEXT ZURÜCKSETZEN",
+      "ALERT": "Upscayl-Next wurde zurückgesetzt. Bitte starte die App neu."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "AUSGABEORDNER SPEICHERN",
       "DESCRIPTION": "Wenn diese Option aktiviert ist, bleibt der Ausgabeordner für die nächste Nutzung gespeichert."
     },
     "AUTO_UPDATE": {
-      "TITLE": "UPSCAYL AUTOMATISCH AKTUALISIEREN",
+      "TITLE": "UPSCAYL-NEXT AUTOMATISCH AKTUALISIEREN",
       "DESCRIPTION": "Auf Wunsch prüft die App auf neue Updates und benachrichtigt dich."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "MITHELFEN, UPSCAYL ZU VERBESSERN",
-      "DESCRIPTION": "Wenn diese Option aktiviert ist, erfasst Upscayl anonyme Nutzungsdaten zur Verbesserung der App-Oberfläche und der Funktionen."
-    },
     "THEME": {
-      "TITLE": "UPSCAYL-DESIGN"
+      "TITLE": "UPSCAYL-NEXT-DESIGN"
     },
     "LANGUAGE": {
-      "TITLE": "UPSCAYL-SPRACHE"
+      "TITLE": "UPSCAYL-NEXT-SPRACHE"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "Benutzerdefinierte Kachelgröße",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "MITTEILUNGEN DEAKTIVIEREN",
-      "DESCRIPTION": "Wenn diese Option deaktiviert ist, sende Upscayl keine System-Mitteilungen bei Erfolg oder Fehler."
+      "DESCRIPTION": "Wenn diese Option deaktiviert ist, sende Upscayl-Next keine System-Mitteilungen bei Erfolg oder Fehler."
     },
     "SUPPORT": {
       "TITLE": "Du hast Schwierigkeiten?",
@@ -108,12 +115,22 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Systeminfo"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Batch-Upscayl",
+      "TITLE": "Batch-Upscayl-Next",
       "DESCRIPTION": "Hiermit kannst du alle Dateien in einem Ordner auf einmal upscaylen"
     },
     "FILE_SELECTION": {
@@ -130,11 +147,11 @@
       "ZOOM": "Zoom",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Geeignet für die meisten Bilder."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Geeignet für die meisten Bilder. Schnelles Upscaling mit minimalen Qualitätsverlusten."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Doppel-Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Doppel-Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Aktiviere diese Option, um ein Bild zweimal zu upscaylen. Beachte, dass dies die Verarbeitungszeit deutlich erhöhen und möglicherweise Leistungsprobleme bei Skalierungen über 4X verursachen kann."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Schritt 3",
-      "MAC_APP_STORE_ALERT": "Aufgrund von Sicherheitseinschränkungen des macOS App Store musst du bei jedem Start von Upscayl einen Ausgabeordner auswählen.\n\nUm dies zu vermeiden, kannst du einen Standard-Ausgabeordner in den Upscayl-Einstellungen dauerhaft speichern.",
+      "MAC_APP_STORE_ALERT": "Aufgrund von Sicherheitseinschränkungen des macOS App Store musst du bei jedem Start von Upscayl-Next einen Ausgabeordner auswählen.\n\nUm dies zu vermeiden, kannst du einen Standard-Ausgabeordner in den Upscayl-Next-Einstellungen dauerhaft speichern.",
       "NOT_SELECTED": "Nicht ausgewählt",
       "DEFAULT_IMG_PATH": "Standard ist der Pfad des Bildes",
       "DEFAULT_FOLDER_PATH": "Standard ist der Ordnerpfad",
@@ -173,10 +192,10 @@
     },
     "SCALE_SELECTION": {
       "TITLE": "Schritt 4",
-      "FROM_TITLE": "Upscayl von ",
+      "FROM_TITLE": "Upscayl-Next von ",
       "TO_TITLE": " zu ",
       "NO_OUTPUT_FOLDER_ALERT": "Bitte wähle zuerst einen Ausgabeordner",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
       "IN_PROGRESS_BUTTON_TITLE": "Upscaylen ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
@@ -188,13 +207,19 @@
       "TOTAL_BATCH_UPSCAYLS": "Gesamte Batch-Upscayls",
       "TOTAL_IMAGE_UPSCAYLS": "Gesamte Bild-Upscayls",
       "TOTAL_DOUBLE_UPSCAYLS": "Gesamte Doppel-Upscayls",
-      "AVERAGE_UPSCAYL_TIME": "Durchschnittliche Upscayl-Zeit",
-      "LAST_UPSCAYL_DURATION": "Letzte Upscayl-Dauer",
+      "AVERAGE_UPSCAYL_TIME": "Durchschnittliche Upscayl-Next-Zeit",
+      "LAST_UPSCAYL_DURATION": "Letzte Upscayl-Next-Dauer",
       "LAST_USED_AT": "Zuletzt verwendet"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Batch-Upscayl in Arbeit:",
-      "IN_PROGRESS_TITLE": "Upscayl arbeitet...",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Batch-Upscayl-Next in Arbeit:",
+      "IN_PROGRESS_TITLE": "Upscayl-Next arbeitet...",
       "STOP_BUTTON_TITLE": "STOPP"
     },
     "RESET_BUTTON_TITLE": "Zurücksetzen",
@@ -209,11 +234,11 @@
       "PROCESSING_TITLE": "Bild wird verarbeitet...",
       "SCALING_CONVERTING_TITLE": "Bild wird skaliert und konvertiert...",
       "WAIT_TITLE": "Einen Moment...",
-      "SUCCESS_TITLE": "Upscayl erfolgreich!",
+      "SUCCESS_TITLE": "Upscayl-Next erfolgreich!",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "Ausgewählter Ordner:",
         "DONE_TITLE": "Alles erledigt!",
-        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscayl-Ordner öffnen"
+        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscayl-Next-Ordner öffnen"
       }
     },
     "SLIDER": {
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Ausnahmefehler",
-      "DESCRIPTION": "Upscayl ist auf einen Fehler gestoßen. Möglicherweise konnte die Upscayl-Binärdatei die Befehle nicht richtig ausführen. Überprüfe die Logs, um weitere Informationen zu erhalten. Du kannst ein Issue im Upscayl-GitHub-Repository erstellen, um Hilfe zu erhalten."
+      "DESCRIPTION": "Upscayl-Next ist auf einen Fehler gestoßen. Möglicherweise konnte die Upscayl-Next-Binärdatei die Befehle nicht richtig ausführen. Überprüfe die Logs, um weitere Informationen zu erhalten. Du kannst ein Issue im Upscayl-Next-GitHub-Repository erstellen, um Hilfe zu erhalten."
     },
     "GENERIC_ERROR": {
       "TITLE": "Fehler"
@@ -277,13 +302,13 @@
       "TITLE": "Metadaten-Warnung",
       "DESCRIPTION": "Auf einigen Systemen sind die Metadaten in anderen Formaten als JPG möglicherweise nicht sichtbar. Verwende gegebenenfalls spezielle Tools zum Anzeigen der Metadaten."
     }
-  },  
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Kommt bald!",
     "CATCHY_PHRASE_1": "Keine Fehler mehr, Hardwareprobleme, Qualitätseinbußen oder lange Ladezeiten!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl überall, jederzeit, auf jedem Gerät\n☁️ Keine Grafikkarte oder Hardware erforderlich\n👩 Gesichtsverbesserung\n🦋 10+ Modelle zur Auswahl\n🏎️ 5-mal schneller als Upscayl Desktop\n🎞️ Video-Upscaling\n💰 Kommerzielle Nutzung\n😴 Upscayl im Schlaf",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next überall, jederzeit, auf jedem Gerät\n☁️ Keine Grafikkarte oder Hardware erforderlich\n👩 Gesichtsverbesserung\n🦋 10+ Modelle zur Auswahl\n🏎️ 5-mal schneller als Upscayl-Next Desktop\n🎞️ Video-Upscaling\n💰 Kommerzielle Nutzung\n😴 Upscayl-Next im Schlaf",
     "ALREADY_REGISTERED_ALERT": "Danke {name}! Es scheint, als wäre deine E-Mail bereits registriert :D Falls das nicht der Fall ist, versuche es bitte erneut.",
-    "ADD_SUCCESS": "Vielen Dank, dass du dich in die Warteliste eingetragen hast! Wir werden dich benachrichtigen, wenn Upscayl Cloud für dich bereit ist.",
+    "ADD_SUCCESS": "Vielen Dank, dass du dich in die Warteliste eingetragen hast! Wir werden dich benachrichtigen, wenn Upscayl-Next Cloud für dich bereit ist.",
     "INCORRECT_FIELDS_ALERT": "Bitte fülle alle Felder korrekt aus.",
     "JOIN_WAITLIST": "In die Warteliste eintragen",
     "DONT_SHOW_AGAIN": "NICHT WIEDER ANZEIGEN"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Loslegen",
     "SETTINGS_NOTE": "Du kannst diese Einstellungen später jederzeit ändern.",
     "STEP_1": {
-      "TITLE": "Willkommen bei Upscayl 🎉",
+      "TITLE": "Willkommen bei Upscayl-Next 🎉",
       "DESCRIPTION": "Lass uns dich mit ein paar schnellen Schritten einrichten."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Konfiguriere deine initialen Einstellungen."
     },
     "STEP_3": {
-      "TITLE": "Wie nutze ich Upscayl? 🚀",
+      "TITLE": "Wie nutze ich Upscayl-Next? 🚀",
       "DESCRIPTION": "Schau dir dieses kurze Video an, um mehr über die neuen Funktionen zu erfahren."
     },
     "STEP_4": {
       "TITLE": "Du bist startklar! 🎉",
-      "DESCRIPTION": "Jetzt kannst du Bilder mit Upscayl upscaylen!"
+      "DESCRIPTION": "Jetzt kannst du Bilder mit Upscayl-Next upscaylen!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

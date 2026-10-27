@@ -1,5 +1,6 @@
 const ELECTRON_COMMANDS = {
   SELECT_FILE: "Select a File",
+  SELECT_VIDEO: "Select a Video",
   SELECT_FOLDER: "Select a Folder",
   UPSCAYL: "Upscale the Image",
   UPSCAYL_DONE: "Upscaling Done",
@@ -11,6 +12,9 @@ const ELECTRON_COMMANDS = {
   FOLDER_UPSCAYL_DONE: "Folder upscaling successful",
   FOLDER_UPSCAYL_PROGRESS:
     "Send Folder Upscaling Progress from Main to Renderer",
+  FOLDER_UPSCAYL_PROGRESS_INFO:
+    "Send Structured Folder Upscaling Progress from Main to Renderer",
+  UPSCAYL_PASS_INFO: "Send Upscayl Pass Info from Main to Renderer",
   OPEN_FOLDER: "Open Folder",
   UPSCAYL_VIDEO: "Upscale the Video",
   UPSCAYL_VIDEO_DONE: "Video Upscaling Done",

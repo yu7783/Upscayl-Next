@@ -22,7 +22,7 @@ function InstructionsCard({ version, batchMode }) {
           <p>{t("APP.RIGHT_PANE_INFO.PASTE_IMAGE_DESCRIPTION")}</p>
         </div>
       )}
-      <p className="badge badge-primary text-sm">Upscayl v{version}</p>
+      <p className="badge badge-primary text-sm">Upscayl-Next v{version}</p>
     </div>
   );
 }

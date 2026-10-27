@@ -117,8 +117,8 @@ function UpscaylSteps({
         <input
           type="checkbox"
           className="toggle"
-          defaultChecked={batchMode}
-          onClick={() => {
+          checked={batchMode}
+          onChange={() => {
             if (!rememberOutputFolder) {
               setOutputPath("");
             }
@@ -159,37 +159,37 @@ function UpscaylSteps({
           <SelectModelDialog />
         </div>
 
-        {!batchMode && (
-          <div className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={doubleUpscayl}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setDoubleUpscayl(true);
-                } else {
-                  setDoubleUpscayl(false);
-                }
-              }}
-            />
-            <p
-              className="cursor-pointer text-sm"
-              onClick={(e) => {
-                setDoubleUpscayl((prev) => !prev);
-              }}
-            >
-              {t("APP.DOUBLE_UPSCAYL.TITLE")}
-            </p>
-            <button
-              className="badge badge-neutral badge-sm cursor-help"
-              data-tooltip-id="tooltip"
-              data-tooltip-content={t("APP.DOUBLE_UPSCAYL.DESCRIPTION")}
-            >
-              ?
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-1">
+          <input
+            type="checkbox"
+            className="checkbox"
+            checked={doubleUpscayl}
+            onChange={(e) => {
+              setDoubleUpscayl(e.target.checked);
+            }}
+          />
+          <p
+            className="cursor-pointer text-sm"
+            onClick={() => {
+              setDoubleUpscayl((prev) => !prev);
+            }}
+          >
+            {batchMode
+              ? t("APP.DOUBLE_UPSCAYL-NEXT.BATCH_TITLE")
+              : t("APP.DOUBLE_UPSCAYL-NEXT.TITLE")}
+          </p>
+          <button
+            className="badge badge-neutral badge-sm cursor-help"
+            data-tooltip-id="tooltip"
+            data-tooltip-content={
+              batchMode
+                ? t("APP.DOUBLE_UPSCAYL-NEXT.BATCH_DESCRIPTION")
+                : t("APP.DOUBLE_UPSCAYL-NEXT.DESCRIPTION")
+            }
+          >
+            ?
+          </button>
+        </div>
 
         <SelectImageScale scale={scale} setScale={setScale} hideInfo />
       </div>

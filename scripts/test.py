@@ -1,5 +1,7 @@
 import functools
 import os
+import sys
+import tempfile
 
 import cv2
 import numpy as np
@@ -9,9 +11,26 @@ import torch.nn.functional as F
 import torch.nn.init as init
 
 device = 'dml'
-result_path = os.getcwd()+'/baboon_upscaled.png'
-img = os.getcwd()+'/baboon.png'
 backend = 'GPU'
+
+# This repository no longer ships sample photographs. Accept an input image on
+# the command line or generate an original synthetic gradient for a smoke test.
+if len(sys.argv) > 1:
+    img = sys.argv[1]
+else:
+    img = os.path.join(tempfile.gettempdir(), 'upscayl-test-input.png')
+    if not os.path.exists(img):
+        gradient = np.tile(
+            np.linspace(0, 255, 256, dtype=np.uint8)[None, :, None],
+            (256, 1, 3),
+        )
+        cv2.imwrite(img, gradient)
+
+result_path = (
+    sys.argv[2]
+    if len(sys.argv) > 2
+    else os.getcwd() + '/upscayl_test_output.png'
+)
 
 def make_layer(block, n_layers):
     layers = []

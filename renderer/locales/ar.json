@@ -7,13 +7,24 @@
   },
   "FOOTER": {
     "NEWS_TITLE": "اخبار ابسكيل",
-    "COPYRIGHT": "حقوق النشر ©",
     "TITLE": "بواسطة ",
     "LINK_TITLE": "فريق ابسكيل"
   },
   "SETTINGS": {
     "TITLE": "الاعدادات",
-    "CHANGE_LANGUAGE": { "TITLE": "تغيير اللغة" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "تغيير اللغة"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "اختزال الصورة",
       "DESCRIPTION": "صيغة png , ربما لن تؤثر على حجم الملف بشكل كبير و عملية الضغط القوية قد يؤثر على الاداء, JPG و WEBP صيغ تفقد جودتها"
@@ -79,10 +90,6 @@
       "TITLE": "تحديث تلقائي لابسكيل",
       "DESCRIPTION": "سيتمم التحقق بشكل تلقائي للتحديثات , اذا فعلت هذا الخيار"
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "ساعدنا لتحسين ابسكيل",
-      "DESCRIPTION": "اذا فعلت هذا الخير يستم تجميع معلومات بشكل صامت لغرض تحسين الجودة"
-    },
     "THEME": {
       "TITLE": "مظهر ابسكيل"
     },
@@ -108,6 +115,16 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "معلومات النظام"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
@@ -159,8 +176,10 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
+    "DOUBLE_UPSCAYL-NEXT": {
       "TITLE": "تحجيم مزدوج",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "تفعيل هذا الخيار سيقوم بمضاعفة التحجيم , لكن سيسبب ضعف في الاداء بالأخص مع تحجيم 4 اضعاف"
     },
     "OUTPUT_PATH_SELECTION": {
@@ -193,6 +212,12 @@
       "LAST_USED_AT": "اخر استخدام عند"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "التحجيم المزدوج قيد العمل:",
       "IN_PROGRESS_TITLE": "القيام ببعض السحر المحجم...",
       "STOP_BUTTON_TITLE": "أيقاف"
@@ -309,7 +334,16 @@
       "TITLE": "انت جاهز! 🎉",
       "DESCRIPTION": "انت مستعد لاستخدام ابسكيل!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }
-
-

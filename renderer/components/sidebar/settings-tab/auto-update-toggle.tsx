@@ -16,7 +16,7 @@ const AutoUpdateToggle = () => {
         type="checkbox"
         className="toggle"
         checked={autoUpdate}
-        onClick={() => {
+        onChange={() => {
           setAutoUpdate((prev) => !prev);
         }}
       />

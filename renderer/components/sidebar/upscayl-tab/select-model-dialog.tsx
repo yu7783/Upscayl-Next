@@ -10,17 +10,45 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Maximize2, SwatchBookIcon, X } from "lucide-react";
+import { Maximize2, SwatchBookIcon, X } from "../../icons/original-icons";
 import { ModelId, MODELS } from "@common/models-list";
-import { useAtom, useAtomValue } from "jotai";
-import { selectedModelIdAtom } from "@/atoms/user-settings-atom";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+  autoOptimizeAtom,
+  compressionAtom,
+  doubleUpscaylAtom,
+  scaleAtom,
+  selectedModelIdAtom,
+  threadsAtom,
+  tileSizeAtom,
+  ttaModeAtom,
+} from "@/atoms/user-settings-atom";
 import { customModelIdsAtom } from "@/atoms/models-list-atom";
 import useTranslation from "@/components/hooks/use-translation";
-import posthog from "posthog-js";
+import { getModelCompatibility } from "@common/model-compatibility";
+import { resolveModelSettings } from "@common/model-profiles";
 
 const SelectModelDialog = () => {
   const t = useTranslation();
   const [selectedModelId, setSelectedModelId] = useAtom(selectedModelIdAtom);
+  const autoOptimize = useAtomValue(autoOptimizeAtom);
+
+  // Profile settings are only written when auto-optimization is enabled. Custom
+  // models have no profile, so the user's own values are kept for them.
+  const setScale = useSetAtom(scaleAtom);
+  const setTileSize = useSetAtom(tileSizeAtom);
+  const setTTAMode = useSetAtom(ttaModeAtom);
+  const setCompression = useSetAtom(compressionAtom);
+  const setDoubleUpscayl = useSetAtom(doubleUpscaylAtom);
+  const setThreads = useSetAtom(threadsAtom);
+
+  // Current values are needed so profiles can be merged in a single place.
+  const currentScale = useAtomValue(scaleAtom);
+  const currentTileSize = useAtomValue(tileSizeAtom);
+  const currentTTAMode = useAtomValue(ttaModeAtom);
+  const currentCompression = useAtomValue(compressionAtom);
+  const currentDoubleUpscayl = useAtomValue(doubleUpscaylAtom);
+  const currentThreads = useAtomValue(threadsAtom);
 
   const customModelIds = useAtomValue(customModelIdsAtom);
   const [open, setOpen] = useState(false);
@@ -28,13 +56,24 @@ const SelectModelDialog = () => {
 
   const handleModelSelect = (model: ModelId | string) => {
     setSelectedModelId(model);
-    setOpen(false);
 
-    posthog.capture("model_selected", {
-      $ip: "0.0.0.0",
-      $geoip_disable: true,
-      model,
+    const next = resolveModelSettings(model, autoOptimize, {
+      scale: currentScale,
+      tileSize: currentTileSize ?? 0,
+      ttaMode: currentTTAMode,
+      compression: currentCompression,
+      doubleUpscayl: currentDoubleUpscayl,
+      threads: currentThreads,
     });
+
+    setScale(next.scale);
+    setTileSize(next.tileSize);
+    setTTAMode(next.ttaMode);
+    setCompression(next.compression);
+    setDoubleUpscayl(next.doubleUpscayl);
+    setThreads(next.threads);
+
+    setOpen(false);
   };
 
   const handleZoom = (event: React.MouseEvent, model: ModelId) => {
@@ -79,12 +118,12 @@ const SelectModelDialog = () => {
                     <div className="relative h-52 w-full overflow-hidden rounded-sm">
                       <div className="flex h-full w-full">
                         <img
-                          src={`public:///model-comparison/${model.id}/before.webp`}
+                          src={`public:///original-placeholder.svg`}
                           alt={`Model Before`}
                           className="h-full w-1/2 object-cover"
                         />
                         <img
-                          src={`public:///model-comparison/${model.id}/after.webp`}
+                          src={`public:///original-placeholder.svg`}
                           alt={`Model After`}
                           className="h-full w-1/2 object-cover"
                         />
@@ -119,13 +158,20 @@ const SelectModelDialog = () => {
                 </p>
               )}
               {customModelIds.map((customModel) => {
+                const compatibility = getModelCompatibility(customModel);
                 return (
                   <button
                     key={customModel}
-                    className="btn h-auto w-full flex-col items-start p-4"
+                    className="btn h-auto w-full flex-col items-start gap-1 p-4"
                     onClick={() => handleModelSelect(customModel)}
+                    title={customModel}
                   >
-                    {customModel}
+                    <span className="flex w-full items-center justify-between gap-2">
+                      <span className="truncate text-left">{customModel}</span>
+                      <span className="badge badge-sm badge-success">
+                        {compatibility.label}
+                      </span>
+                    </span>
                   </button>
                 );
               })}
@@ -146,7 +192,7 @@ const SelectModelDialog = () => {
             <div className="flex h-full w-full">
               <div className="relative h-full w-1/2">
                 <img
-                  src={`public:///model-comparison/${MODELS[zoomedModel]?.id}/before.webp`}
+                  src={`public:///original-placeholder.svg`}
                   alt={`Zoomed in Image - Before`}
                   className="h-full w-full object-contain"
                 />
@@ -156,7 +202,7 @@ const SelectModelDialog = () => {
               </div>
               <div className="relative h-full w-1/2">
                 <img
-                  src={`public:///model-comparison/${MODELS[zoomedModel]?.id}/after.webp`}
+                  src={`public:///original-placeholder.svg`}
                   alt={`Zoomed in Image - After`}
                   className="h-full w-full object-contain"
                 />

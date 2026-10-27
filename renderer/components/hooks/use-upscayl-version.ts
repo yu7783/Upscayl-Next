@@ -4,10 +4,15 @@ const useUpscaylVersion = () => {
   const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
-    const upscaylVersion = navigator?.userAgent?.match(
-      /Upscayl\/([\d\.]+\d+)/,
-    )?.[1];
-    setVersion(upscaylVersion);
+    const match = navigator?.userAgent?.match(/Upscayl(?:-Next)?\/(v?[\d.]+)/);
+    const detectedVersion = match?.[1];
+    setVersion(
+      detectedVersion
+        ? detectedVersion.startsWith("v")
+          ? detectedVersion
+          : `v${detectedVersion}`
+        : null,
+    );
   }, []);
 
   return version;

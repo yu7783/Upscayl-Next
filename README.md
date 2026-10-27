@@ -1,6 +1,6 @@
 <div align="center">
 
-  # v2.15 is out! 🥳 [Download Now ⬇️](https://github.com/upscayl/upscayl/releases/latest)
+  # v1.0.0 is out! 🥳 [Download Now ⬇️](https://github.com/yu7783/Upscayl-Next/releases/latest)
 
 <h3>Special thanks to our sponsors:</h3>
 <a href="https://www.warp.dev/upscayl">
@@ -25,9 +25,9 @@
 
 #
 
-<a href="https://github.com/upscayl/upscayl/releases/latest">
+<a href="https://github.com/yu7783/Upscayl-Next/releases/latest">
   
-  ![Frame 111](https://github.com/upscayl/upscayl/assets/25067102/d1b4af3c-aade-4bc9-97d0-cf88db679931)
+  ![Frame 111](https://github.com/yu7783/Upscayl-Next/assets/25067102/d1b4af3c-aade-4bc9-97d0-cf88db679931)
 </a>
 
 <a href="https://upscayl.org/#download">
@@ -37,8 +37,8 @@
   </br>
   </br>
 
-<!--<a href="https://github.com/upscayl/upscayl/releases/latest">
-  <img src="https://github.com/upscayl/upscayl/assets/25067102/6287fd40-2c91-4028-b1d6-3986e77d8211" width="200px" />
+<!--<a href="https://github.com/yu7783/Upscayl-Next/releases/latest">
+  <img src="https://github.com/yu7783/Upscayl-Next/assets/25067102/6287fd40-2c91-4028-b1d6-3986e77d8211" width="200px" />
 </a>-->
 
 <a href="https://t.me/iamnayam">
@@ -46,23 +46,41 @@
 </a>      
 
 <a href="https://x.com/upscayl">
-  <img src="https://github.com/upscayl/upscayl/assets/25067102/917dcf6f-452b-43e6-95cd-2c6b0a47913d" width="200px" />
+  <img src="https://github.com/yu7783/Upscayl-Next/assets/25067102/917dcf6f-452b-43e6-95cd-2c6b0a47913d" width="200px" />
 </a>
 
-# 🆙 Upscayl
+# 🆙 Upscayl-Next
 
 #### Free and Open Source AI Image Upscaler
-Upscayl lets you enlarge and enhance low-resolution images using advanced AI algorithms.
+Upscayl-Next lets you enlarge and enhance low-resolution images using advanced AI algorithms.
 Enlarge images without losing quality. It's almost like magic! 🎩🪄
 
 **https://upscayl.org**
 
-<video src="https://github.com/upscayl/upscayl/assets/25067102/ad2453b1-3c5a-4eb2-b992-4cf10e6a49f5" autoplay muted loop />
+<video src="https://github.com/yu7783/Upscayl-Next/assets/25067102/ad2453b1-3c5a-4eb2-b992-4cf10e6a49f5" autoplay muted loop />
 
 </div>
 
+# ✨ What's new in this fork?
+
+Upscayl-Next keeps everything from upstream Upscayl and adds the following:
+
+- **🎬 Video upscaling (experimental)** — upscale every frame of a video and re-encode it with FFmpeg.
+- **🧠 Automatic VRAM recovery** — detects `vkAllocateMemory failed`, `vk Allocated memory failed` and
+  related Vulkan errors, then automatically retries with a smaller tile size
+  (`512 → 256 → 128 → 64 → 32`). This works for single images, batch, double upscale and video frames.
+- **⚡ Per-model auto-optimization** — bundled models ship with recommended scale, tile size, TTA,
+  compression and thread settings. Toggle *Auto-optimize settings* to apply them automatically.
+- **🧵 Thread split tuning** — advanced users can pin the `load:process:save` thread split
+  (`-j`) used by the NCNN backend.
+- **🎛 Tile size control** — lower the tile size manually when a GPU has very little VRAM.
+- **🖼 Metadata copy** — keep EXIF metadata in upscaled images.
+- **📦 Modern animated installer** — the Windows installer now uses custom branding and an
+  animated welcome banner generated from `build/anim/`.
+
 # Contents
 
+- [✨ What's new in this fork?](#-whats-new-in-this-fork)
 - [👨‍💻 Installation](#-installation)
   - [🐧 Linux](#-linux)
   - [🍎 macOS](#-macos)
@@ -70,7 +88,7 @@ Enlarge images without losing quality. It's almost like magic! 🎩🪄
 - [👨‍🏫 Documentation - Tutorials and Guides](#-documentation---tutorials-and-guides)
 - [⚖️ Demo Results (Before and After)](#%EF%B8%8F-results)
 - [🤫 Roadmap](#-roadmap)
-- [🛠 Developing Upscayl](#-development)
+- [🛠 Developing Upscayl-Next](#-development)
 - [🤓 FAQ](#-faq)
 - [🎁 Donate and support the project](#-donate)
 - [❤ Credits](#-credits)
@@ -82,11 +100,11 @@ Enlarge images without losing quality. It's almost like magic! 🎩🪄
 
 ## 🐧 Linux
 
-  <a href="https://flathub.org/apps/org.upscayl.Upscayl">
+  <a href="https://flathub.org/apps/org.upscayl.Upscayl-Next">
     <img src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg" height="50px"/>
   </a>
 
-  <a href="https://appimage.github.io/Upscayl/">
+  <a href="https://appimage.github.io/Upscayl-Next/">
     <img src="https://user-images.githubusercontent.com/25067102/191270389-9de37c0f-39a8-41f1-a659-8dd4e7b8ac28.png" height="50px"/>
   </a>
 
@@ -99,16 +117,16 @@ Enlarge images without losing quality. It's almost like magic! 🎩🪄
   </a>
 
   <a href="https://github.com/MrPenguin07/ebuilds">
-    <img src="https://github.com/upscayl/upscayl/assets/25067102/322aebc5-91aa-4fc6-ac3a-d5a054449554" height="50px"/>
+    <img src="https://github.com/yu7783/Upscayl-Next/assets/25067102/322aebc5-91aa-4fc6-ac3a-d5a054449554" height="50px"/>
   </a>
 
-Upscayl should be available on the software listings of most Linux operating systems. Your distro's Store app might also support the [Flatpak](https://flatpak.org/setup) or Snap version.
+Upscayl-Next should be available on the software listings of most Linux operating systems. Your distro's Store app might also support the [Flatpak](https://flatpak.org/setup) or Snap version.
 
 ### 💼 Portable Method
 
-1. Go to [releases section](https://github.com/upscayl/upscayl/releases/latest) or [our official website](https://upscayl.org/).
+1. Go to [releases section](https://github.com/yu7783/Upscayl-Next/releases/latest) or [our official website](https://upscayl.org/).
 2. Download the `upscayl-x.x.x-linux.AppImage` file.
-3. Right Click AppImage -> Go to Permissions tab -> Check 'allow file to execute' and then double click the file to run Upscayl.
+3. Right Click AppImage -> Go to Permissions tab -> Check 'allow file to execute' and then double click the file to run Upscayl-Next.
 
 *You can also choose to install using other formats like RPM (Fedora), DEB (Debian/Ubuntu based), and ZIP (Any x86 Linux OS).*
 
@@ -119,10 +137,10 @@ Upscayl should be available on the software listings of most Linux operating sys
   Link
 </a>
 
-1. Go to [releases section](https://github.com/upscayl/upscayl/releases/latest) or [our official website](https://upscayl.org/).
+1. Go to [releases section](https://github.com/yu7783/Upscayl-Next/releases/latest) or [our official website](https://upscayl.org/).
 2. Download the `upscayl-x.x.x-mac.dmg` file.
-3. Double click dmg, drag Upscayl icon into Applications folder.
-4. Open Finder, click 'Applications' tab in the left sidebar. Find Upscayl and right click on it. Select 'Open'.
+3. Double click dmg, drag Upscayl-Next icon into Applications folder.
+4. Open Finder, click 'Applications' tab in the left sidebar. Find Upscayl-Next and right click on it. Select 'Open'.
 5. In the window that appears, press 'Open' yet again.
 
 ### 🍺 Homebrew
@@ -132,25 +150,36 @@ Upscayl should be available on the software listings of most Linux operating sys
 ## 🐌 Windows
 (Windows 10 and later)
 
-1. Go to [releases section](https://github.com/upscayl/upscayl/releases/latest) or [our official website](https://upscayl.org/).
-2. Download the `upscayl-x.x.x-win.exe` file.
-3. Double click exe file to launch.
-4. If you get a SmartScreen warning - click 'More Info' and then 'Run Anyway' OR press 'YES' on the unverified publisher dialog.
-5. Follow the installation steps.
-6. Profit!
+1. Go to the [releases section](https://github.com/yu7783/Upscayl-Next/releases/latest).
+2. Download **`Upscayl-Next-Setup-1.0.0.exe`** (or the portable
+   `Upscayl-Next-Setup-1.0.0.zip`).
+3. Double-click the installer. The first page shows an animated Upscayl-Next banner.
+4. Choose the installation folder and click **Next**.
+5. If Windows SmartScreen appears, click **More Info → Run Anyway**.
+6. Launch Upscayl-Next from the Start Menu or desktop shortcut.
+
+> [!NOTE]
+> A **Vulkan-compatible GPU** is required. For video upscaling, install
+> [FFmpeg](https://ffmpeg.org/download.html) and make sure `ffmpeg` is available in `PATH`.
+
+### Upgrading from v1.0.0
+
+The installer is a normal NSIS assisted installer. Running a newer setup over an
+existing install keeps your settings and models. Use the **Overwrite previous
+upscale** option if you want to re-process images that already have output files.
 
 # 👨‍🏫 Documentation - Tutorials and Guides
 
 Check out our Documentation [here](https://docs.upscayl.org/).
 
 - [Try out even more new models!](https://github.com/upscayl/custom-models)
-- [Convert your own models](https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion---Create-more-AI-models!)
-- [Compatibility List](https://github.com/upscayl/upscayl/wiki/Compatibility-List)
-- [Troubleshooting](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
+- [Convert your own models](https://github.com/yu7783/Upscayl-Next/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion---Create-more-AI-models!)
+- [Compatibility List](https://github.com/yu7783/Upscayl-Next/wiki/Compatibility-List)
+- [Troubleshooting](https://github.com/yu7783/Upscayl-Next/wiki/Troubleshooting)
 
 # ⚖️ Results
 
-Check out Upscayl before/after comparisons [here](COMPARISONS.MD).
+Check out Upscayl-Next before/after comparisons [here](COMPARISONS.MD).
 
 # 🤫 Roadmap
 
@@ -166,10 +195,10 @@ Download and install volta, then do: `volta install node`.
 
 ## 🏃 Running
 > [!NOTE]
-> If you are not willing to install [git](https://git-scm.com/downloads), you can skip the first line, download [the source zip](https://github.com/upscayl/upscayl/archive/refs/heads/main.zip) and extract it to `upscayl` instead and carry on with the rest of the instructions.
+> If you are not willing to install [git](https://git-scm.com/downloads), you can skip the first line, download [the source zip](https://github.com/yu7783/Upscayl-Next/archive/refs/heads/main.zip) and extract it to `upscayl` instead and carry on with the rest of the instructions.
 
 ```sh
-git clone https://github.com/upscayl/upscayl
+git clone https://github.com/yu7783/Upscayl-Next
 cd upscayl
 
 # INSTALL DEPENDENCIES
@@ -194,24 +223,47 @@ npm run dist
 npm run publish-app
 ```
 
+### 🎨 Installer artwork
+
+The animated welcome banner and branded installer images are generated from
+`build/icon.png`:
+
+```sh
+# Generate BMP frames and static installer images
+pwsh -NoProfile -File scripts/generate-installer-assets.ps1
+
+# Pack the banner frames into the silent AVI used by NSIS
+ffmpeg -y -framerate 8 -i build/anim/banner%02d.bmp \
+  -c:v rawvideo -pix_fmt bgr24 build/anim/banner.avi
+```
+
+`build/installer.nsh` is picked up automatically through the `nsis.include`
+option in `package.json`.
+
 # 🤓 FAQ
 
-- **How does Upscayl work?**
-  - Upscayl uses AI models to enhance your images by guessing what the details could be. It uses Real-ESRGAN and Vulkan architecture to achieve this. [Our backend](https://github.com/upscayl/upscayl-ncnn) is fully open-source under the AGPLv3 license.
+- **How does Upscayl-Next work?**
+  - Upscayl-Next uses AI models to enhance your images by guessing what the details could be. It uses Real-ESRGAN and Vulkan architecture to achieve this. [Our backend](https://github.com/upscayl/upscayl-ncnn) is fully open-source under the AGPLv3 license.
 - **I don't see a drastic change in my upscaled image. Why is that?**
-  - Upscayl can enhance low resolution images and images that are pixelated but it cannot de-blur or do focus adjustment on your image. If your image is out-of-focus or totally blurred, Upscayl is not the right tool for it. Please use images that are similar to the [examples we've given here.](COMPARISONS.MD)
+  - Upscayl-Next can enhance low resolution images and images that are pixelated but it cannot de-blur or do focus adjustment on your image. If your image is out-of-focus or totally blurred, Upscayl-Next is not the right tool for it. Please use images that are similar to the [examples we've given here.](COMPARISONS.MD)
 - **Is there a CLI available?**
   - The CLI tool is called [upscayl-ncnn](https://github.com/upscayl/upscayl-ncnn).
+- **I get `vkAllocateMemory failed -2` or `vk Allocated memory failed -2`. What should I do?**
+  - This means the GPU could not allocate enough VRAM. Upscayl-Next detects this
+    error and automatically retries with a smaller tile size
+    (`512 → 256 → 128 → 64 → 32`). If it still fails at 32px:
+    close other GPU-heavy applications, update your graphics driver, lower the
+    output scale, or choose a lighter model such as **Upscayl-Next Lite**.
 - **Do I need a GPU for this to work?**
-  - Yes, unfortunately. NCNN Vulkan requires a Vulkan-compatible GPU. Upscayl won't work with **most** iGPUs or CPUs. But hey, no harm in trying ;)
-    - @Wyrdgirn has contributed a workaround for Windows and Linux in [#390](https://github.com/upscayl/upscayl/issues/390)! Nobody knows how to manipulate the macOS and Haiku frameworks...
-- **I stopped the magic Batch Upscayl and my images haven't been processed, compressed, or are in the wrong scale!**
-  - When a model doesn't support an action, Upscayl will finish upscayling all the images first before post-processing them. What this means is that you should simply **wait** for the process to finish.
+  - Yes, unfortunately. NCNN Vulkan requires a Vulkan-compatible GPU. Upscayl-Next won't work with **most** iGPUs or CPUs. But hey, no harm in trying ;)
+    - @Wyrdgirn has contributed a workaround for Windows and Linux in [#390](https://github.com/yu7783/Upscayl-Next/issues/390)! Nobody knows how to manipulate the macOS and Haiku frameworks...
+- **I stopped the magic Batch Upscayl-Next and my images haven't been processed, compressed, or are in the wrong scale!**
+  - When a model doesn't support an action, Upscayl-Next will finish upscayling all the images first before post-processing them. What this means is that you should simply **wait** for the process to finish.
 - **How can I contribute?**
   - You can report issues, fix code and add features by submitting PRs, or donate! 😊
 - **What's the GPU ID for?**
-  - It is for selecting which GPU to use. The specific procedure is detailed in the [Wiki](https://github.com/upscayl/upscayl/wiki/Guide).
-    - Note that for Windows systems, if Upscayl is not set to performance mode, the system may override this setting.
+  - It is for selecting which GPU to use. The specific procedure is detailed in the [Wiki](https://github.com/yu7783/Upscayl-Next/wiki/Guide).
+    - Note that for Windows systems, if Upscayl-Next is not set to performance mode, the system may override this setting.
 - **Where do I find more models?**
   -  More models can be taken from here: https://github.com/upscayl/custom-models
 
@@ -235,7 +287,6 @@ npm run publish-app
 
 <div align="center">
 
-Copyright © 2023 - **Upscayl**\
 By Nayam Amarshe and TGS963\
 Made with 🖱 & ⌨
 

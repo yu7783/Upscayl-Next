@@ -35,7 +35,7 @@
     "entitlements": "resources/entitlements.mas-dev.plist",
     "provisioningProfile": "dev.provisionprofile",
     "entitlementsInherit": "resources/entitlements.mas.inherit.plist",
-    "icon": "build/icon.icns",
+    "icon": "build/icon.png",
     "target": [
       {
         "target": "mas",

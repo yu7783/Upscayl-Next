@@ -16,6 +16,7 @@ export const getSingleImageArguments = ({
   tileSize,
   compression,
   ttaMode,
+  threads,
 }: {
   inputDir: string;
   fileNameWithExt: string;
@@ -29,6 +30,11 @@ export const getSingleImageArguments = ({
   tileSize: number;
   compression: string;
   ttaMode: boolean;
+  /**
+   * Optional "load:proc:save" thread split for upscayl-bin (-j).
+   * Leave empty to use the binary default (1:2:2).
+   */
+  threads?: string;
 }) => {
   const modelScale = getModelScale(model);
   let includeScale = modelScale !== scale && !customWidth;
@@ -65,6 +71,9 @@ export const getSingleImageArguments = ({
     tileSize ? tileSize.toString() : "",
     // TTA MODE
     ttaMode ? "-x" : "",
+    // THREADS
+    threads ? "-j" : "",
+    threads ? threads : "",
   ];
 };
 
@@ -79,6 +88,7 @@ export const getDoubleUpscaleArguments = ({
   saveImageAs,
   customWidth,
   tileSize,
+  threads,
 }: {
   inputDir: string;
   fullfileName: string;
@@ -90,6 +100,7 @@ export const getDoubleUpscaleArguments = ({
   saveImageAs: ImageFormat;
   customWidth: string;
   tileSize: number;
+  threads?: string;
 }) => {
   const modelScale = getModelScale(model);
   let includeScale = modelScale !== scale && !customWidth;
@@ -118,6 +129,9 @@ export const getDoubleUpscaleArguments = ({
     // TILE SIZE
     tileSize ? `-t` : "",
     tileSize ? tileSize.toString() : "",
+    // THREADS
+    threads ? "-j" : "",
+    threads ? threads : "",
   ];
 };
 
@@ -132,6 +146,7 @@ export const getDoubleUpscaleSecondPassArguments = ({
   compression,
   tileSize,
   ttaMode,
+  threads,
 }: {
   outFile: string;
   modelsPath: string;
@@ -143,6 +158,7 @@ export const getDoubleUpscaleSecondPassArguments = ({
   compression: string;
   tileSize: number;
   ttaMode: boolean;
+  threads?: string;
 }) => {
   const modelScale = getModelScale(model);
   let includeScale = modelScale !== scale && !customWidth;
@@ -179,6 +195,9 @@ export const getDoubleUpscaleSecondPassArguments = ({
     tileSize ? tileSize.toString() : "",
     // TTA MODE
     ttaMode ? "-x" : "",
+    // THREADS
+    threads ? "-j" : "",
+    threads ? threads : "",
   ];
 };
 
@@ -194,6 +213,7 @@ export const getBatchArguments = ({
   compression,
   tileSize,
   ttaMode,
+  threads,
 }: {
   inputDir: string;
   outputDir: string;
@@ -206,6 +226,7 @@ export const getBatchArguments = ({
   compression: string;
   tileSize: number;
   ttaMode: boolean;
+  threads?: string;
 }) => {
   const modelScale = getModelScale(model);
   let includeScale = modelScale !== scale && !customWidth;
@@ -243,5 +264,8 @@ export const getBatchArguments = ({
     tileSize ? tileSize.toString() : "",
     // TTA MODE
     ttaMode ? "-x" : "",
+    // THREADS
+    threads ? "-j" : "",
+    threads ? threads : "",
   ];
 };

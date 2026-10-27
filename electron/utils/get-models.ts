@@ -3,6 +3,7 @@ import logit from "./logit";
 import { MessageBoxOptions, app, dialog } from "electron";
 import settings from "electron-settings";
 import { FEATURE_FLAGS } from "../../common/feature-flags";
+import { getModelFileSupport } from "../../common/model-compatibility";
 
 const getModels = async (folderPath: string | undefined) => {
   let models: string[] = [];
@@ -39,19 +40,23 @@ const getModels = async (folderPath: string | undefined) => {
   }
 
   // READ CUSTOM MODELS FOLDER
-  fs.readdirSync(folderPath).forEach((file) => {
-    // log.log("Files in Folder: ", file);
-    if (
-      file.endsWith(".param") ||
-      file.endsWith(".PARAM") ||
-      file.endsWith(".bin") ||
-      file.endsWith(".BIN")
-    ) {
+  // NCNN, ONNX and PyTorch checkpoints are all accepted now. Keep the extension
+  // for non-NCNN files so the UI can show the correct engine label.
+  fs.readdirSync(folderPath, { withFileTypes: true }).forEach((entry) => {
+    if (!entry.isFile()) return;
+    const file = entry.name;
+    const support = getModelFileSupport(file);
+
+    if (support.supportedByBuiltInEngine) {
       isValid = true;
-      const modelName = file.substring(0, file.lastIndexOf(".")) || file;
+      const modelName =
+        support.engine === "ncnn"
+          ? file.substring(0, file.lastIndexOf(".")) || file
+          : file;
       if (!models.includes(modelName)) {
         models.push(modelName);
       }
+      return;
     }
   });
 
@@ -61,7 +66,7 @@ const getModels = async (folderPath: string | undefined) => {
       type: "error",
       title: "Invalid Folder",
       message:
-        "The selected folder does not contain valid model files. Make sure you select the folder that ONLY contains '.param' and '.bin' files.",
+        "The selected folder does not contain valid model files. Make sure you select a folder with NCNN (.param/.bin), ONNX (.onnx) or PyTorch (.pth/.pt/.ckpt/.safetensors) models.",
       buttons: ["OK"],
     };
     dialog.showMessageBoxSync(options);

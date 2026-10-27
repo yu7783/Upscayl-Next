@@ -9,6 +9,8 @@ import {
   progressAtom,
   rememberOutputFolderAtom,
   userStatsAtom,
+  upscaylPassAtom,
+  batchProgressAtom,
 } from "../atoms/user-settings-atom";
 import useLogger from "../components/hooks/use-logger";
 import { useToast } from "@/components/ui/use-toast";
@@ -34,6 +36,7 @@ const Home = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [imagePath, setImagePath] = useState("");
+  const [videoPath, setVideoPath] = useState("");
   const [upscaledImagePath, setUpscaledImagePath] = useState("");
   const [dimensions, setDimensions] = useState({
     width: null,
@@ -45,7 +48,8 @@ const Home = () => {
   const [batchFolderPath, setBatchFolderPath] = useState("");
   const [upscaledBatchFolderPath, setUpscaledBatchFolderPath] = useState("");
   const setProgress = useSetAtom(progressAtom);
-  const [doubleUpscaylCounter, setDoubleUpscaylCounter] = useState(0);
+  const setUpscaylPass = useSetAtom(upscaylPassAtom);
+  const setBatchProgress = useSetAtom(batchProgressAtom);
   const setModelIds = useSetAtom(customModelIdsAtom);
   const setUserStats = useSetAtom(userStatsAtom);
 
@@ -63,6 +67,20 @@ const Home = () => {
       }
     }
     validateImagePath(path);
+  };
+
+  const selectVideoHandler = async () => {
+    const path = await window.electron.invoke(ELECTRON_COMMANDS.SELECT_VIDEO);
+    if (path === null) return;
+    logit("🎬 Selected Video Path: ", path);
+    setVideoPath(path);
+    const dirname = getDirectoryFromPath(path);
+    logit("📁 Selected Video Directory: ", dirname);
+    if (!FEATURE_FLAGS.APP_STORE_BUILD) {
+      if (!rememberOutputFolder) {
+        setOutputPath(dirname);
+      }
+    }
   };
 
   const selectFolderHandler = async () => {
@@ -212,6 +230,39 @@ const Home = () => {
         logit(`🚧 UPSCAYL_PROGRESS: `, data);
       },
     );
+    // VIDEO UPSCAYL PROGRESS
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_VIDEO_PROGRESS,
+      (_, data: string) => {
+        if (data.length > 0 && data.length < 10) {
+          setProgress(data);
+        } else {
+          setProgress(data);
+        }
+        handleErrors(data);
+        logit(`🎬 UPSCAYL_VIDEO_PROGRESS: `, data);
+      },
+    );
+    // VIDEO UPSCAYL DONE
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_VIDEO_DONE,
+      (_, data: string) => {
+        setProgress("");
+        toast({
+          title: t("VIDEO_UPSCAYL.SUCCESS_TITLE"),
+          description: data,
+        });
+        setUserStats((prev) => ({
+          ...prev,
+          lastUpscaylDuration: new Date().getTime() - prev.lastUsedAt,
+          averageUpscaylTime:
+            (prev.averageUpscaylTime * prev.totalUpscayls +
+              (new Date().getTime() - prev.lastUsedAt)) /
+            (prev.totalUpscayls + 1),
+        }));
+        logit(`💯 UPSCAYL_VIDEO_DONE: `, data);
+      },
+    );
     // FOLDER UPSCAYL PROGRESS
     window.electron.on(
       ELECTRON_COMMANDS.FOLDER_UPSCAYL_PROGRESS,
@@ -231,18 +282,45 @@ const Home = () => {
       ELECTRON_COMMANDS.DOUBLE_UPSCAYL_PROGRESS,
       (_, data: string) => {
         if (data.length > 0 && data.length < 10) {
-          if (data === "0.00%") {
-            setDoubleUpscaylCounter(doubleUpscaylCounter + 1);
-          }
           setProgress(data);
         }
         handleErrors(data);
         logit(`🚧 DOUBLE_UPSCAYL_PROGRESS: `, data);
       },
     );
+    // UPSCAYL PASS INFO (single image + double upscale)
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_PASS_INFO,
+      (_, data: { pass: number; totalPasses: number }) => {
+        setUpscaylPass(data);
+        logit(`🔁 UPSCAYL_PASS_INFO: `, JSON.stringify(data));
+      },
+    );
+    // FOLDER UPSCAYL PROGRESS INFO (batch + double upscale)
+    window.electron.on(
+      ELECTRON_COMMANDS.FOLDER_UPSCAYL_PROGRESS_INFO,
+      (
+        _,
+        data: {
+          pass: number;
+          totalPasses: number;
+          completed: number;
+          total: number;
+        },
+      ) => {
+        setBatchProgress(data);
+        setUpscaylPass({ pass: data.pass, totalPasses: data.totalPasses });
+        logit(
+          `📊 FOLDER_UPSCAYL_PROGRESS_INFO: `,
+          JSON.stringify(data),
+        );
+      },
+    );
     // UPSCAYL DONE
     window.electron.on(ELECTRON_COMMANDS.UPSCAYL_DONE, (_, data: string) => {
       setProgress("");
+      setUpscaylPass({ pass: 0, totalPasses: 0 });
+      setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
       setUpscaledImagePath(data);
       setUserStats((prev) => ({
         ...prev,
@@ -260,6 +338,8 @@ const Home = () => {
       ELECTRON_COMMANDS.FOLDER_UPSCAYL_DONE,
       (_, data: string) => {
         setProgress("");
+        setUpscaylPass({ pass: 0, totalPasses: 0 });
+        setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
         setUpscaledBatchFolderPath(data);
         logit(`💯 FOLDER_UPSCAYL_DONE: `, data);
         setUserStats((prev) => ({
@@ -278,7 +358,8 @@ const Home = () => {
       (_, data: string) => {
         setProgress("");
         setTimeout(() => setUpscaledImagePath(data), 500);
-        setDoubleUpscaylCounter(0);
+        setUpscaylPass({ pass: 0, totalPasses: 0 });
+        setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
         logit(`💯 DOUBLE_UPSCAYL_DONE: `, data);
         setUserStats((prev) => ({
           ...prev,
@@ -344,6 +425,8 @@ const Home = () => {
         setUpscaledBatchFolderPath={setUpscaledBatchFolderPath}
         selectImageHandler={selectImageHandler}
         selectFolderHandler={selectFolderHandler}
+        videoPath={videoPath}
+        selectVideoHandler={selectVideoHandler}
       />
       <MainContent
         imagePath={imagePath}
@@ -355,7 +438,6 @@ const Home = () => {
         selectImageHandler={selectImageHandler}
         batchFolderPath={batchFolderPath}
         upscaledImagePath={upscaledImagePath}
-        doubleUpscaylCounter={doubleUpscaylCounter}
         setDimensions={setDimensions}
       />
       <OnboardingDialog />

@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Bemutatjuk az Upscayl Cloud-ot!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Bemutatjuk az Upscayl-Next Cloud-ot!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Csillagozz be minket GitHubon 😁",
     "DESCRIPTION": "AI Kép Felskálázó"
   },
   "FOOTER": {
-    "NEWS_TITLE": "UPSCAYL HÍREK",
-    "COPYRIGHT": "Copyright ©",
+    "NEWS_TITLE": "UPSCAYL-NEXT HÍREK",
     "TITLE": "Készítette ",
-    "LINK_TITLE": "Az Upscayl Csapat"
+    "LINK_TITLE": "Az Upscayl-Next Csapat"
   },
   "SETTINGS": {
     "TITLE": "Beállítások",
-    "CHANGE_LANGUAGE": { "TITLE": "Nyelvváltás" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Nyelvváltás"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Képtömörítés",
       "DESCRIPTION": "A PNG-tömörítés veszteségmentes, ezért nem feltétlenül csökkenti jelentősen a fájl méretét, és a magasabb tömörítési értékek ronthatják a teljesítményt. A JPG és WebP tömörítés viszont veszteséges."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU AZONOSÍTÓ",
-      "DESCRIPTION": "További információkért olvasd el az Upscayl dokumentációját.",
+      "DESCRIPTION": "További információkért olvasd el az Upscayl-Next dokumentációját.",
       "ADDITIONAL_DESCRIPTION": "A jobb eredmények érdekében engedélyezd a teljesítmény módot a Windows-on."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Képméretezés",
-      "DESCRIPTION": "A 4X fölötti értékek (kivéve a 16X dupla Upscayl) csak átméretezik a képet, és nem használnak AI felnagyítást.",
+      "DESCRIPTION": "A 4X fölötti értékek (kivéve a 16X dupla Upscayl-Next) csak átméretezik a képet, és nem használnak AI felnagyítást.",
       "WARNING": "Az 5X fölötti értékek egyes eszközökön teljesítményproblémákat okozhatnak!",
       "ADDITIONAL_WARNING": "Ez egyes eszközökön teljesítményproblémákat okozhat!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "ELŐZŐ FELNAGYÍTÁS FELÜLÍRÁSA",
-      "DESCRIPTION": "Ha be van kapcsolva, az Upscayl újra feldolgozza a képet ahelyett, hogy közvetlenül betöltené."
+      "DESCRIPTION": "Ha be van kapcsolva, az Upscayl-Next újra feldolgozza a képet ahelyett, hogy közvetlenül betöltené."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "UPSCAYL VISSZAÁLLÍTÁSA",
-      "ALERT": "Az Upscayl vissza lett állítva. Kérjük, indítsd újra az alkalmazást."
+      "BUTTON_TITLE": "UPSCAYL-NEXT VISSZAÁLLÍTÁSA",
+      "ALERT": "Az Upscayl-Next vissza lett állítva. Kérjük, indítsd újra az alkalmazást."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "KIMENETI MAPPA MENTÉSE",
       "DESCRIPTION": "Ha be van kapcsolva, a kimeneti mappa megjegyzésre kerül a munkamenetek között."
     },
     "AUTO_UPDATE": {
-      "TITLE": "UPSCAYL AUTOMATIKUS FRISSÍTÉSE",
+      "TITLE": "UPSCAYL-NEXT AUTOMATIKUS FRISSÍTÉSE",
       "DESCRIPTION": "Ha be van kapcsolva, az alkalmazás ellenőrzi az új frissítéseket és értesít róla."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "SEGÍTS FEJLESZTENI AZ UPSCAYL-T",
-      "DESCRIPTION": "Ha be van kapcsolva, az Upscayl névtelen használati adatokat gyűjt az alkalmazás felületének és funkcióinak javítása érdekében."
-    },
     "THEME": {
-      "TITLE": "UPSCAYL TÉMA"
+      "TITLE": "UPSCAYL-NEXT TÉMA"
     },
     "LANGUAGE": {
-      "TITLE": "UPSCAYL NYELV"
+      "TITLE": "UPSCAYL-NEXT NYELV"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "EGYEDI CSEMPE MÉRET",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "ÉRTESÍTÉSEK KIKAPCSOLÁSA",
-      "DESCRIPTION": "Ha be van kapcsolva, az Upscayl nem küld rendszerszintű értesítéseket siker vagy hiba esetén."
+      "DESCRIPTION": "Ha be van kapcsolva, az Upscayl-Next nem küld rendszerszintű értesítéseket siker vagy hiba esetén."
     },
     "SUPPORT": {
       "TITLE": "Problémába ütköztél?",
@@ -108,12 +115,22 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Rendszerinformációk"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Csoportos Upscayl",
+      "TITLE": "Csoportos Upscayl-Next",
       "DESCRIPTION": "Lehetővé teszi, hogy egy mappa összes fájlját egyszerre felskálázd"
     },
     "FILE_SELECTION": {
@@ -130,11 +147,11 @@
       "ZOOM": "Nagyítás",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "A legtöbb képhez alkalmas."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "A legtöbb képhez alkalmas. Nagysebességű felnagyítás minimális minőségvesztéssel."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Dupla Upscayl",
-      "DESCRIPTION": "Kapcsold be ezt az opciót, hogy kétszer fusson le az Upscayl egy képen. Ez jelentősen megnövelheti a feldolgozási időt, és 4X fölötti nagyítás esetén teljesítményproblémákat okozhat."
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Dupla Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
+      "DESCRIPTION": "Kapcsold be ezt az opciót, hogy kétszer fusson le az Upscayl-Next egy képen. Ez jelentősen megnövelheti a feldolgozási időt, és 4X fölötti nagyítás esetén teljesítményproblémákat okozhat."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "3. Lépés",
-      "MAC_APP_STORE_ALERT": "A MacOS App Store biztonsági korlátozásai miatt az Upscayl minden indításkor kéri a kimeneti mappa kiválasztását.\n\nEnnek elkerülése érdekében az Upscayl 'Beállítások' fülén tartósan beállítható egy alapértelmezett mentési mappa.",
+      "MAC_APP_STORE_ALERT": "A MacOS App Store biztonsági korlátozásai miatt az Upscayl-Next minden indításkor kéri a kimeneti mappa kiválasztását.\n\nEnnek elkerülése érdekében az Upscayl-Next 'Beállítások' fülén tartósan beállítható egy alapértelmezett mentési mappa.",
       "NOT_SELECTED": "Nincs kiválasztva",
       "DEFAULT_IMG_PATH": "Alapértelmezés a kép helyére",
       "DEFAULT_FOLDER_PATH": "Alapértelmezés a mappa helyére",
@@ -176,7 +195,7 @@
       "FROM_TITLE": "Méretezés: ",
       "TO_TITLE": " → ",
       "NO_OUTPUT_FOLDER_ALERT": "Először válassz mentési mappát",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
       "IN_PROGRESS_BUTTON_TITLE": "Upscaylezés ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
@@ -184,17 +203,23 @@
       "LENS_VIEW_TITLE": "Lencse nézet",
       "SLIDER_VIEW_TITLE": "Csúszka nézet",
       "ZOOM_AMOUNT_TITLE": "Nagyítás mértéke",
-      "TOTAL_UPSCAYLS": "Összes Upscayl",
-      "TOTAL_BATCH_UPSCAYLS": "Összes csoportos Upscayl",
-      "TOTAL_IMAGE_UPSCAYLS": "Összes kép Upscayl",
-      "TOTAL_DOUBLE_UPSCAYLS": "Összes dupla Upscayl",
-      "AVERAGE_UPSCAYL_TIME": "Átlagos Upscayl időtartam",
-      "LAST_UPSCAYL_DURATION": "Utolsó Upscayl időtartama",
+      "TOTAL_UPSCAYLS": "Összes Upscayl-Next",
+      "TOTAL_BATCH_UPSCAYLS": "Összes csoportos Upscayl-Next",
+      "TOTAL_IMAGE_UPSCAYLS": "Összes kép Upscayl-Next",
+      "TOTAL_DOUBLE_UPSCAYLS": "Összes dupla Upscayl-Next",
+      "AVERAGE_UPSCAYL_TIME": "Átlagos Upscayl-Next időtartam",
+      "LAST_UPSCAYL_DURATION": "Utolsó Upscayl-Next időtartama",
       "LAST_USED_AT": "Utoljára használva"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Csoportos Upscayl Folyamatban:",
-      "IN_PROGRESS_TITLE": "Az Upscayl varázslata folyamatban...",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Csoportos Upscayl-Next Folyamatban:",
+      "IN_PROGRESS_TITLE": "Az Upscayl-Next varázslata folyamatban...",
       "STOP_BUTTON_TITLE": "MEGÁLLÍTÁS"
     },
     "RESET_BUTTON_TITLE": "Visszaállítás",
@@ -209,11 +234,11 @@
       "PROCESSING_TITLE": "Kép feldolgozása...",
       "SCALING_CONVERTING_TITLE": "Kép átméretezése és konvertálása...",
       "WAIT_TITLE": "Egy pillanat...",
-      "SUCCESS_TITLE": "Sikeres Upscayl!",
+      "SUCCESS_TITLE": "Sikeres Upscayl-Next!",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "Választott mappa:",
         "DONE_TITLE": "Kész!",
-        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscayl mappa megnyitása"
+        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscayl-Next mappa megnyitása"
       }
     },
     "SLIDER": {
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Kivétel hiba",
-      "DESCRIPTION": "Az Upscayl hibába ütközött. Valószínűleg az upscayl bináris nem futott le megfelelően. Nézd meg a naplókat további információért. Segítségért feltehetsz egy hibajegyet az Upscayl GitHub oldalán."
+      "DESCRIPTION": "Az Upscayl-Next hibába ütközött. Valószínűleg az upscayl bináris nem futott le megfelelően. Nézd meg a naplókat további információért. Segítségért feltehetsz egy hibajegyet az Upscayl-Next GitHub oldalán."
     },
     "GENERIC_ERROR": {
       "TITLE": "Hiba"
@@ -281,9 +306,9 @@
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Hamarosan!",
     "CATCHY_PHRASE_1": "Nincsenek többé hibák, hardverproblémák, minőségromlás vagy hosszú várakozási idők!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl bárhol, bármikor, bármilyen eszközön\n☁️ Nem kell videókártya vagy hardver\n👩 Arc Kiemelés\n🦋 Több mint 10 modell közül választhatsz\n🏎 5x gyorsabb, mint az Upscayl asztali verziója\n🎞 Videó feljavítás\n💰 Kereskedelmi használat\n😴 Upscayl alvás közben",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next bárhol, bármikor, bármilyen eszközön\n☁️ Nem kell videókártya vagy hardver\n👩 Arc Kiemelés\n🦋 Több mint 10 modell közül választhatsz\n🏎 5x gyorsabb, mint az Upscayl-Next asztali verziója\n🎞 Videó feljavítás\n💰 Kereskedelmi használat\n😴 Upscayl-Next alvás közben",
     "ALREADY_REGISTERED_ALERT": "Köszönjük, {name}! Úgy tűnik, az email címed már regisztrálva van :D Ha ez nem így van, kérjük, próbáld újra.",
-    "ADD_SUCCESS": "Köszönjük, hogy csatlakoztál a várólistához! Értesítünk, amint az Upscayl Cloud elérhető lesz számodra.",
+    "ADD_SUCCESS": "Köszönjük, hogy csatlakoztál a várólistához! Értesítünk, amint az Upscayl-Next Cloud elérhető lesz számodra.",
     "INCORRECT_FIELDS_ALERT": "Kérjük, tölts ki minden mezőt helyesen.",
     "JOIN_WAITLIST": "Csatlakozás a várólistához",
     "DONT_SHOW_AGAIN": "NE MUTASD TÖBBET"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Kezdés",
     "SETTINGS_NOTE": "Ezeket a beállításokat később bármikor megváltoztathatod.",
     "STEP_1": {
-      "TITLE": "Üdvözlünk az Upscayl-ben 🎉",
+      "TITLE": "Üdvözlünk az Upscayl-Next-ben 🎉",
       "DESCRIPTION": "Kezdjük néhány gyors lépéssel."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Állítsd be az elsődleges beállításokat."
     },
     "STEP_3": {
-      "TITLE": "Hogyan használd az Upscayl-t? 🚀",
+      "TITLE": "Hogyan használd az Upscayl-Next-t? 🚀",
       "DESCRIPTION": "Nézd meg ezt a rövid videót az új funkcióinkról."
     },
     "STEP_4": {
       "TITLE": "Minden készen áll! 🎉",
-      "DESCRIPTION": "Készen állsz, hogy képeket javíts az Upscayl segítségével!"
+      "DESCRIPTION": "Készen állsz, hogy képeket javíts az Upscayl-Next segítségével!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

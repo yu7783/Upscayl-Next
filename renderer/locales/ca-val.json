@@ -1,18 +1,27 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Presentem Upscayl Cloud!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Presentem Upscayl-Next Cloud!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Doneu-nos una estrela en GitHub 😁",
     "DESCRIPTION": "Augmentador d'imatges amb IA"
   },
   "FOOTER": {
-    "NEWS_TITLE": "NOTÍCIES D'UPSCAYL",
-    "COPYRIGHT": "Copyright ©",
+    "NEWS_TITLE": "NOTÍCIES D'UPSCAYL-NEXT",
     "TITLE": "Per ",
-    "LINK_TITLE": "L'equip d'Upscayl"
+    "LINK_TITLE": "L'equip d'Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Configuració",
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
     "CHANGE_LANGUAGE": {
       "TITLE": "Canvia idioma"
     },
@@ -37,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ID de GPU",
-      "DESCRIPTION": "Llegiu la documentació d'Upscayl per a més informació.",
+      "DESCRIPTION": "Llegiu la documentació d'Upscayl-Next per a més informació.",
       "ADDITIONAL_DESCRIPTION": "Habiliteu el mode de rendiment en Windows per a obtindre millors resultats."
     },
     "IMAGE_FORMAT": {
@@ -56,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Escala d'imatge",
-      "DESCRIPTION": "Qualsevol cosa per damunt de 4x (excepte 16x Double Upscayl) només redimensiona la imatge i no usa augment amb IA.",
+      "DESCRIPTION": "Qualsevol cosa per damunt de 4x (excepte 16x Double Upscayl-Next) només redimensiona la imatge i no usa augment amb IA.",
       "WARNING": "Qualsevol cosa per damunt de 5x pot causar problemes de rendiment en alguns dispositius!",
       "ADDITIONAL_WARNING": "Això pot causar problemes de rendiment en alguns dispositius!"
     },
@@ -67,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "SOBREESCRIU L'AUGMENT ANTERIOR",
-      "DESCRIPTION": "Si està habilitat, Upscayl processarà la imatge de nou en lloc de carregar-la directament."
+      "DESCRIPTION": "Si està habilitat, Upscayl-Next processarà la imatge de nou en lloc de carregar-la directament."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "REINICIA UPSCAYL",
-      "ALERT": "Upscayl s'ha reiniciat. Reinicia l'aplicació."
+      "BUTTON_TITLE": "REINICIA UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next s'ha reiniciat. Reinicia l'aplicació."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "GUARDA CARPETA D'EIXIDA",
       "DESCRIPTION": "Si està habilitat, la carpeta d'eixida es recordarà entre sessions."
     },
     "AUTO_UPDATE": {
-      "TITLE": "ACTUALITZACIÓ AUTOMÀTICA D'UPSCAYL",
+      "TITLE": "ACTUALITZACIÓ AUTOMÀTICA D'UPSCAYL-NEXT",
       "DESCRIPTION": "Si està habilitat, l'aplicació buscarà noves actualitzacions i vos notificarà."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "AJUDEU A MILLORAR UPSCAYL",
-      "DESCRIPTION": "Si està habilitat, Upscayl recopilarà dades d'ús anònimes per a millorar la interfície i les característiques de l'aplicació."
-    },
     "THEME": {
-      "TITLE": "TEMA D'UPSCAYL"
+      "TITLE": "TEMA D'UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "IDIOMA D'UPSCAYL"
+      "TITLE": "IDIOMA D'UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "GRANDÀRIA DE MOSAIC PERSONALITZADA",
@@ -97,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "DESACTIVA LES NOTIFICACIONS",
-      "DESCRIPTION": "Si està habilitat, Upscayl no enviarà notificacions del sistema quan funcione bé o quan falle."
+      "DESCRIPTION": "Si està habilitat, Upscayl-Next no enviarà notificacions del sistema quan funcione bé o quan falle."
     },
     "SUPPORT": {
       "TITLE": "Teniu problemes?",
@@ -110,10 +115,20 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Informació del sistema"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
       "TITLE": "Augment per lots",
       "DESCRIPTION": "Això vos permetrà augmentar totes les imatges d'una carpeta alhora"
@@ -132,11 +147,11 @@
       "ZOOM": "Zoom",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl estàndard",
+          "NAME": "Upscayl-Next estàndard",
           "DESCRIPTION": "Adequat per a la majoria de les imatges."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Adequat per a la majoria de les imatges. Augment de velocitat alta amb pèrdua de qualitat mínima."
         },
         "remacri-4x": {
@@ -162,13 +177,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Doble Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Doble Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Habilita esta opció per a realitzar dos augments en una imatge. Tingueu en compte que això pot causar un augment significatiu en el temps de processament i possiblement problemes de rendiment per a escales superiors a 4x."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Pas 3",
-      "MAC_APP_STORE_ALERT": "A causa de les restriccions de seguretat de la MacOS App Store, Upscayl requerix que seleccioneu una carpeta d'eixida cada vegada que l'inicieu.\n\nPer a evitar-ho, podeu guardar permanentment una carpeta d'eixida predeterminada en la pestanya 'Configuració' d'Upscayl.",
+      "MAC_APP_STORE_ALERT": "A causa de les restriccions de seguretat de la MacOS App Store, Upscayl-Next requerix que seleccioneu una carpeta d'eixida cada vegada que l'inicieu.\n\nPer a evitar-ho, podeu guardar permanentment una carpeta d'eixida predeterminada en la pestanya 'Configuració' d'Upscayl-Next.",
       "NOT_SELECTED": "No seleccionat",
       "DEFAULT_IMG_PATH": "Ruta predeterminada de la imatge",
       "DEFAULT_FOLDER_PATH": "Ruta predeterminada de la carpeta",
@@ -179,7 +196,7 @@
       "FROM_TITLE": "Augmentar des de ",
       "TO_TITLE": " a ",
       "NO_OUTPUT_FOLDER_ALERT": "Seleccioneu primer una carpeta d'eixida",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
       "IN_PROGRESS_BUTTON_TITLE": "S'està augmentant ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
@@ -196,8 +213,14 @@
       "LAST_USED_AT": "Últim ús"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Augment per lots en progrés:",
-      "IN_PROGRESS_TITLE": "S'està fent la màgia d'Upscayl...",
+      "IN_PROGRESS_TITLE": "S'està fent la màgia d'Upscayl-Next...",
       "STOP_BUTTON_TITLE": "DETÍN"
     },
     "RESET_BUTTON_TITLE": "Restablix",
@@ -246,7 +269,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Error d'excepció",
-      "DESCRIPTION": "Upscayl ha trobat un error. És possible que el binari d'Upscayl no haja executat les ordes correctament. Intenteu revisar els registres per a veure si obteniu alguna informació. Podeu publicar un problema en el repositori de GitHub d'Upscayl per a obtindre més ajuda."
+      "DESCRIPTION": "Upscayl-Next ha trobat un error. És possible que el binari d'Upscayl-Next no haja executat les ordes correctament. Intenteu revisar els registres per a veure si obteniu alguna informació. Podeu publicar un problema en el repositori de GitHub d'Upscayl-Next per a obtindre més ajuda."
     },
     "GENERIC_ERROR": {
       "TITLE": "Error"
@@ -284,9 +307,9 @@
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Pròximament!",
     "CATCHY_PHRASE_1": "No més errors, problemes de maquinari, compromisos de qualitat o llargs temps de càrrega!",
-    "CATCHY_PHRASE_2": "🌐 Augmenta en qualsevol lloc, en qualsevol moment, en qualsevol dispositiu\n☁️ No es requerix targeta gràfica ni maquinari\n👩 Millora de rostres\n🦋 Més de 10 models per a triar\n🏎 5 vegades més ràpid que Upscayl Desktop\n🎞  Augment de vídeos\n💰 Ús comercial\n 😴Augmenta mentres dormiu",
+    "CATCHY_PHRASE_2": "🌐 Augmenta en qualsevol lloc, en qualsevol moment, en qualsevol dispositiu\n☁️ No es requerix targeta gràfica ni maquinari\n👩 Millora de rostres\n🦋 Més de 10 models per a triar\n🏎 5 vegades més ràpid que Upscayl-Next Desktop\n🎞  Augment de vídeos\n💰 Ús comercial\n 😴Augmenta mentres dormiu",
     "ALREADY_REGISTERED_ALERT": "Gràcies {name}! Sembla que este correu electrònic ja està registrat :D Si no és així, intenteu-ho de nou.",
-    "ADD_SUCCESS": "Gràcies per unir-te a la llista d'espera! Et notificarem quan Upscayl Cloud estiga llest per a tu.",
+    "ADD_SUCCESS": "Gràcies per unir-te a la llista d'espera! Et notificarem quan Upscayl-Next Cloud estiga llest per a tu.",
     "INCORRECT_FIELDS_ALERT": "Completeu tots els camps correctament.",
     "JOIN_WAITLIST": "Uniu-vos a la llista d'espera",
     "DONT_SHOW_AGAIN": "NO MOSTRES DE NOU"
@@ -297,7 +320,7 @@
     "GET_STARTED_BUTTON_TITLE": "Comença",
     "SETTINGS_NOTE": "Sempre podeu canviar estos ajustaments més tard.",
     "STEP_1": {
-      "TITLE": "Benvinguts a Upscayl 🎉",
+      "TITLE": "Benvinguts a Upscayl-Next 🎉",
       "DESCRIPTION": "Començarem amb uns pocs passos ràpids."
     },
     "STEP_2": {
@@ -305,12 +328,23 @@
       "DESCRIPTION": "Configureu els vostres ajustaments inicials."
     },
     "STEP_3": {
-      "TITLE": "Com use Upscayl? 🚀",
+      "TITLE": "Com use Upscayl-Next? 🚀",
       "DESCRIPTION": "Mireu este vídeo breu per a aprendre sobre les noves característiques."
     },
     "STEP_4": {
       "TITLE": "Tot llest! 🎉",
-      "DESCRIPTION": "Esteu llestos per a començar a augmentar imatges amb Upscayl!"
+      "DESCRIPTION": "Esteu llestos per a començar a augmentar imatges amb Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

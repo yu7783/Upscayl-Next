@@ -6,7 +6,7 @@ import {
 } from "@/atoms/user-settings-atom";
 import { cn } from "@/lib/utils";
 import { useAtom, useAtomValue } from "jotai";
-import { EllipsisIcon, WrenchIcon } from "lucide-react";
+import { EllipsisIcon, WrenchIcon } from "../icons/original-icons";
 import { useEffect, useMemo, useState } from "react";
 import useSystemInfo from "../hooks/use-system-info";
 

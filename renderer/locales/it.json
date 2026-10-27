@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Presentazione di Upscayl Cloud !",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Presentazione di Upscayl-Next Cloud !",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Metti una stella su GitHub 😁",
     "DESCRIPTION": "Campionatore di immagini AI"
   },
   "FOOTER": {
-    "NEWS_TITLE": "NOTIZIE su UPSCAYL",
-    "COPYRIGHT": "Copyright ©",
+    "NEWS_TITLE": "NOTIZIE su UPSCAYL-NEXT",
     "TITLE": "di",
-    "LINK_TITLE": "Il team di Upscayl"
+    "LINK_TITLE": "Il team di Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Parametri",
-    "CHANGE_LANGUAGE": { "TITLE": "Cambia lingua" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Cambia lingua"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Compressione di immagine",
       "DESCRIPTION": "La compressione PNG è senza perdite, quindi potrebbe non ridurre significativamente le dimensioni del file e valori di compressione più elevati potrebbero influire sulle prestazioni. La compressione JPG e WebP è con perdita di dati."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ID GPU",
-      "DESCRIPTION": "Per ulteriori informazioni, leggere la documentazione di Upscayl.",
+      "DESCRIPTION": "Per ulteriori informazioni, leggere la documentazione di Upscayl-Next.",
       "ADDITIONAL_DESCRIPTION": "Abilita la modalità prestazioni su Windows per ottenere i migliori risultati."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Scala dell'immagine",
-      "DESCRIPTION": "Qualsiasi valore superiore a 4X (eccetto 16X Double Upscayl) ridimensiona solo l'immagine e non utilizza l'upsampling AI.",
+      "DESCRIPTION": "Qualsiasi valore superiore a 4X (eccetto 16X Double Upscayl-Next) ridimensiona solo l'immagine e non utilizza l'upsampling AI.",
       "WARNING": "Qualsiasi valore superiore a 5X può causare problemi di prestazioni su alcuni dispositivi !",
       "ADDITIONAL_WARNING": "Ciò potrebbe causare problemi di prestazioni su alcuni dispositivi !"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "SOVRASCRIVERE IL SOVRACAMPIONAMENTO PRECEDENTE",
-      "DESCRIPTION": "Se abilitato, Upscayl rielaborerà l'immagine invece di caricarla direttamente."
+      "DESCRIPTION": "Se abilitato, Upscayl-Next rielaborerà l'immagine invece di caricarla direttamente."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "RIPRISTINA UPSCAYL",
-      "ALERT": "Upscayl è stato ripristinato. Riavviare l'applicazione."
+      "BUTTON_TITLE": "RIPRISTINA UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next è stato ripristinato. Riavviare l'applicazione."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "SALVA FILE DI USCITA",
       "DESCRIPTION": "Se abilitata, la cartella di output verrà memorizzata tra una sessione e l'altra."
     },
     "AUTO_UPDATE": {
-      "TITLE": "AGGIORNAMENTO AUTOMATICO DI UPSCAYL",
+      "TITLE": "AGGIORNAMENTO AUTOMATICO DI UPSCAYL-NEXT",
       "DESCRIPTION": "Se abilitato, l'app controllerà la presenza di nuovi aggiornamenti e ti avviserà."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "AIUTA A MIGLIORARE UPSCAYL",
-      "DESCRIPTION": "Se abilitato, Upscayl raccoglierà dati di utilizzo anonimi per migliorare l'interfaccia e la funzionalità dell'app."
-    },
     "THEME": {
-      "TITLE": "TEMA DI UPSCAYL"
+      "TITLE": "TEMA DI UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "LINGUA DI UPSCAYL"
+      "TITLE": "LINGUA DI UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "DIMENSIONE PERSONALIZZATA DEL RIQUADRO",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "DISATTIVARE LE NOTIFICHE",
-      "DESCRIPTION": "Se abilitato, Upscayl non invierà alcuna notifica di sistema in caso di successo o errore."
+      "DESCRIPTION": "Se abilitato, Upscayl-Next non invierà alcuna notifica di sistema in caso di successo o errore."
     },
     "SUPPORT": {
       "TITLE": "Hai problemi ?",
@@ -108,10 +115,20 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Informazioni di sistema"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
       "TITLE": "Sovracampionamento batch",
       "DESCRIPTION": "Ciò ti consentirà di sovracampionare tutti i file in una cartella contemporaneamente"
@@ -130,11 +147,11 @@
       "ZOOM": "Zoom",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Adatto per la maggior parte delle immagini."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Adatto per la maggior parte delle immagini. Sovracampionamento veloce con perdita di qualità minima."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Doppio Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Doppio Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Abilita questa opzione per eseguire il supercampionamento due volte su un'immagine. Tieni presente che ciò potrebbe causare un aumento significativo del tempo di elaborazione e possibili problemi di prestazioni per scale superiori a 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Fase 3",
-      "MAC_APP_STORE_ALERT": "A causa delle restrizioni di sicurezza dell'App Store di MacOS, Upscayl richiede di selezionare una cartella di output ogni volta che lo avvii.\n\nPer evitare ciò, puoi salvare in modo permanente una cartella di output predefinita nella \"scheda\" Impostazioni Upscayl.",
+      "MAC_APP_STORE_ALERT": "A causa delle restrizioni di sicurezza dell'App Store di MacOS, Upscayl-Next richiede di selezionare una cartella di output ogni volta che lo avvii.\n\nPer evitare ciò, puoi salvare in modo permanente una cartella di output predefinita nella \"scheda\" Impostazioni Upscayl-Next.",
       "NOT_SELECTED": "Non selezionato",
       "DEFAULT_IMG_PATH": "Per impostazione predefinita è il percorso dell'immagine",
       "DEFAULT_FOLDER_PATH": "Per impostazione predefinita è il percorso della cartella",
@@ -193,6 +212,12 @@
       "LAST_USED_AT": "Ultimo usato"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Sovracampionamento batch in corso :",
       "IN_PROGRESS_TITLE": "Fare la magia del sovracampionamento...",
       "STOP_BUTTON_TITLE": "FERMARE"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Errore di eccezione",
-      "DESCRIPTION": "Upscayl ha riscontrato un errore. È possibile che il binario Upscayl non sia riuscito a eseguire correttamente i comandi. Prova a controllare i log per vedere se ottieni qualche informazione. Puoi pubblicare un problema sul repository GitHub di Upscayl per ulteriore assistenza."
+      "DESCRIPTION": "Upscayl-Next ha riscontrato un errore. È possibile che il binario Upscayl-Next non sia riuscito a eseguire correttamente i comandi. Prova a controllare i log per vedere se ottieni qualche informazione. Puoi pubblicare un problema sul repository GitHub di Upscayl-Next per ulteriore assistenza."
     },
     "GENERIC_ERROR": {
       "TITLE": "Errore"
@@ -277,13 +302,13 @@
       "TITLE": "Avviso sui metadati",
       "DESCRIPTION": "Su alcuni sistemi, i metadati potrebbero non essere visibili in formati diversi da JPG. Utilizza strumenti specifici per visualizzare i metadati se necessario."
     }
-  },  
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Presto disponibile !",
     "CATCHY_PHRASE_1": "Niente più errori, problemi hardware, compromessi di qualità o lunghi tempi di caricamento !",
-    "CATCHY_PHRASE_2": "🌐 Effettua l'upsample ovunque, in qualsiasi momento, su qualsiasi dispositivo\n☁️ Nessuna scheda grafica o hardware richiesto\n👩 Miglioramento del viso\n🦋 Più di 10 modelli tra cui scegliere\n🏎 5 volte più veloce di Upscayl Desktop\n🎞 Sovracampionamento video\n💰 Uso commerciale\n😴 Sovracampiona mentre voi dormite",
+    "CATCHY_PHRASE_2": "🌐 Effettua l'upsample ovunque, in qualsiasi momento, su qualsiasi dispositivo\n☁️ Nessuna scheda grafica o hardware richiesto\n👩 Miglioramento del viso\n🦋 Più di 10 modelli tra cui scegliere\n🏎 5 volte più veloce di Upscayl-Next Desktop\n🎞 Sovracampionamento video\n💰 Uso commerciale\n😴 Sovracampiona mentre voi dormite",
     "ALREADY_REGISTERED_ALERT": "Grazie {name} ! Sembra che la tua email sia già stata salvata :D In caso contrario, riprova.",
-    "ADD_SUCCESS": "Grazie per esserti iscritto alla lista d'attesa! Ti faremo sapere quando Upscayl Cloud sarà pronto per te.",
+    "ADD_SUCCESS": "Grazie per esserti iscritto alla lista d'attesa! Ti faremo sapere quando Upscayl-Next Cloud sarà pronto per te.",
     "INCORRECT_FIELDS_ALERT": "Ti preghiamo di compilare correttamente tutti i campi.",
     "JOIN_WAITLIST": "Iscriviti alla lista d'attesa",
     "DONT_SHOW_AGAIN": "NON MOSTRARE PIÙ"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Inizia",
     "SETTINGS_NOTE": "Puoi sempre modificare queste impostazioni in un secondo momento.",
     "STEP_1": {
-      "TITLE": "Benvenuto su Upscayl 🎉",
+      "TITLE": "Benvenuto su Upscayl-Next 🎉",
       "DESCRIPTION": "Iniziamo con alcuni rapidi passaggi."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Configura le tue impostazioni iniziali."
     },
     "STEP_3": {
-      "TITLE": "Come usare Upscayl ? 🚀",
+      "TITLE": "Come usare Upscayl-Next ? 🚀",
       "DESCRIPTION": "Guarda questo breve video per conoscere le nuove funzionalità."
     },
     "STEP_4": {
       "TITLE": "Sei pronto ! 🎉",
-      "DESCRIPTION": "Sei pronto per iniziare a sovracampionare le immagini con Upscayl !"
+      "DESCRIPTION": "Sei pronto per iniziare a sovracampionare le immagini con Upscayl-Next !"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

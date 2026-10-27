@@ -15,13 +15,13 @@ import { UpscaylCloudModal } from "@/components/upscayl-cloud-modal";
 import { ResetSettingsButton } from "./reset-settings-button";
 import { FEATURE_FLAGS } from "@common/feature-flags";
 import TurnOffNotificationsToggle from "./turn-off-notifications-toggle";
-import { cn } from "@/lib/utils";
 import { InputCustomResolution } from "./input-custom-resolution";
 import { InputTileSize } from "./input-tile-size";
+import { InputThreads } from "./input-threads";
+import AutoOptimizeToggle from "./auto-optimize-toggle";
 import LanguageSwitcher from "./language-switcher";
 import { translationAtom } from "@/atoms/translations-atom";
 import { ImageFormat } from "@/lib/valid-formats";
-import EnableContributionToggle from "./enable-contributions-toggle";
 import AutoUpdateToggle from "./auto-update-toggle";
 import TTAModeToggle from "./tta-mode-toggle";
 import SystemInfo from "./system-info";
@@ -39,7 +39,23 @@ interface IProps {
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
   setDontShowCloudModal: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose?: () => void;
 }
+
+const SettingsSection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <section className="flex flex-col gap-4 rounded-btn border border-base-content/10 bg-base-100/70 p-4 shadow-sm backdrop-blur">
+    <h3 className="text-xs font-bold uppercase tracking-wider text-base-content/60">
+      {title}
+    </h3>
+    <div className="flex flex-col gap-4">{children}</div>
+  </section>
+);
 
 function SettingsTab({
   batchMode,
@@ -53,13 +69,12 @@ function SettingsTab({
   show,
   setShow,
   setDontShowCloudModal,
+  onClose,
 }: IProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   const [customModelsPath, setCustomModelsPath] = useAtom(customModelsPathAtom);
   const [scale, setScale] = useAtom(scaleAtom);
-  const [enableScrollbar, setEnableScrollbar] = useState(true);
-  const [timeoutId, setTimeoutId] = useState(null);
   const t = useAtomValue(translationAtom);
 
   // HANDLERS
@@ -103,142 +118,99 @@ function SettingsTab({
     }
   };
 
-  const upscaylVersion = navigator?.userAgent?.match(
-    /Upscayl\/([\d\.]+\d+)/,
-  )[1];
-
-  function disableScrolling() {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-
-    setTimeoutId(
-      setTimeout(function () {
-        setEnableScrollbar(false);
-      }, 1000),
-    );
-  }
-
-  function enableScrolling() {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-    }
-
-    setEnableScrollbar(true);
-  }
-
   return (
-    <div
-      className={cn(
-        "animate-step-in animate z-50 flex h-screen flex-col gap-7 overflow-y-auto overflow-x-hidden p-5",
-        enableScrollbar ? "" : "hide-scrollbar",
-      )}
-      onScroll={() => {
-        if (enableScrollbar) disableScrolling();
-      }}
-      onWheel={() => {
-        enableScrolling();
-      }}
-    >
-      <div className="flex flex-col gap-2 text-sm font-medium uppercase">
-        <p>{t("SETTINGS.SUPPORT.TITLE")}</p>
-        <a
-          className="btn btn-primary"
-          href="https://docs.upscayl.org/"
-          target="_blank"
-        >
-          {t("SETTINGS.SUPPORT.DOCS_BUTTON_TITLE")}
-        </a>
-        {FEATURE_FLAGS.APP_STORE_BUILD && (
-          <button
-            className="btn btn-primary"
-            onClick={async () => {
-              const systemInfo = await window.electron.getSystemInfo();
-              const appVersion = await window.electron.getAppVersion();
-              const mailToUrl = `mailto:support@upscayl.org?subject=Upscayl%20Issue%3A%20%3CWRITE%20HERE%3E&body=Hi%20Nayam!%0AI'm%20having%20an%20issue%20with%20Upscayl%20${appVersion}%0A%0A%3CPLEASE%20DESCRIBE%20ISSUE%20HERE%3E%0A%0A---%0ALOGS%3A%0A${logData.join("\n")}%0A%0ADEVICE%20DETAILS%3A%20${JSON.stringify(systemInfo)}`;
-              window.open(mailToUrl, "_blank");
-            }}
-          >
-            {t("SETTINGS.SUPPORT.EMAIL_BUTTON_TITLE")}
-          </button>
-        )}
-        {!FEATURE_FLAGS.APP_STORE_BUILD && <DonateButton />}
+    <div className="animate-step-in flex h-screen w-full flex-col overflow-y-auto bg-base-300">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-6">
+        <div className="sticky top-0 z-10 -mx-6 flex flex-wrap items-center justify-between gap-3 border-b border-base-content/10 bg-base-300/95 px-6 py-4 backdrop-blur">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl font-bold">{t("SETTINGS.TITLE")}</h2>
+            <p className="text-xs text-base-content/60">
+              {t("SETTINGS.SECTIONS.DESCRIPTION")}
+            </p>
+          </div>
+          {onClose && (
+            <button className="btn btn-sm btn-outline" onClick={onClose}>
+              {t("SETTINGS.BACK_TO_UPSCAYL-NEXT")}
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+          <SettingsSection title={t("SETTINGS.SECTIONS.IMAGE")}>
+            <SelectImageFormat
+              batchMode={batchMode}
+              saveImageAs={saveImageAs}
+              setExportType={setExportType}
+            />
+            <CopyMetadataToggle
+              saveImageAs={saveImageAs}
+              setExportType={setExportType}
+            />
+            <SelectImageScale scale={scale} setScale={setScale} />
+            <InputCustomResolution />
+            <InputCompression
+              compression={compression}
+              handleCompressionChange={handleCompressionChange}
+            />
+            <SaveOutputFolderToggle />
+            <OverwriteToggle />
+          </SettingsSection>
+
+          <SettingsSection title={t("SETTINGS.SECTIONS.PERFORMANCE")}>
+            <InputGpuId gpuId={gpuId} handleGpuIdChange={handleGpuIdChange} />
+            <InputTileSize />
+            <InputThreads />
+            <TTAModeToggle />
+            <AutoOptimizeToggle />
+          </SettingsSection>
+
+          <SettingsSection title={t("SETTINGS.SECTIONS.INTERFACE")}>
+            <SelectTheme />
+            <LanguageSwitcher />
+            <TurnOffNotificationsToggle />
+            <AutoUpdateToggle />
+          </SettingsSection>
+
+          <SettingsSection title={t("SETTINGS.SECTIONS.MODELS")}>
+            <CustomModelsFolderSelect
+              customModelsPath={customModelsPath}
+              setCustomModelsPath={setCustomModelsPath}
+            />
+          </SettingsSection>
+
+          <SettingsSection title={t("SETTINGS.SECTIONS.SYSTEM")}>
+            <LogArea
+              copyOnClickHandler={copyOnClickHandler}
+              isCopied={isCopied}
+              logData={logData}
+            />
+            <SystemInfo />
+            <ResetSettingsButton />
+            {FEATURE_FLAGS.SHOW_UPSCAYL_CLOUD_INFO && (
+              <>
+                <button
+                  className="animate-pulse rounded-btn bg-success p-1 text-sm text-slate-50 shadow-lg shadow-success/40"
+                  onClick={() => {
+                    setShow(true);
+                  }}
+                >
+                  {t("INTRO")}
+                </button>
+
+                <UpscaylCloudModal
+                  show={show}
+                  setShow={setShow}
+                  setDontShowCloudModal={setDontShowCloudModal}
+                />
+              </>
+            )}
+          </SettingsSection>
+
+          <SettingsSection title={t("SETTINGS.SECTIONS.SUPPORT")}>
+            <DonateButton />
+          </SettingsSection>
+        </div>
       </div>
-
-      <LogArea
-        copyOnClickHandler={copyOnClickHandler}
-        isCopied={isCopied}
-        logData={logData}
-      />
-
-      {/* THEME SELECTOR */}
-      <SelectTheme />
-
-      <LanguageSwitcher />
-
-      {/* IMAGE FORMAT BUTTONS */}
-      <SelectImageFormat
-        batchMode={batchMode}
-        saveImageAs={saveImageAs}
-        setExportType={setExportType}
-      />
-      
-      {/* COPY METADATA TOGGLE */}
-      <CopyMetadataToggle saveImageAs={saveImageAs} setExportType={setExportType} />
-
-      {/* IMAGE SCALE */}
-      <SelectImageScale scale={scale} setScale={setScale} />
-
-      <InputCustomResolution />
-
-      <InputCompression
-        compression={compression}
-        handleCompressionChange={handleCompressionChange}
-      />
-
-      <SaveOutputFolderToggle />
-
-      <OverwriteToggle />
-      <TurnOffNotificationsToggle />
-      <AutoUpdateToggle />
-      <EnableContributionToggle />
-
-      {/* GPU ID INPUT */}
-      <InputGpuId gpuId={gpuId} handleGpuIdChange={handleGpuIdChange} />
-
-      <InputTileSize />
-
-      {/* CUSTOM MODEL */}
-      <CustomModelsFolderSelect
-        customModelsPath={customModelsPath}
-        setCustomModelsPath={setCustomModelsPath}
-      />
-
-      <TTAModeToggle />
-
-      {/* RESET SETTINGS */}
-      <ResetSettingsButton />
-
-      {FEATURE_FLAGS.SHOW_UPSCAYL_CLOUD_INFO && (
-        <>
-          <button
-            className="mx-5 mb-5 animate-pulse rounded-btn bg-success p-1 text-sm text-slate-50 shadow-lg shadow-success/40"
-            onClick={() => {
-              setShow(true);
-            }}
-          >
-            {t("INTRO")}
-          </button>
-
-          <UpscaylCloudModal
-            show={show}
-            setShow={setShow}
-            setDontShowCloudModal={setDontShowCloudModal}
-          />
-        </>
-      )}
-
-      <SystemInfo />
     </div>
   );
 }

@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Представляем Upscayl Cloud!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Представляем Upscayl-Next Cloud!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Оцените нас на GitHub 😁",
     "DESCRIPTION": "ИИ-увеличитель изображений"
   },
   "FOOTER": {
-    "NEWS_TITLE": "НОВОСТИ UPSCAYL",
-    "COPYRIGHT": "Авторское право ©",
+    "NEWS_TITLE": "НОВОСТИ UPSCAYL-NEXT",
     "TITLE": "Разработка ",
-    "LINK_TITLE": "Команды Upscayl"
+    "LINK_TITLE": "Команды Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Настройки",
-    "CHANGE_LANGUAGE": { "TITLE": "Сменить язык" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Сменить язык"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Сжатие изображения",
       "DESCRIPTION": "Сжатие PNG происходит без потерь, поэтому размер файла может уменьшиться незначительно, а более высокие значения сжатия могут повлиять на производительность. Сжатие JPG и WebP совершается с потерями."
@@ -22,7 +33,7 @@
       "TITLE": "ДОБАВИТЬ ПОЛЬЗОВАТЕЛЬСКИЕ МОДЕЛИ",
       "BUTTON_FOLDER": "Выбрать папку",
       "DESCRIPTION": "Вы можете легко добавить свои модели. Подробности в:",
-	  "LINK_TITLE": "Хранилище пользовательских моделей"
+      "LINK_TITLE": "Хранилище пользовательских моделей"
     },
     "CUSTOM_INPUT_RESOLUTION": {
       "TITLE": "ПОЛЬЗОВАТЕЛЬСКАЯ ШИРИНА ВЫХОДА",
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ИДЕНТИФИКАТОР ГП",
-      "DESCRIPTION": "Пожалуйста, прочитайте документацию Upscayl для получения дополнительной информации.",
+      "DESCRIPTION": "Пожалуйста, прочитайте документацию Upscayl-Next для получения дополнительной информации.",
       "ADDITIONAL_DESCRIPTION": "Включите режим производительности на Windows для лучших результатов."
     },
     "IMAGE_FORMAT": {
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "ПЕРЕЗАПИСЬ ПРЕДЫДУЩЕГО УВЕЛИЧЕНИЯ",
-      "DESCRIPTION": "Если включено, Upscayl повторно обработает изображение вместо того, чтобы загружать его напрямую."
+      "DESCRIPTION": "Если включено, Upscayl-Next повторно обработает изображение вместо того, чтобы загружать его напрямую."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "СБРОСИТЬ UPSCAYL",
-      "ALERT": "Upscayl был сброшен. Пожалуйста, перезапустите приложение."
+      "BUTTON_TITLE": "СБРОСИТЬ UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next был сброшен. Пожалуйста, перезапустите приложение."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "СОХРАНИТЬ ПАПКУ ВЫВОДА",
       "DESCRIPTION": "Если включено, папка вывода будет запоминаться между сеансами."
     },
     "AUTO_UPDATE": {
-      "TITLE": "АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ UPSCAYL",
+      "TITLE": "АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ UPSCAYL-NEXT",
       "DESCRIPTION": "Если включено, приложение будет проверять наличие новых обновлений и уведомлять вас."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "ПОМОЧЬ УЛУЧШЕНИЮ UPSCAYL",
-      "DESCRIPTION": "Если включено, Upscayl будет собирать анонимные данные об использовании для улучшения интерфейса и функций приложения."
-    },
     "THEME": {
-      "TITLE": "ТЕМА UPSCAYL"
+      "TITLE": "ТЕМА UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "ЯЗЫК UPSCAYL"
+      "TITLE": "ЯЗЫК UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "ПОЛЬЗОВАТЕЛЬСКИЙ РАЗМЕР ПЛИТКИ",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "ОТКЛЮЧИТЬ УВЕДОМЛЕНИЯ",
-      "DESCRIPTION": "Если включено, Upscayl не будет отправлять системные уведомления о завершении или ошибках."
+      "DESCRIPTION": "Если включено, Upscayl-Next не будет отправлять системные уведомления о завершении или ошибках."
     },
     "SUPPORT": {
       "TITLE": "Возникли проблемы?",
@@ -108,10 +115,20 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Системная информация"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
       "TITLE": "Пакетное увеличение",
       "DESCRIPTION": "Позволяет увеличивать все файлы в папке сразу"
@@ -130,11 +147,11 @@
       "ZOOM": "Увеличение",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl обычный",
+          "NAME": "Upscayl-Next обычный",
           "DESCRIPTION": "Подходит для большинства изображений."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl лёгкий",
+          "NAME": "Upscayl-Next лёгкий",
           "DESCRIPTION": "Подходит для большинства изображений. Высокоскоростное увеличение с минимальной потерей качества."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
+    "DOUBLE_UPSCAYL-NEXT": {
       "TITLE": "Двойное увеличение",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Включите эту опцию, чтобы дважды увеличить изображение. Обратите внимание, что это может значительно увеличить время обработки и, возможно, вызвать проблемы с производительностью для масштабов больше 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Шаг 3",
-      "MAC_APP_STORE_ALERT": "Из-за ограничений безопасности MacOS App Store Upscayl требует выбора папки вывода каждый раз при запуске.\n\nЧтобы избежать этого, вы можете навсегда сохранить папку вывода по умолчанию на вкладке «Настройки» Upscayl.",
+      "MAC_APP_STORE_ALERT": "Из-за ограничений безопасности MacOS App Store Upscayl-Next требует выбора папки вывода каждый раз при запуске.\n\nЧтобы избежать этого, вы можете навсегда сохранить папку вывода по умолчанию на вкладке «Настройки» Upscayl-Next.",
       "NOT_SELECTED": "Не выбрано",
       "DEFAULT_IMG_PATH": "Стандартный путь изображения",
       "DEFAULT_FOLDER_PATH": "Стандартный путь папки",
@@ -193,6 +212,12 @@
       "LAST_USED_AT": "Последнее использование"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Пакетное увеличение в процессе:",
       "IN_PROGRESS_TITLE": "Магия увеличения в процессе...",
       "STOP_BUTTON_TITLE": "СТОП"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Ошибка исключения",
-      "DESCRIPTION": "Upscayl столкнулся с ошибкой. Возможно, двоичный файл upscayl не смог правильно выполнить команды. Попробуйте проверить журнал, чтобы узнать больше информации. Вы можете оставить запрос в репозитории GitHub Upscayl для получения дополнительной помощи."
+      "DESCRIPTION": "Upscayl-Next столкнулся с ошибкой. Возможно, двоичный файл upscayl не смог правильно выполнить команды. Попробуйте проверить журнал, чтобы узнать больше информации. Вы можете оставить запрос в репозитории GitHub Upscayl-Next для получения дополнительной помощи."
     },
     "GENERIC_ERROR": {
       "TITLE": "Ошибка"
@@ -277,13 +302,13 @@
       "TITLE": "Предупреждение о метаданных",
       "DESCRIPTION": "В некоторых системах метаданные могут не отображаться в форматах, отличных от JPG. При необходимости используйте специальные инструменты для просмотра метаданных."
     }
-  },   
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Скоро будет доступно!",
     "CATCHY_PHRASE_1": "Больше никаких ошибок, проблем с оборудованием, компромиссов в качестве или долгих загрузок!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl где угодно, в любое время, на любом устройстве\n☁️ Не требуется видеокарта или оборудование\n👩 Улучшение лиц\n🦋 Более 10 моделей на выбор\n🏎 В 5 раз быстрее, чем настольная версия Upscayl\n🎞 Увеличение видео\n💰 Коммерческое использование\n😴 Увеличивайте, пока спите",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next где угодно, в любое время, на любом устройстве\n☁️ Не требуется видеокарта или оборудование\n👩 Улучшение лиц\n🦋 Более 10 моделей на выбор\n🏎 В 5 раз быстрее, чем настольная версия Upscayl-Next\n🎞 Увеличение видео\n💰 Коммерческое использование\n😴 Увеличивайте, пока спите",
     "ALREADY_REGISTERED_ALERT": "Спасибо, {name}! Похоже, ваш email уже зарегистрирован :D Если это не так, пожалуйста, попробуйте снова.",
-    "ADD_SUCCESS": "Спасибо за присоединение к списку ожидания! Мы уведомим вас, когда Upscayl Cloud будет готов для вас.",
+    "ADD_SUCCESS": "Спасибо за присоединение к списку ожидания! Мы уведомим вас, когда Upscayl-Next Cloud будет готов для вас.",
     "INCORRECT_FIELDS_ALERT": "Пожалуйста, правильно заполните все поля.",
     "JOIN_WAITLIST": "Присоединиться к списку ожидания",
     "DONT_SHOW_AGAIN": "БОЛЬШЕ НЕ ПОКАЗЫВАТЬ"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Начать",
     "SETTINGS_NOTE": "Вы всегда можете изменить эти настройки позже.",
     "STEP_1": {
-      "TITLE": "Добро пожаловать в Upscayl 🎉",
+      "TITLE": "Добро пожаловать в Upscayl-Next 🎉",
       "DESCRIPTION": "Давайте начнём с нескольких быстрых шагов."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Настройте начальные параметры."
     },
     "STEP_3": {
-      "TITLE": "Как использовать Upscayl? 🚀",
+      "TITLE": "Как использовать Upscayl-Next? 🚀",
       "DESCRIPTION": "Посмотрите это короткое видео, чтобы узнать о новых функциях."
     },
     "STEP_4": {
       "TITLE": "Все готово! 🎉",
-      "DESCRIPTION": "Теперь вы готовы начать увеличивать изображения с помощью Upscayl!"
+      "DESCRIPTION": "Теперь вы готовы начать увеличивать изображения с помощью Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

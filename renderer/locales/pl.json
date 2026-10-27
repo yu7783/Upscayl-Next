@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Przedstawiamy Chmurę Upscayl!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Przedstawiamy Chmurę Upscayl-Next!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Daj nam gwiazdke na GitHub 😁",
     "DESCRIPTION": "Skalowanie obrazów za pomocą AI"
   },
   "FOOTER": {
-    "NEWS_TITLE": "WIADOMOŚCI UPSCAYL",
-    "COPYRIGHT": "Copyright ©",
+    "NEWS_TITLE": "WIADOMOŚCI UPSCAYL-NEXT",
     "TITLE": "Stworzona przez ",
-    "LINK_TITLE": "The Upscayl Team"
+    "LINK_TITLE": "The Upscayl-Next Team"
   },
   "SETTINGS": {
     "TITLE": "Ustawienia",
-    "CHANGE_LANGUAGE": { "TITLE": "Zmień Język" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Zmień Język"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Kompresja obrazu",
       "DESCRIPTION": "Kompresja PNG jest bezstratna, więc rozmiar pliku może nie zostać znacząco zmniejszony, a wyższe wartości kompresji mogą mieć wpływ na wydajność. Kompresja JPG i WebP powoduje straty."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU ID",
-      "DESCRIPTION": "Przeczytaj dokumentację Upscayl, aby uzyskać więcej informacji.",
+      "DESCRIPTION": "Przeczytaj dokumentację Upscayl-Next, aby uzyskać więcej informacji.",
       "ADDITIONAL_DESCRIPTION": "Włącz tryb wydajności w systemie Windows, aby uzyskać lepsze wyniki."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Skala obrazu",
-      "DESCRIPTION": "Wszystko powyżej 4X (oprócz 16X Podwójny Upscayl) zmienia tylko rozmiar obrazu i nie korzysta ze skalowania AI.",
+      "DESCRIPTION": "Wszystko powyżej 4X (oprócz 16X Podwójny Upscayl-Next) zmienia tylko rozmiar obrazu i nie korzysta ze skalowania AI.",
       "WARNING": "Wszystko powyżej 5X może spowodować problem z wydajnością na niektórych urządzeniach!",
       "ADDITIONAL_WARNING": "To może spowodować problemy z wydajnością na niektórych urządzeniach!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "NADPISZ POPRZEDNIE SKALOWANIE",
-      "DESCRIPTION": "Jeżeli włączone, Upscayl przetworzy obraz ponownie zamiast ładować go bezpośrednio."
+      "DESCRIPTION": "Jeżeli włączone, Upscayl-Next przetworzy obraz ponownie zamiast ładować go bezpośrednio."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "ZRESETUJ UPSCAYL",
-      "ALERT": "Upscayl został zresetowany. Uruchom ponownie aplikację."
+      "BUTTON_TITLE": "ZRESETUJ UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next został zresetowany. Uruchom ponownie aplikację."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "ZAPISZ WYJŚCIOWY FOLDER",
       "DESCRIPTION": "Jeżeli włączone, wyjściowy folder zostanie zapamiętany pomiędzy sesjami."
     },
     "AUTO_UPDATE": {
-      "TITLE": "AUTOMATYCZNA AKTUALIZACJA UPSCAYL",
+      "TITLE": "AUTOMATYCZNA AKTUALIZACJA UPSCAYL-NEXT",
       "DESCRIPTION": "Jeżeli włączone, aplikacja sprawdzi, czy są nowe aktualizacje i Cię powiadomi."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "POMÓŻ ULEPSZYĆ UPSCAYL",
-      "DESCRIPTION": "Jeżeli włączone, Upscayl będzie zbierał anonimowe dane dotyczące użytkowania w celu ulepszenia interfejsu i funkcji aplikacji."
-    },
     "THEME": {
-      "TITLE": "MOTYW UPSCAYL"
+      "TITLE": "MOTYW UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "JĘZYK UPSCAYL"
+      "TITLE": "JĘZYK UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "NIESTANDARDOWY ROZMIAR KAFELKI",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "WYŁĄCZ POWIADOMIENIA",
-      "DESCRIPTION": "Jeżeli włączone, Upscayl nie będzie wysyłał żadnych powiadomień systemowych o powodzeniu lub niepowodzeniu."
+      "DESCRIPTION": "Jeżeli włączone, Upscayl-Next nie będzie wysyłał żadnych powiadomień systemowych o powodzeniu lub niepowodzeniu."
     },
     "SUPPORT": {
       "TITLE": "Masz problemy?",
@@ -108,13 +115,23 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Informacje o Systemie"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Plik Upscayl",
-      "DESCRIPTION": "To ci pozwoli na Upscayl wszystkich plików w folderze na raz"
+      "TITLE": "Plik Upscayl-Next",
+      "DESCRIPTION": "To ci pozwoli na Upscayl-Next wszystkich plików w folderze na raz"
     },
     "FILE_SELECTION": {
       "TITLE": "Krok 1",
@@ -130,11 +147,11 @@
       "ZOOM": "Powiększ",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Nadaje się do większości obrazów."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Nadaje się do większości obrazów. Szybkie skalowanie z minimalną utratą jakości."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Podwójny Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Podwójny Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Włącz tę opcję, aby uruchomić upscayl dwukrotnie na obrazie. Należy pamiętać, że może to spowodować znaczne wydłużenie czasu przetwarzania i ewentualne problemy z wydajnością w przypadku skal większych niż 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Krok 3",
-      "MAC_APP_STORE_ALERT": "Ze względu na ograniczenia bezpieczeństwa sklepu App Store w systemie macOS, Upscayl wymaga wybrania folderu wyjściowego przy każdym uruchomieniu.\n\nAby tego uniknąć, możesz trwale zapisać domyślny folder wyjściowy w zakładce „Ustawienia” programu Upscayl.",
+      "MAC_APP_STORE_ALERT": "Ze względu na ograniczenia bezpieczeństwa sklepu App Store w systemie macOS, Upscayl-Next wymaga wybrania folderu wyjściowego przy każdym uruchomieniu.\n\nAby tego uniknąć, możesz trwale zapisać domyślny folder wyjściowy w zakładce „Ustawienia” programu Upscayl-Next.",
       "NOT_SELECTED": "Nie Wybrano",
       "DEFAULT_IMG_PATH": "Domyślna ścieżka obrazu",
       "DEFAULT_FOLDER_PATH": "Domyślna ścieżka folderu",
@@ -173,7 +192,7 @@
     },
     "SCALE_SELECTION": {
       "TITLE": "Krok 4",
-      "FROM_TITLE": "Upscayl z ",
+      "FROM_TITLE": "Upscayl-Next z ",
       "TO_TITLE": " do ",
       "NO_OUTPUT_FOLDER_ALERT": "Wybierz najpierw folder wyjściowy",
       "START_BUTTON_TITLE": "Upscayluj 🚀",
@@ -189,11 +208,17 @@
       "TOTAL_IMAGE_UPSCAYLS": "Łącznie Obrazów Upscaylowano",
       "TOTAL_DOUBLE_UPSCAYLS": "Łącznie Podwójnych Upscaylowano",
       "AVERAGE_UPSCAYL_TIME": "Średni czas Upscaylowania",
-      "LAST_UPSCAYL_DURATION": "Ostatni czas trwania Upscayl",
+      "LAST_UPSCAYL_DURATION": "Ostatni czas trwania Upscayl-Next",
       "LAST_USED_AT": "Ostatnio Używany W"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Plikowy Upscayl W Toku:",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Plikowy Upscayl-Next W Toku:",
       "IN_PROGRESS_TITLE": "Robię magię Upscaylowania...",
       "STOP_BUTTON_TITLE": "ZATRZYMAJ"
     },
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Błąd wyjątku",
-      "DESCRIPTION": "Upscayl napotkał błąd. Możliwe, że plik binarny Upscayl nie wykonał poprawnie poleceń. Sprawdź logi, aby znaleźć dodatkowe informacje. Możesz zgłosić problem w repozytorium Upscayl na GitHubie, aby uzyskać więcej pomocy."
+      "DESCRIPTION": "Upscayl-Next napotkał błąd. Możliwe, że plik binarny Upscayl-Next nie wykonał poprawnie poleceń. Sprawdź logi, aby znaleźć dodatkowe informacje. Możesz zgłosić problem w repozytorium Upscayl-Next na GitHubie, aby uzyskać więcej pomocy."
     },
     "GENERIC_ERROR": {
       "TITLE": "Błąd"
@@ -281,9 +306,9 @@
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Wkrótce!",
     "CATCHY_PHRASE_1": "Koniec z błędami, problemami ze sprzętem, kompromisami w zakresie jakości i długim czasem ładowania!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl wszędzie, kiedykolwiek, dowolne urządzenie\n☁️ Nie jest wymagana żadna karta graficzna ani sprzęt\n👩 Uwydatnianie twarzy\n🦋 10+ modeli do wyboru\n🏎 5x szybszy niż pulpitowa wersja Upscayl\n🎞 Skalowanie wideo\n💰 Wykorzystanie komercyjne\n😴 Upscayl kiedy śpisz",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next wszędzie, kiedykolwiek, dowolne urządzenie\n☁️ Nie jest wymagana żadna karta graficzna ani sprzęt\n👩 Uwydatnianie twarzy\n🦋 10+ modeli do wyboru\n🏎 5x szybszy niż pulpitowa wersja Upscayl-Next\n🎞 Skalowanie wideo\n💰 Wykorzystanie komercyjne\n😴 Upscayl-Next kiedy śpisz",
     "ALREADY_REGISTERED_ALERT": "Dziękujemy {name}! Wygląda na to, że Twój adres email został już zarejestrowany :D Jeśli tak nie jest, spróbuj ponownie.",
-    "ADD_SUCCESS": "Dziękujemy za dołączenie do listy oczekujących! Powiadomimy Cię, gdy Upscayl Cloud będzie dla Ciebie gotowy.",
+    "ADD_SUCCESS": "Dziękujemy za dołączenie do listy oczekujących! Powiadomimy Cię, gdy Upscayl-Next Cloud będzie dla Ciebie gotowy.",
     "INCORRECT_FIELDS_ALERT": "Proszę wypełnić wszystkie pola poprawnie.",
     "JOIN_WAITLIST": "Dołącz do listy oczekujących",
     "DONT_SHOW_AGAIN": "NIE POKAZUJ PONOWNIE"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Rozpocznij",
     "SETTINGS_NOTE": "Możesz zawsze zmienić te ustawienia później.",
     "STEP_1": {
-      "TITLE": "Witaj w Upscayl 🎉",
+      "TITLE": "Witaj w Upscayl-Next 🎉",
       "DESCRIPTION": "Zacznijmy od kilku szybkich kroków."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Skonfiguruj ustawienia początkowe."
     },
     "STEP_3": {
-      "TITLE": "Jak używać Upscayl? 🚀",
+      "TITLE": "Jak używać Upscayl-Next? 🚀",
       "DESCRIPTION": "Obejrzyj ten krótki film, aby dowiedzieć się więcej o nowych funkcjach."
     },
     "STEP_4": {
       "TITLE": "Wszystko gotowe! 🎉",
-      "DESCRIPTION": "Możesz zacząć skalować obrazy za pomocą Upscayl!"
+      "DESCRIPTION": "Możesz zacząć skalować obrazy za pomocą Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

@@ -1,138 +1,48 @@
-function Spinner() {
+import React, { SVGProps } from "react";
+
+/**
+ * Original loading spinner. The previous component reused third-party artwork
+ * (with an author credit). This version draws eight fading dots on a circle and
+ * animates them with CSS, so the app ships only original artwork.
+ */
+function Spinner({ className, ...rest }: SVGProps<SVGSVGElement>) {
+  const dots = Array.from({ length: 8 });
   return (
-    // By Sam Herbert (@sherb), for everyone. More @ http://goo.gl/7AJzbL
     <svg
-      viewBox="0 0 58 58"
-      fill="currentColor"
-      stroke="currentColor"
+      viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
-      className="h-16 w-16 rounded-full bg-base-300 p-2 text-base-content"
+      fill="none"
+      className={
+        className ??
+        "h-16 w-16 rounded-full bg-base-300 p-2 text-base-content"
+      }
+      {...rest}
     >
-      <g fill="none" fill-rule="evenodd">
-        <g transform="translate(2 1)" stroke="currentColor" stroke-width="1.5">
-          <circle
-            cx="42.601"
-            cy="11.462"
-            r="5"
-            fill-opacity="1"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="1;0;0;0;0;0;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
+      <style>{`
+        @keyframes upscayl-original-spin {
+          to { transform: rotate(360deg); }
+        }
+        .upscayl-original-spinner {
+          animation: upscayl-original-spin 1s linear infinite;
+          transform-origin: 12px 12px;
+        }
+      `}</style>
+      <g className="upscayl-original-spinner">
+        {dots.map((_, index) => {
+          const angle = (index * Math.PI * 2) / dots.length;
+          const x = 12 + Math.cos(angle) * 7.5;
+          const y = 12 + Math.sin(angle) * 7.5;
+          return (
+            <circle
+              key={index}
+              cx={x}
+              cy={y}
+              r={1.6}
+              fill="currentColor"
+              opacity={0.15 + (index / dots.length) * 0.85}
             />
-          </circle>
-          <circle
-            cx="49.063"
-            cy="27.063"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;1;0;0;0;0;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="42.601"
-            cy="42.663"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;1;0;0;0;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="27"
-            cy="49.125"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;0;1;0;0;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="11.399"
-            cy="42.663"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;0;0;1;0;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="4.938"
-            cy="27.063"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;0;0;0;1;0;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle
-            cx="11.399"
-            cy="11.462"
-            r="5"
-            fill-opacity="0"
-            fill="currentColor"
-          >
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;0;0;0;0;1;0"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <circle cx="27" cy="5" r="5" fill-opacity="0" fill="currentColor">
-            <animate
-              attributeName="fill-opacity"
-              begin="0s"
-              dur="1.3s"
-              values="0;0;0;0;0;0;0;1"
-              calcMode="linear"
-              repeatCount="indefinite"
-            />
-          </circle>
-        </g>
+          );
+        })}
       </g>
     </svg>
   );

@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Upscayl Cloud 隆重登场！",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Upscayl-Next Cloud 隆重登场！",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "给我们的 GitHub 仓库标星 😁",
     "DESCRIPTION": "AI 图像增强工具"
   },
   "FOOTER": {
-    "NEWS_TITLE": "Upscayl 新闻",
-    "COPYRIGHT": "版权所有 ©",
+    "NEWS_TITLE": "Upscayl-Next 新闻",
     "TITLE": "开发者：",
-    "LINK_TITLE": "Upscayl 团队"
+    "LINK_TITLE": "Upscayl-Next 团队"
   },
   "SETTINGS": {
     "TITLE": "设置",
-    "CHANGE_LANGUAGE": { "TITLE": "更改语言" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "更改语言"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "图片压缩",
       "DESCRIPTION": "PNG 压缩是无损的，因此可能不会显著减少文件大小，而更高的压缩比值可能会影响性能。JPG 和 WebP 压缩是有损的。"
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU ID",
-      "DESCRIPTION": "请阅读 Upscayl 文档 Wiki 来了解更多信息。",
+      "DESCRIPTION": "请阅读 Upscayl-Next 文档 Wiki 来了解更多信息。",
       "ADDITIONAL_DESCRIPTION": "在 Windows 上启用性能模式以获得更好的效果。"
     },
     "IMAGE_FORMAT": {
@@ -65,23 +76,19 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "覆盖之前的结果",
-      "DESCRIPTION": "启用后，Upscayl 将重新处理图片，不直接加载之前的结果。"
+      "DESCRIPTION": "启用后，Upscayl-Next 将重新处理图片，不直接加载之前的结果。"
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "重置 Upscayl",
-      "ALERT": "Upscayl 已被重置，请重新启动应用程序。"
+      "BUTTON_TITLE": "重置 Upscayl-Next",
+      "ALERT": "Upscayl-Next 已被重置，请重新启动应用程序。"
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "保存输出文件夹",
       "DESCRIPTION": "启用后，输出文件夹将在会话之间被记住。"
     },
     "AUTO_UPDATE": {
-      "TITLE": "自动更新Upscayl",
+      "TITLE": "自动更新Upscayl-Next",
       "DESCRIPTION": "启用后，应用程序将检查更新并通知你。"
-    },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "帮助改进Upscayl",
-      "DESCRIPTION": "启用后，Upscayl 将收集匿名使用数据以改进应用程序界面和功能。"
     },
     "THEME": {
       "TITLE": "主题"
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "关闭通知",
-      "DESCRIPTION": "启用后，Upscayl 将不会发送任何有关图像处理的系统通知。"
+      "DESCRIPTION": "启用后，Upscayl-Next 将不会发送任何有关图像处理的系统通知。"
     },
     "SUPPORT": {
       "TITLE": "有问题吗？",
@@ -108,10 +115,20 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "系统信息"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
       "TITLE": "批量",
       "DESCRIPTION": "一次性对文件夹中的所有文件进行升图操作"
@@ -130,11 +147,11 @@
       "ZOOM": "缩放",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl 标准",
+          "NAME": "Upscayl-Next 标准",
           "DESCRIPTION": "适用于大多数图像。"
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl 轻量版",
+          "NAME": "Upscayl-Next 轻量版",
           "DESCRIPTION": "适用于大多数图像。高速升图，质量损失最小。"
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
+    "DOUBLE_UPSCAYL-NEXT": {
       "TITLE": "双重升图",
-      "DESCRIPTION": "启用后，Upscayl 会对自己的输出再次增强。请注意，这可能会显著拖慢处理速度，导致性能问题。当增强比例超过 4X 时, 该问题会更加明显。"
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
+      "DESCRIPTION": "启用后，Upscayl-Next 会对自己的输出再次增强。请注意，这可能会显著拖慢处理速度，导致性能问题。当增强比例超过 4X 时, 该问题会更加明显。"
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "第三步",
-      "MAC_APP_STORE_ALERT": "由于 App Store 的安全限制，Upscayl 每次启动时都需要你选择一个输出文件夹。\n\n为避免此情况，你可以在 Upscayl 的设置中选择保存输出文件夹。",
+      "MAC_APP_STORE_ALERT": "由于 App Store 的安全限制，Upscayl-Next 每次启动时都需要你选择一个输出文件夹。\n\n为避免此情况，你可以在 Upscayl-Next 的设置中选择保存输出文件夹。",
       "NOT_SELECTED": "未选择",
       "DEFAULT_IMG_PATH": "默认为图片路径",
       "DEFAULT_FOLDER_PATH": "默认为文件夹路径",
@@ -193,6 +212,12 @@
       "LAST_USED_AT": "上次使用日期"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "批量升图中",
       "IN_PROGRESS_TITLE": "稍等一下，升图魔法进行中",
       "STOP_BUTTON_TITLE": "取消"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "异常错误",
-      "DESCRIPTION": "Upscayl 核心程序遇到未知错误。试试检查日志是否有任何信息。在 GitHub 仓库中提交 issue 以获取更多帮助"
+      "DESCRIPTION": "Upscayl-Next 核心程序遇到未知错误。试试检查日志是否有任何信息。在 GitHub 仓库中提交 issue 以获取更多帮助"
     },
     "GENERIC_ERROR": {
       "TITLE": "错误"
@@ -277,13 +302,13 @@
       "TITLE": "元数据警告",
       "DESCRIPTION": "在某些系统上，JPG 以外的格式可能无法显示元数据。如有需要，请使用专门的工具查看元数据。"
     }
-  },    
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "即将推出！",
     "CATCHY_PHRASE_1": "该与错误、硬件问题、质量妥协和漫长的等待告别喽！",
-    "CATCHY_PHRASE_2": "🌐 随时随地，任何设备都能使用 Upscayl\n☁️ 无需显卡或硬件\n👩 面部增强\n🦋 10+ 模型可供选择\n🏎 比桌面版快 5 倍\n🎞 视频增强\n💰 商业用途\n😴 你睡你的觉，它升它的图",
+    "CATCHY_PHRASE_2": "🌐 随时随地，任何设备都能使用 Upscayl-Next\n☁️ 无需显卡或硬件\n👩 面部增强\n🦋 10+ 模型可供选择\n🏎 比桌面版快 5 倍\n🎞 视频增强\n💰 商业用途\n😴 你睡你的觉，它升它的图",
     "ALREADY_REGISTERED_ALERT": "{name}，谢谢您！不过看起来您好像已经注册过了 b（￣▽￣）d 不对的话，再注册一遍试试。",
-    "ADD_SUCCESS": "感谢您加入候补名单！我们将会在 Upscayl Cloud 准备就绪时通知你。",
+    "ADD_SUCCESS": "感谢您加入候补名单！我们将会在 Upscayl-Next Cloud 准备就绪时通知你。",
     "INCORRECT_FIELDS_ALERT": "请适当填写",
     "JOIN_WAITLIST": "加入候补名单",
     "DONT_SHOW_AGAIN": "不再显示"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "开始使用",
     "SETTINGS_NOTE": "你可以随时更改这些设置。",
     "STEP_1": {
-      "TITLE": "欢迎使用 Upscayl 🎉",
+      "TITLE": "欢迎使用 Upscayl-Next 🎉",
       "DESCRIPTION": "让我们通过几个快速步骤来开始吧。"
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "配置你的初始设置。"
     },
     "STEP_3": {
-      "TITLE": "如何使用 Upscayl？ 🚀",
+      "TITLE": "如何使用 Upscayl-Next？ 🚀",
       "DESCRIPTION": "观看这个简短的视频，了解新功能。"
     },
     "STEP_4": {
       "TITLE": "一切准备就绪！ 🎉",
-      "DESCRIPTION": "你已经准备好使用 Upscayl 来升级图片了！"
+      "DESCRIPTION": "你已经准备好使用 Upscayl-Next 来升级图片了！"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

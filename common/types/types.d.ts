@@ -15,6 +15,10 @@ export type ImageUpscaylPayload = {
   tileSize: number;
   ttaMode: boolean;
   copyMetadata: boolean;
+  /**
+   * Optional "load:proc:save" thread split. Empty/undefined keeps the default.
+   */
+  threads?: string;
 };
 
 export type DoubleUpscaylPayload = {
@@ -34,6 +38,28 @@ export type DoubleUpscaylPayload = {
   tileSize: number;
   ttaMode: boolean;
   copyMetadata: boolean;
+  /**
+   * Optional "load:proc:save" thread split. Empty/undefined keeps the default.
+   */
+  threads?: string;
+};
+
+export type VideoUpscaylPayload = {
+  videoPath: string;
+  outputPath: string;
+  scale: string;
+  model: string;
+  gpuId: string;
+  saveImageAs: ImageFormat;
+  compression: string;
+  customWidth: string;
+  useCustomWidth: boolean;
+  tileSize: number;
+  ttaMode: boolean;
+  /**
+   * Optional "load:proc:save" thread split. Empty/undefined keeps the default.
+   */
+  threads?: string;
 };
 
 export type BatchUpscaylPayload = {
@@ -50,4 +76,14 @@ export type BatchUpscaylPayload = {
   tileSize: number;
   ttaMode: boolean;
   copyMetadata: boolean;
+  /**
+   * Run the whole folder twice (the second pass reads the first pass output).
+   * Enables Batch + Double Upscayl together and fixes issue #1405.
+   */
+  doubleUpscale?: boolean;
+  /**
+   * Optional "load:proc:save" thread split. Empty/undefined lets the app
+   * calculate a split from the CPU core count.
+   */
+  threads?: string;
 };

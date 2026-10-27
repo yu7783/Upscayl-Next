@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Upscayl Cloudを紹介します！",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Upscayl-Next Cloudを紹介します！",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "GitHubでスターをつけてください 😁",
     "DESCRIPTION": "AI画像アップスケーラー"
   },
   "FOOTER": {
-    "NEWS_TITLE": "UPSCAYLニュース",
-    "COPYRIGHT": "著作権 ©",
+    "NEWS_TITLE": "UPSCAYL-NEXTニュース",
     "TITLE": "作成者: ",
-    "LINK_TITLE": "Upscaylチーム"
+    "LINK_TITLE": "Upscayl-Nextチーム"
   },
   "SETTINGS": {
     "TITLE": "設定",
-    "CHANGE_LANGUAGE": { "TITLE": "言語を変更する" },
+    "BACK_TO_UPSCAYL-NEXT": "Upscayl-Nextに戻る",
+    "SECTIONS": {
+      "DESCRIPTION": "設定をカテゴリ別に整理しています。目的の項目をすぐに見つけられます。",
+      "IMAGE": "画像と出力",
+      "PERFORMANCE": "パフォーマンス",
+      "INTERFACE": "インターフェース",
+      "MODELS": "モデル",
+      "SYSTEM": "システム",
+      "SUPPORT": "サポート"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "言語を変更する"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "画像圧縮",
       "DESCRIPTION": "PNG圧縮は非可逆的であるため、ファイルサイズが大幅に削減されることはなく、高い圧縮値はパフォーマンスに影響を与える可能性があります。JPGおよびWebP圧縮は可逆的です。"
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU ID",
-      "DESCRIPTION": "詳細については、Upscaylのドキュメントをお読みください。",
+      "DESCRIPTION": "詳細については、Upscayl-Nextのドキュメントをお読みください。",
       "ADDITIONAL_DESCRIPTION": "Windowsでパフォーマンスモードを有効にして、より良い結果を得ることができます。"
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "画像スケール",
-      "DESCRIPTION": "4X以上のスケール（16X Double Upscaylを除く）は、画像をリサイズするだけで、AIアップスケーリングは行われません。",
+      "DESCRIPTION": "4X以上のスケール（16X Double Upscayl-Nextを除く）は、画像をリサイズするだけで、AIアップスケーリングは行われません。",
       "WARNING": "5X以上は一部のデバイスでパフォーマンスに問題を引き起こす可能性があります！",
       "ADDITIONAL_WARNING": "これにより、一部のデバイスでパフォーマンスに問題が発生する可能性があります！"
     },
@@ -65,11 +76,11 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "以前のアップスケールを上書き",
-      "DESCRIPTION": "有効にすると、Upscaylは画像を再処理し、直接ロードするのではなく再度処理します。"
+      "DESCRIPTION": "有効にすると、Upscayl-Nextは画像を再処理し、直接ロードするのではなく再度処理します。"
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "Upscaylをリセット",
-      "ALERT": "Upscaylがリセットされました。アプリを再起動してください。"
+      "BUTTON_TITLE": "Upscayl-Nextをリセット",
+      "ALERT": "Upscayl-Nextがリセットされました。アプリを再起動してください。"
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "出力フォルダを保存",
@@ -79,15 +90,11 @@
       "TITLE": "自動更新",
       "DESCRIPTION": "有効にすると、アプリケーションは新しい更新をチェックし、通知します。"
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "UPSCAYLの改善に協力",
-      "DESCRIPTION": "有効にすると、Upscaylは匿名の使用データを収集して、アプリケーションのインターフェースと機能を改善します。"
-    },
     "THEME": {
-      "TITLE": "UPSCAYLテーマ"
+      "TITLE": "UPSCAYL-NEXTテーマ"
     },
     "LANGUAGE": {
-      "TITLE": "UPSCAYLの言語"
+      "TITLE": "UPSCAYL-NEXTの言語"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "カスタムタイルサイズ",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "通知をオフにする",
-      "DESCRIPTION": "有効にすると、Upscaylは成功または失敗時にシステム通知を送信しなくなります。"
+      "DESCRIPTION": "有効にすると、Upscayl-Nextは成功または失敗時にシステム通知を送信しなくなります。"
     },
     "SUPPORT": {
       "TITLE": "問題がありますか？",
@@ -106,15 +113,25 @@
       "TITLE": "TTAモード",
       "DESCRIPTION": "テストタイムオーグメンテーションを有効にして、アーティファクトの除去など、より良い結果を得ることができますが、処理時間が8倍に増加します！"
     },
+    "THREADS": {
+      "TITLE": "スレッド数",
+      "DESCRIPTION": "「読み込み:処理:保存」形式でスレッド分割を指定します。空欄にすると Upscayl-Next が自動で最適な値を使用します。",
+      "RESET": "自動",
+      "INVALID": "「読み込み:処理:保存」形式で入力してください（例: 2:2:2）。"
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "設定の自動最適化",
+      "DESCRIPTION": "内蔵モデルを選択したとき、そのモデルに推奨されるスケール・タイルサイズ・TTA・スレッド数を自動で適用します。カスタムモデルでは現在の設定を維持します。"
+    },
     "SYSTEM_INFO": {
       "TITLE": "システム情報"
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "バッチUpscayl",
-      "DESCRIPTION": "これにより、フォルダ内のすべてのファイルを一度にUpscaylできます"
+      "TITLE": "バッチUpscayl-Next",
+      "DESCRIPTION": "これにより、フォルダ内のすべてのファイルを一度にUpscayl-Nextできます"
     },
     "FILE_SELECTION": {
       "TITLE": "ステップ 1",
@@ -130,11 +147,11 @@
       "ZOOM": "ズーム",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscaylスタンダード",
+          "NAME": "Upscayl-Nextスタンダード",
           "DESCRIPTION": "ほとんどの画像に適しています。"
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscaylライト",
+          "NAME": "Upscayl-Nextライト",
           "DESCRIPTION": "ほとんどの画像に適しています。最小限の品質損失で高速アップスケーリング。"
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Double Upscayl",
-      "DESCRIPTION": "このオプションを有効にすると、画像に対して2回Upscaylを実行します。4X以上のスケールでは、処理時間が大幅に増加し、パフォーマンスに問題が発生する可能性があることに注意してください。"
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Double Upscayl-Next",
+      "BATCH_TITLE": "ダブルアップスケール（2パス）",
+      "BATCH_DESCRIPTION": "フォルダ内のすべての画像を2回（2パス）アップスケールします。処理時間が大幅に増加します。",
+      "DESCRIPTION": "このオプションを有効にすると、画像に対して2回Upscayl-Nextを実行します。4X以上のスケールでは、処理時間が大幅に増加し、パフォーマンスに問題が発生する可能性があることに注意してください。"
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "ステップ 3",
-      "MAC_APP_STORE_ALERT": "MacOS App Storeのセキュリティ制限のため、Upscaylを開始するたびに出力フォルダを選択する必要があります。\n\nこれを回避するには、Upscaylの「設定」タブでデフォルトの出力フォルダを永久に保存できます。",
+      "MAC_APP_STORE_ALERT": "MacOS App Storeのセキュリティ制限のため、Upscayl-Nextを開始するたびに出力フォルダを選択する必要があります。\n\nこれを回避するには、Upscayl-Nextの「設定」タブでデフォルトの出力フォルダを永久に保存できます。",
       "NOT_SELECTED": "未選択",
       "DEFAULT_IMG_PATH": "画像のパスがデフォルトになります",
       "DEFAULT_FOLDER_PATH": "フォルダのパスがデフォルトになります",
@@ -173,11 +192,11 @@
     },
     "SCALE_SELECTION": {
       "TITLE": "ステップ 4",
-      "FROM_TITLE": "Upscayl元 ",
+      "FROM_TITLE": "Upscayl-Next元 ",
       "TO_TITLE": " から ",
       "NO_OUTPUT_FOLDER_ALERT": "まず出力フォルダを選択してください",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
-      "IN_PROGRESS_BUTTON_TITLE": "Upscayl中 ⏳"
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
+      "IN_PROGRESS_BUTTON_TITLE": "Upscayl-Next中 ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
       "RESET_BUTTON_TITLE": "画像をリセット",
@@ -193,14 +212,20 @@
       "LAST_USED_AT": "最終使用日時"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "バッチUpscayl進行中：",
-      "IN_PROGRESS_TITLE": "Upscaylの魔法をかけています...",
+      "PASS_TITLE": "パス {pass} / {totalPasses}",
+      "BATCH_COUNT_TITLE": "バッチ進捗: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "経過時間: {time}",
+      "REMAINING_TITLE": "残り時間: {time}",
+      "ESTIMATING_TITLE": "計算中...",
+      "REMAINING_FILES_TITLE": "残り {count} ファイル",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "バッチUpscayl-Next進行中：",
+      "IN_PROGRESS_TITLE": "Upscayl-Nextの魔法をかけています...",
       "STOP_BUTTON_TITLE": "停止"
     },
     "RESET_BUTTON_TITLE": "リセット",
     "RIGHT_PANE_INFO": {
-      "SELECT_FOLDER": "Upscaylするフォルダを選択",
-      "SELECT_IMAGE": "Upscaylする画像を選択",
+      "SELECT_FOLDER": "Upscayl-Nextするフォルダを選択",
+      "SELECT_IMAGE": "Upscayl-Nextする画像を選択",
       "SELECT_FOLDER_DESCRIPTION": "フォルダにはPNG、JPG、JPEG、WEBPの画像以外のものが含まれていないことを確認してください。",
       "SELECT_IMAGES_DESCRIPTION": "PNG、JPG、JPEG、またはWEBP画像を選択するか、ドラッグアンドドロップしてください。",
       "PASTE_IMAGE_DESCRIPTION": "Ctrl+V または ⌘+V を押してクリップボードから画像を貼り付けます"
@@ -209,16 +234,16 @@
       "PROCESSING_TITLE": "画像を処理中...",
       "SCALING_CONVERTING_TITLE": "画像をスケールおよび変換中...",
       "WAIT_TITLE": "少々お待ちください...",
-      "SUCCESS_TITLE": "Upscaylが成功しました！",
+      "SUCCESS_TITLE": "Upscayl-Nextが成功しました！",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "選択されたフォルダ：",
         "DONE_TITLE": "すべて完了しました！",
-        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscaylされたフォルダを開く"
+        "OPEN_UPSCAYLED_FOLDER_TITLE": "Upscayl-Nextされたフォルダを開く"
       }
     },
     "SLIDER": {
       "ORIGINAL_TITLE": "オリジナル",
-      "UPSCAYLED_TITLE": "Upscayl後"
+      "UPSCAYLED_TITLE": "Upscayl-Next後"
     },
     "DIALOG_BOX": {
       "CLOSE": "閉じる"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "例外エラー",
-      "DESCRIPTION": "Upscaylでエラーが発生しました。おそらく、Upscaylのバイナリがコマンドを適切に実行できなかった可能性があります。ログを確認して情報を取得してみてください。さらに支援が必要な場合は、UpscaylのGitHubリポジトリに問題を投稿することができます。"
+      "DESCRIPTION": "Upscayl-Nextでエラーが発生しました。おそらく、Upscayl-Nextのバイナリがコマンドを適切に実行できなかった可能性があります。ログを確認して情報を取得してみてください。さらに支援が必要な場合は、Upscayl-NextのGitHubリポジトリに問題を投稿することができます。"
     },
     "GENERIC_ERROR": {
       "TITLE": "エラー"
@@ -277,13 +302,13 @@
       "TITLE": "メタデータの警告",
       "DESCRIPTION": "一部のシステムでは、JPG以外の形式ではメタデータが表示されない場合があります。必要に応じて専用のツールを使用してメタデータを表示してください。"
     }
-  },   
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "近日公開！",
     "CATCHY_PHRASE_1": "もうエラー、ハードウェアの問題、品質の妥協や長い読み込み時間はありません！",
-    "CATCHY_PHRASE_2": "🌐 いつでもどこでも、どのデバイスでもUpscayl\n☁️ グラフィックカードやハードウェアは不要\n👩 顔の改善\n🦋 10以上のモデルから選べます\n🏎 Upscaylデスクトップの5倍の速さ\n🎞 ビデオアップスケーリング\n💰 商用利用\n😴 寝ている間にUpscayl",
+    "CATCHY_PHRASE_2": "🌐 いつでもどこでも、どのデバイスでもUpscayl-Next\n☁️ グラフィックカードやハードウェアは不要\n👩 顔の改善\n🦋 10以上のモデルから選べます\n🏎 Upscayl-Nextデスクトップの5倍の速さ\n🎞 ビデオアップスケーリング\n💰 商用利用\n😴 寝ている間にUpscayl-Next",
     "ALREADY_REGISTERED_ALERT": "ありがとう {name}！あなたのメールはすでに登録されているようです :D そうでない場合は、もう一度お試しください。",
-    "ADD_SUCCESS": "待機リストにご参加いただきありがとうございます！Upscayl Cloudが準備でき次第お知らせします。",
+    "ADD_SUCCESS": "待機リストにご参加いただきありがとうございます！Upscayl-Next Cloudが準備でき次第お知らせします。",
     "INCORRECT_FIELDS_ALERT": "すべてのフィールドに正しく入力してください。",
     "JOIN_WAITLIST": "待機リストに参加",
     "DONT_SHOW_AGAIN": "再表示しない"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "始める",
     "SETTINGS_NOTE": "これらの設定は後でいつでも変更できます。",
     "STEP_1": {
-      "TITLE": "Upscaylへようこそ 🎉",
+      "TITLE": "Upscayl-Nextへようこそ 🎉",
       "DESCRIPTION": "いくつかの簡単なステップで始めましょう。"
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "初期設定を構成します。"
     },
     "STEP_3": {
-      "TITLE": "Upscaylの使い方 🚀",
+      "TITLE": "Upscayl-Nextの使い方 🚀",
       "DESCRIPTION": "新機能について学ぶための短いビデオをご覧ください。"
     },
     "STEP_4": {
       "TITLE": "準備完了！ 🎉",
-      "DESCRIPTION": "Upscaylで画像のアップスケールを始める準備ができました！"
+      "DESCRIPTION": "Upscayl-Nextで画像のアップスケールを始める準備ができました！"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "画像",
+    "TAB_VIDEO": "動画",
+    "SELECT_VIDEO": "動画を選択",
+    "SELECT_VIDEO_BUTTON": "動画ファイルを選択",
+    "NO_VIDEO_SELECTED": "動画が選択されていません",
+    "NO_OUTPUT_FOLDER": "出力フォルダが選択されていません",
+    "MODEL_TITLE": "モデル",
+    "START_BUTTON": "動画をアップスケール",
+    "SUCCESS_TITLE": "動画のアップスケールが完了しました"
   }
 }

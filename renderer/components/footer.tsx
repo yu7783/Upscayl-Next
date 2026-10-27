@@ -19,10 +19,9 @@ function Footer() {
         </button>
       )}
       <p>
-        {t("FOOTER.COPYRIGHT")} {new Date().getFullYear()} -{" "}
         <a
           className="font-bold"
-          href="https://github.com/upscayl/upscayl"
+          href="https://github.com/yu7783/Upscayl-Next"
           target="_blank"
         >
           {t("TITLE")}
@@ -31,7 +30,7 @@ function Footer() {
       <p>
         {t("FOOTER.TITLE")}
         <a
-          href="https://github.com/upscayl"
+          href="https://github.com/yu7783/Upscayl-Next"
           className="font-bold"
           target="_blank"
         >

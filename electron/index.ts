@@ -8,6 +8,8 @@ import openFolder from "./commands/open-folder";
 import stop from "./commands/stop";
 import selectFolder from "./commands/select-folder";
 import selectFile from "./commands/select-file";
+import selectVideo from "./commands/select-video";
+import videoUpscayl from "./commands/video-upscayl";
 import getModelsList from "./commands/get-models-list";
 import customModelsSelect from "./commands/custom-models-select";
 import imageUpscayl from "./commands/image-upscayl";
@@ -49,11 +51,11 @@ app.on("ready", async () => {
   createMainWindow();
 
   log.info(
-    "🆙 Upscayl version:",
+    "🆙 Upscayl-Next version:",
     app.getVersion(),
     FEATURE_FLAGS.APP_STORE_BUILD ? "MAC-APP-STORE" : "FOSS",
   );
-  log.info("🚀 UPSCAYL EXEC PATH: ", execPath);
+  log.info("🚀 UPSCAYL-NEXT EXEC PATH: ", execPath);
   log.info("🚀 MODELS PATH: ", modelsPath);
 
   let closeAccess;
@@ -89,6 +91,8 @@ ipcMain.handle(ELECTRON_COMMANDS.SELECT_FOLDER, selectFolder);
 
 ipcMain.handle(ELECTRON_COMMANDS.SELECT_FILE, selectFile);
 
+ipcMain.handle(ELECTRON_COMMANDS.SELECT_VIDEO, selectVideo);
+
 ipcMain.on(ELECTRON_COMMANDS.GET_MODELS_LIST, getModelsList);
 
 ipcMain.handle(
@@ -101,6 +105,8 @@ ipcMain.on(ELECTRON_COMMANDS.UPSCAYL, imageUpscayl);
 ipcMain.on(ELECTRON_COMMANDS.FOLDER_UPSCAYL, batchUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.DOUBLE_UPSCAYL, doubleUpscayl);
+
+ipcMain.on(ELECTRON_COMMANDS.UPSCAYL_VIDEO, videoUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.PASTE_IMAGE, pasteImage);
 

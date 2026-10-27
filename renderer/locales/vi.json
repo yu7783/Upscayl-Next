@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Giới thiệu Upscayl Cloud!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Giới thiệu Upscayl-Next Cloud!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Star chúng tôi trên GitHub 😁",
     "DESCRIPTION": "Tăng cường hình ảnh AI"
   },
   "FOOTER": {
-    "NEWS_TITLE": "TIN TỨC UPSCAYL",
-    "COPYRIGHT": "Bản quyền ©",
+    "NEWS_TITLE": "TIN TỨC UPSCAYL-NEXT",
     "TITLE": "Bởi ",
-    "LINK_TITLE": "Đội ngũ Upscayl"
+    "LINK_TITLE": "Đội ngũ Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Cài đặt",
-    "CHANGE_LANGUAGE": { "TITLE": "Thay đổi ngôn ngữ" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Thay đổi ngôn ngữ"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Nén hình ảnh",
       "DESCRIPTION": "Nén PNG là không mất mát, vì vậy có thể không giảm kích thước tệp một cách đáng kể và các giá trị nén cao hơn có thể ảnh hưởng đến hiệu suất. Nén JPG và WebP là có mất mát."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ID GPU",
-      "DESCRIPTION": "Vui lòng đọc Tài liệu Upscayl để biết thêm thông tin.",
+      "DESCRIPTION": "Vui lòng đọc Tài liệu Upscayl-Next để biết thêm thông tin.",
       "ADDITIONAL_DESCRIPTION": "Kích hoạt chế độ hiệu suất trên Windows để có kết quả tốt hơn."
     },
     "IMAGE_FORMAT": {
@@ -47,14 +58,14 @@
     "COPY_METADATA": {
       "TITLE": "SAO CHÉP METADATA ẢNH",
       "DESCRIPTION": "Giữ metadata gốc của ảnh (EXIF) trong ảnh đã được nâng cao.",
-      "SUGGEST_JPG_TITLE": "Đề Xuất Thay Đổi Định Dạng", 
+      "SUGGEST_JPG_TITLE": "Đề Xuất Thay Đổi Định Dạng",
       "SUGGEST_JPG_DESCRIPTION": "Để có khả năng tương thích metadata tốt hơn trên các hệ thống khác nhau, chúng tôi khuyên bạn nên sử dụng định dạng JPG. Bạn có muốn thay đổi không?",
       "CHANGE_TO_JPG": "Chuyển sang JPG",
       "KEEP_CURRENT_FORMAT": "Giữ {format}"
     },
     "IMAGE_SCALE": {
       "TITLE": "Tỷ lệ Hình ảnh",
-      "DESCRIPTION": "Bất kỳ tỷ lệ nào trên 4X (ngoại trừ 16X Double Upscayl) chỉ thay đổi kích thước hình ảnh mà không sử dụng tăng cường AI.",
+      "DESCRIPTION": "Bất kỳ tỷ lệ nào trên 4X (ngoại trừ 16X Double Upscayl-Next) chỉ thay đổi kích thước hình ảnh mà không sử dụng tăng cường AI.",
       "WARNING": "Bất kỳ tỷ lệ nào trên 5X có thể gây ra vấn đề về hiệu suất trên một số thiết bị!",
       "ADDITIONAL_WARNING": "Điều này có thể gây ra vấn đề về hiệu suất trên một số thiết bị!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "GHI ĐÈ UPSCALE TRƯỚC ĐÓ",
-      "DESCRIPTION": "Nếu được kích hoạt, Upscayl sẽ xử lý lại hình ảnh thay vì tải nó trực tiếp."
+      "DESCRIPTION": "Nếu được kích hoạt, Upscayl-Next sẽ xử lý lại hình ảnh thay vì tải nó trực tiếp."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "ĐẶT LẠI UPSCAYL",
-      "ALERT": "Upscayl đã được đặt lại. Vui lòng khởi động lại ứng dụng."
+      "BUTTON_TITLE": "ĐẶT LẠI UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next đã được đặt lại. Vui lòng khởi động lại ứng dụng."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "LƯU THƯ MỤC ĐẦU RA",
       "DESCRIPTION": "Nếu được kích hoạt, thư mục đầu ra sẽ được ghi nhớ giữa các phiên làm việc."
     },
     "AUTO_UPDATE": {
-      "TITLE": "CẬP NHẬT TỰ ĐỘNG UPSCAYL",
+      "TITLE": "CẬP NHẬT TỰ ĐỘNG UPSCAYL-NEXT",
       "DESCRIPTION": "Nếu được kích hoạt, ứng dụng sẽ kiểm tra các bản cập nhật mới và thông báo cho bạn."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "GIÚP CẢI THIỆN UPSCAYL",
-      "DESCRIPTION": "Nếu được kích hoạt, Upscayl sẽ thu thập dữ liệu sử dụng ẩn danh để cải thiện giao diện và các tính năng của ứng dụng."
-    },
     "THEME": {
-      "TITLE": "CHỦ ĐỀ UPSCAYL"
+      "TITLE": "CHỦ ĐỀ UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "NGÔN NGỮ UPSCAYL"
+      "TITLE": "NGÔN NGỮ UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "KÍCH THƯỚC GẠCH TÙY CHỈNH",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "TẮT THÔNG BÁO",
-      "DESCRIPTION": "Nếu được kích hoạt, Upscayl sẽ không gửi bất kỳ thông báo hệ thống nào về sự thành công hoặc thất bại."
+      "DESCRIPTION": "Nếu được kích hoạt, Upscayl-Next sẽ không gửi bất kỳ thông báo hệ thống nào về sự thành công hoặc thất bại."
     },
     "SUPPORT": {
       "TITLE": "Có gặp vấn đề?",
@@ -108,13 +115,23 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Thông tin Hệ thống"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Batch Upscayl",
-      "DESCRIPTION": "Điều này sẽ cho phép bạn Upscayl tất cả các tệp trong một thư mục cùng một lúc"
+      "TITLE": "Batch Upscayl-Next",
+      "DESCRIPTION": "Điều này sẽ cho phép bạn Upscayl-Next tất cả các tệp trong một thư mục cùng một lúc"
     },
     "FILE_SELECTION": {
       "TITLE": "Bước 1",
@@ -130,11 +147,11 @@
       "ZOOM": "Phóng to",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Phù hợp với hầu hết các hình ảnh."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Phù hợp với hầu hết các hình ảnh. Tăng cường tốc độ cao với tổn thất chất lượng tối thiểu."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Double Upscayl",
-      "DESCRIPTION": "Kích hoạt tùy chọn này để chạy Upscayl hai lần trên một hình ảnh. Lưu ý rằng điều này có thể làm tăng đáng kể thời gian xử lý và có thể gây ra vấn đề hiệu suất cho các tỷ lệ lớn hơn 4X."
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Double Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
+      "DESCRIPTION": "Kích hoạt tùy chọn này để chạy Upscayl-Next hai lần trên một hình ảnh. Lưu ý rằng điều này có thể làm tăng đáng kể thời gian xử lý và có thể gây ra vấn đề hiệu suất cho các tỷ lệ lớn hơn 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Bước 3",
-      "MAC_APP_STORE_ALERT": "Do các hạn chế bảo mật của MacOS App Store, Upscayl yêu cầu bạn chọn một thư mục đầu ra mỗi lần bạn khởi động nó.\n\nĐể tránh điều này, bạn có thể lưu một thư mục đầu ra mặc định một cách vĩnh viễn trong tab 'Cài đặt' của Upscayl.",
+      "MAC_APP_STORE_ALERT": "Do các hạn chế bảo mật của MacOS App Store, Upscayl-Next yêu cầu bạn chọn một thư mục đầu ra mỗi lần bạn khởi động nó.\n\nĐể tránh điều này, bạn có thể lưu một thư mục đầu ra mặc định một cách vĩnh viễn trong tab 'Cài đặt' của Upscayl-Next.",
       "NOT_SELECTED": "Chưa chọn",
       "DEFAULT_IMG_PATH": "Mặc định là Đường dẫn của Hình ảnh",
       "DEFAULT_FOLDER_PATH": "Mặc định là Đường dẫn của Thư mục",
@@ -173,11 +192,11 @@
     },
     "SCALE_SELECTION": {
       "TITLE": "Bước 4",
-      "FROM_TITLE": "Upscayl từ ",
+      "FROM_TITLE": "Upscayl-Next từ ",
       "TO_TITLE": " đến ",
       "NO_OUTPUT_FOLDER_ALERT": "Vui lòng chọn một thư mục đầu ra trước",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
-      "IN_PROGRESS_BUTTON_TITLE": "Đang tiến hành Upscayl ⏳"
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
+      "IN_PROGRESS_BUTTON_TITLE": "Đang tiến hành Upscayl-Next ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
       "RESET_BUTTON_TITLE": "Đặt Lại Hình Ảnh",
@@ -188,13 +207,19 @@
       "TOTAL_BATCH_UPSCAYLS": "Tổng số Batch Upscayls",
       "TOTAL_IMAGE_UPSCAYLS": "Tổng số Upscayls Hình Ảnh",
       "TOTAL_DOUBLE_UPSCAYLS": "Tổng số Double Upscayls",
-      "AVERAGE_UPSCAYL_TIME": "Thời gian Upscayl Trung Bình",
-      "LAST_UPSCAYL_DURATION": "Thời gian Upscayl Cuối Cùng",
+      "AVERAGE_UPSCAYL_TIME": "Thời gian Upscayl-Next Trung Bình",
+      "LAST_UPSCAYL_DURATION": "Thời gian Upscayl-Next Cuối Cùng",
       "LAST_USED_AT": "Lần Cuối Sử Dụng Tại"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Batch Upscayl Đang Tiến Hành:",
-      "IN_PROGRESS_TITLE": "Đang thực hiện phép màu Upscayl...",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Batch Upscayl-Next Đang Tiến Hành:",
+      "IN_PROGRESS_TITLE": "Đang thực hiện phép màu Upscayl-Next...",
       "STOP_BUTTON_TITLE": "DỪNG"
     },
     "RESET_BUTTON_TITLE": "Đặt Lại",
@@ -209,7 +234,7 @@
       "PROCESSING_TITLE": "Đang xử lý hình ảnh...",
       "SCALING_CONVERTING_TITLE": "Đang thay đổi kích thước và chuyển đổi hình ảnh...",
       "WAIT_TITLE": "Chờ một chút...",
-      "SUCCESS_TITLE": "Upscayl Thành Công!",
+      "SUCCESS_TITLE": "Upscayl-Next Thành Công!",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "Thư mục đã chọn:",
         "DONE_TITLE": "Tất cả đã xong!",
@@ -218,7 +243,7 @@
     },
     "SLIDER": {
       "ORIGINAL_TITLE": "Gốc",
-      "UPSCAYLED_TITLE": "Đã Upscayl"
+      "UPSCAYLED_TITLE": "Đã Upscayl-Next"
     },
     "DIALOG_BOX": {
       "CLOSE": "Đóng"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Lỗi Ngoại lệ",
-      "DESCRIPTION": "Upscayl gặp lỗi. Có thể, nhị phân Upscayl không thực hiện các lệnh đúng cách. Hãy kiểm tra nhật ký để xem bạn có thông tin gì không. Bạn có thể đăng vấn đề trên kho lưu trữ GitHub của Upscayl để được giúp đỡ thêm."
+      "DESCRIPTION": "Upscayl-Next gặp lỗi. Có thể, nhị phân Upscayl-Next không thực hiện các lệnh đúng cách. Hãy kiểm tra nhật ký để xem bạn có thông tin gì không. Bạn có thể đăng vấn đề trên kho lưu trữ GitHub của Upscayl-Next để được giúp đỡ thêm."
     },
     "GENERIC_ERROR": {
       "TITLE": "Lỗi"
@@ -263,7 +288,7 @@
       "DESCRIPTION": "Vui lòng chọn một hình ảnh để tăng cường"
     },
     "METADATA_ERROR": {
-      "TITLE": "Lỗi Sao Chép Metadata", 
+      "TITLE": "Lỗi Sao Chép Metadata",
       "DESCRIPTION": "Không thể sao chép metadata từ ảnh gốc sang ảnh đã tạo. ({data})"
     },
     "OPEN_DOCS_TITLE": "Mở Tài liệu",
@@ -277,13 +302,13 @@
       "TITLE": "Cảnh báo về Metadata",
       "DESCRIPTION": "Trên một số hệ thống, metadata có thể không hiển thị trong các định dạng khác ngoài JPG. Sử dụng các công cụ chuyên dụng để xem metadata nếu cần."
     }
-  },    
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Sẽ ra mắt sớm!",
     "CATCHY_PHRASE_1": "Không còn lỗi, vấn đề phần cứng, thỏa hiệp chất lượng hoặc thời gian tải lâu!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl bất cứ nơi nào, bất cứ lúc nào, trên bất cứ thiết bị nào\n☁️ Không cần Card Đồ họa hoặc phần mềm phần cứng\n👩 Tăng cường Khuôn mặt\n🦋 Hơn 10 mô hình để lựa chọn\n🏎 Nhanh hơn 5 lần so với Upscayl Desktop\n🎞 Tăng cường Video\n💰 Sử dụng Thương mại\n😴 Upscayl trong khi bạn ngủ",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next bất cứ nơi nào, bất cứ lúc nào, trên bất cứ thiết bị nào\n☁️ Không cần Card Đồ họa hoặc phần mềm phần cứng\n👩 Tăng cường Khuôn mặt\n🦋 Hơn 10 mô hình để lựa chọn\n🏎 Nhanh hơn 5 lần so với Upscayl-Next Desktop\n🎞 Tăng cường Video\n💰 Sử dụng Thương mại\n😴 Upscayl-Next trong khi bạn ngủ",
     "ALREADY_REGISTERED_ALERT": "Cảm ơn bạn {name}! Có vẻ như email của bạn đã được đăng ký rồi :D Nếu không phải vậy, vui lòng thử lại.",
-    "ADD_SUCCESS": "Cảm ơn bạn đã tham gia danh sách chờ! Chúng tôi sẽ thông báo khi Upscayl Cloud sẵn sàng cho bạn.",
+    "ADD_SUCCESS": "Cảm ơn bạn đã tham gia danh sách chờ! Chúng tôi sẽ thông báo khi Upscayl-Next Cloud sẵn sàng cho bạn.",
     "INCORRECT_FIELDS_ALERT": "Vui lòng điền đúng các trường thông tin.",
     "JOIN_WAITLIST": "Tham gia danh sách chờ",
     "DONT_SHOW_AGAIN": "KHÔNG HIỂN THỊ LẠI"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Bắt đầu",
     "SETTINGS_NOTE": "Bạn luôn có thể thay đổi các cài đặt này sau.",
     "STEP_1": {
-      "TITLE": "Chào mừng đến với Upscayl 🎉",
+      "TITLE": "Chào mừng đến với Upscayl-Next 🎉",
       "DESCRIPTION": "Hãy để chúng tôi giúp bạn bắt đầu với một vài bước nhanh chóng."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Cấu hình cài đặt ban đầu của bạn."
     },
     "STEP_3": {
-      "TITLE": "Làm thế nào để sử dụng Upscayl? 🚀",
+      "TITLE": "Làm thế nào để sử dụng Upscayl-Next? 🚀",
       "DESCRIPTION": "Xem video ngắn này để tìm hiểu về các tính năng mới."
     },
     "STEP_4": {
       "TITLE": "Bạn đã sẵn sàng! 🎉",
-      "DESCRIPTION": "Bạn đã sẵn sàng để bắt đầu tăng cường hình ảnh với Upscayl!"
+      "DESCRIPTION": "Bạn đã sẵn sàng để bắt đầu tăng cường hình ảnh với Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

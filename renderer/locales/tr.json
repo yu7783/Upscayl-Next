@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Upscayl Cloud ile tanışın!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Upscayl-Next Cloud ile tanışın!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Bize GitHub'da yıldız verin! 🌟",
     "DESCRIPTION": "AI Görsel İyileştirici"
   },
   "FOOTER": {
-    "NEWS_TITLE": "UPSCAYL HABERLERİ",
-    "COPYRIGHT": "Telif Hakkı ©",
+    "NEWS_TITLE": "UPSCAYL-NEXT HABERLERİ",
     "TITLE": "Geliştiren: ",
-    "LINK_TITLE": "The Upscayl Ekibi"
+    "LINK_TITLE": "The Upscayl-Next Ekibi"
   },
   "SETTINGS": {
     "TITLE": "Ayarlar",
-    "CHANGE_LANGUAGE": { "TITLE": "Dili Değiştirin" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Dili Değiştirin"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Görsel Sıkıştırma",
       "DESCRIPTION": "PNG sıkıştırması kayıpsızdır, bu nedenle dosya boyutunu önemli ölçüde küçültmeyebilir ve daha yüksek sıkıştırma değerleri performansı etkileyebilir. JPG ve WebP sıkıştırması ise kayıplıdır."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "GPU ID",
-      "DESCRIPTION": "Daha fazla bilgi için lütfen Upscayl Dökümantasyonunu okuyun.",
+      "DESCRIPTION": "Daha fazla bilgi için lütfen Upscayl-Next Dökümantasyonunu okuyun.",
       "ADDITIONAL_DESCRIPTION": "Windows'da daha iyi sonuçlar için performnas modunu etkinleştirin."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Görsel Ölçeği",
-      "DESCRIPTION": "4X'ten büyük herhangi bir ayar (16X Çifte Upscayl dışında) yalnızca görüntüyü yeniden boyutlandırır ve AI ile iyileştirme yapmaz.",
+      "DESCRIPTION": "4X'ten büyük herhangi bir ayar (16X Çifte Upscayl-Next dışında) yalnızca görüntüyü yeniden boyutlandırır ve AI ile iyileştirme yapmaz.",
       "WARNING": "5X üzerinde herhangi bir ayar bazı aygıtlarda performans sorunlarına neden olabilir!",
       "ADDITIONAL_WARNING": "Bu bazı cihazlarda performans sorunlarına neden olabilir!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "ÖNCEKİ GELİŞTİRME AYARLARININ ÜZERİNE YAZ",
-      "DESCRIPTION": "Etkinleştirilirdiği takdirde, Upscayl görüntüyü doğrudan yüklemek yerine tekrardan işleyecektir."
+      "DESCRIPTION": "Etkinleştirilirdiği takdirde, Upscayl-Next görüntüyü doğrudan yüklemek yerine tekrardan işleyecektir."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "UPSCAYL'I SIFIRLA",
-      "ALERT": "Upscayl sıfırlandı. Lütfen uygulamayı yeniden başlatın."
+      "BUTTON_TITLE": "UPSCAYL-NEXT'I SIFIRLA",
+      "ALERT": "Upscayl-Next sıfırlandı. Lütfen uygulamayı yeniden başlatın."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "ÇIKTI KLASÖRÜNÜ KAYDET",
-      "DESCRIPTION": "Etkinleştirildiği takdirde, Upscayl oturumlar arası çıktı klasörünü hatırlayacaktır."
+      "DESCRIPTION": "Etkinleştirildiği takdirde, Upscayl-Next oturumlar arası çıktı klasörünü hatırlayacaktır."
     },
     "AUTO_UPDATE": {
-      "TITLE": "UPSCAYL'I OTOMATİK GÜNCELLE",
+      "TITLE": "UPSCAYL-NEXT'I OTOMATİK GÜNCELLE",
       "DESCRIPTION": "Etkinleştirildiği takdirde, uygulama yeni güncellemeleri kendiliğinden kontrol edecek ve sizi de bilgilendirecektir."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "UPSCAYL'I GELİŞTİRMEYE YARDIMCI OL",
-      "DESCRIPTION": "Etkinleştirildiği takdirde; Upscayl, uygulama arayüzünü ve özelliklerini geliştirmek için anonim kullanım verileri toplayacaktır."
-    },
     "THEME": {
-      "TITLE": "UPSCAYL'IN TEMASI"
+      "TITLE": "UPSCAYL-NEXT'IN TEMASI"
     },
     "LANGUAGE": {
-      "TITLE": "UPSCAYL'IN DİLİ"
+      "TITLE": "UPSCAYL-NEXT'IN DİLİ"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "ÖZEL KARO BOYUTU",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "BİLDİRİMLERİ KAPAT",
-      "DESCRIPTION": "Etkinleştirildiği takdirde, Upscayl başarı veya başarısızlık durumunda herhangi bir sistem bildirimi göndermeyecektir."
+      "DESCRIPTION": "Etkinleştirildiği takdirde, Upscayl-Next başarı veya başarısızlık durumunda herhangi bir sistem bildirimi göndermeyecektir."
     },
     "SUPPORT": {
       "TITLE": "Sorun mu var?",
@@ -108,13 +115,23 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Sistem Bilgisi"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Topyekün Upscayl",
-      "DESCRIPTION": "Bununla birlikte tek seferde bir bütün klasörü Upscayl edebilirsiniz."
+      "TITLE": "Topyekün Upscayl-Next",
+      "DESCRIPTION": "Bununla birlikte tek seferde bir bütün klasörü Upscayl-Next edebilirsiniz."
     },
     "FILE_SELECTION": {
       "TITLE": "1. Adım",
@@ -130,11 +147,11 @@
       "ZOOM": "Yakınlaştır",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Çoğu görsel için ideal."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Çoğu görsel için ideal. Minimal kalite kaybıyla, yüksek hızda ölçeklendirme."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Çifte Upscayl",
-      "DESCRIPTION": "Bu seçeneği etkinleştirerek, bir görüntü üzerinde Upscayl'ı iki kez çalıştırabilirsiniz. Lakin, bu işlem süresinde önemli bir uzamaya ve 4X'ten büyük ölçeklerde performans sorunlarına yol açabilir."
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Çifte Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
+      "DESCRIPTION": "Bu seçeneği etkinleştirerek, bir görüntü üzerinde Upscayl-Next'ı iki kez çalıştırabilirsiniz. Lakin, bu işlem süresinde önemli bir uzamaya ve 4X'ten büyük ölçeklerde performans sorunlarına yol açabilir."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "3. Adım",
-      "MAC_APP_STORE_ALERT": "MacOS App Store güvenlik kısıtlamaları nedeniyle, Upscayl her başlatıldığında bir çıktı klasörü seçmenizi isteyecektir.\n\nBunu engellemek için, Upscayl'ın 'Ayarlar' sekmesinde varsayılan bir çıktı klasörü kalıcı olarak kaydedebilirsiniz.",
+      "MAC_APP_STORE_ALERT": "MacOS App Store güvenlik kısıtlamaları nedeniyle, Upscayl-Next her başlatıldığında bir çıktı klasörü seçmenizi isteyecektir.\n\nBunu engellemek için, Upscayl-Next'ın 'Ayarlar' sekmesinde varsayılan bir çıktı klasörü kalıcı olarak kaydedebilirsiniz.",
       "NOT_SELECTED": "Seçilmemiş",
       "DEFAULT_IMG_PATH": "Çıktı resim, girdi resmin dizinine",
       "DEFAULT_FOLDER_PATH": "Çıktı klasör, girdi klasörün dizine",
@@ -176,8 +195,8 @@
       "FROM_TITLE": "",
       "TO_TITLE": "'dan ->",
       "NO_OUTPUT_FOLDER_ALERT": "Lütfen önce bir çıktı klasörü seçin.",
-      "START_BUTTON_TITLE": "Upscayl'la 🚀",
-      "IN_PROGRESS_BUTTON_TITLE": "Upscayl'lanıyor ⏳"
+      "START_BUTTON_TITLE": "Upscayl-Next'la 🚀",
+      "IN_PROGRESS_BUTTON_TITLE": "Upscayl-Next'lanıyor ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
       "RESET_BUTTON_TITLE": "Resmi Sıfırla",
@@ -188,13 +207,19 @@
       "TOTAL_BATCH_UPSCAYLS": "Toplam Topyekün Upscayllar",
       "TOTAL_IMAGE_UPSCAYLS": "Toplam Görsel Upscaylları",
       "TOTAL_DOUBLE_UPSCAYLS": "Toplam Çifte Upscayllar",
-      "AVERAGE_UPSCAYL_TIME": "Ortalama Upscayl Süresi",
-      "LAST_UPSCAYL_DURATION": "Son Upscayl Süresi",
+      "AVERAGE_UPSCAYL_TIME": "Ortalama Upscayl-Next Süresi",
+      "LAST_UPSCAYL_DURATION": "Son Upscayl-Next Süresi",
       "LAST_USED_AT": "En son şu tarihte kullanıldı"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Topyekün Upscayl ediliyor...",
-      "IN_PROGRESS_TITLE": "Upscayl sihrini konuşturuyor...",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Topyekün Upscayl-Next ediliyor...",
+      "IN_PROGRESS_TITLE": "Upscayl-Next sihrini konuşturuyor...",
       "STOP_BUTTON_TITLE": "DURDUR"
     },
     "RESET_BUTTON_TITLE": "Sıfırla",
@@ -209,7 +234,7 @@
       "PROCESSING_TITLE": "Görsel işleniyor...",
       "SCALING_CONVERTING_TITLE": "Görsel ölçeklendirilip dönüştürülüyor...",
       "WAIT_TITLE": "Bekleyin...",
-      "SUCCESS_TITLE": "Upscayl Başarılı!",
+      "SUCCESS_TITLE": "Upscayl-Next Başarılı!",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "Seçili klasör:",
         "DONE_TITLE": "Hepsi tamamlandı!",
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "İstinai Hata",
-      "DESCRIPTION": "Upscayl bir hata ile karşılaştı. Muhtemelen, upscayl ikili dosyası komutları düzgün şekilde çalıştırmayı başaramadı. Bilgi almak için log dosyalarını kontrol etmeyi deneyin. Daha fazla yardım için Upscayl'ın GitHub deposunda bir sorun bildirisi oluşturabilirsiniz."
+      "DESCRIPTION": "Upscayl-Next bir hata ile karşılaştı. Muhtemelen, upscayl ikili dosyası komutları düzgün şekilde çalıştırmayı başaramadı. Bilgi almak için log dosyalarını kontrol etmeyi deneyin. Daha fazla yardım için Upscayl-Next'ın GitHub deposunda bir sorun bildirisi oluşturabilirsiniz."
     },
     "GENERIC_ERROR": {
       "TITLE": "Hata"
@@ -277,13 +302,13 @@
       "TITLE": "Meta Veri Uyarısı",
       "DESCRIPTION": "Bazı sistemlerde, JPG dışındaki formatlarda meta veriler görüntülenemeyebilir. Gerekirse meta verileri görüntülemek için özel araçlar kullanın."
     }
-  },    
+  },
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Yakında sizlerle!",
     "CATCHY_PHRASE_1": "Artık hatalar, donanım uyuşmazlıkları, kalite tavizleri ya da uzun yükleme süreleri yok!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl her yerde, her zaman , her cihazda\n☁️ Ekran kartına ya da donanıma gerek yok.\n👩 Yüz güzelleştirici\n🦋 Seçilebilecek 10 model ve fazlası\n🏎 Upscayl Desktop'tan 5 kat daha hızlı\n🎞 Video İyileştirici\n💰 Ticari Kullanım\n😴 Siz uyurken Upscayl",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next her yerde, her zaman , her cihazda\n☁️ Ekran kartına ya da donanıma gerek yok.\n👩 Yüz güzelleştirici\n🦋 Seçilebilecek 10 model ve fazlası\n🏎 Upscayl-Next Desktop'tan 5 kat daha hızlı\n🎞 Video İyileştirici\n💰 Ticari Kullanım\n😴 Siz uyurken Upscayl-Next",
     "ALREADY_REGISTERED_ALERT": "Teşekkürler {name}! Görünüşe göre e-postanı zaten kaydetmişiz :D Eğer bu bir hata ise, tekrar deneyin.",
-    "ADD_SUCCESS": "Bekleme listesine katıldığın için teşekkürler! Upscayl Cloud senin için hazır olduğunda mutlaka ulaşacağız!",
+    "ADD_SUCCESS": "Bekleme listesine katıldığın için teşekkürler! Upscayl-Next Cloud senin için hazır olduğunda mutlaka ulaşacağız!",
     "INCORRECT_FIELDS_ALERT": "Lütfen tüm alanları tam doldurun.",
     "JOIN_WAITLIST": "Bekleme listesine yazıl",
     "DONT_SHOW_AGAIN": "BİR DAHA GÖSTERME"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Başlayın",
     "SETTINGS_NOTE": "Tüm bu ayarları istersen sonra değiştirebilirsin.",
     "STEP_1": {
-      "TITLE": "Upscayl'e hoş geldiniz! 🎉",
+      "TITLE": "Upscayl-Next'e hoş geldiniz! 🎉",
       "DESCRIPTION": "Hadi sizi bir kaç adımda hazır edelim."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Ön ayarlarınızı yapılandırın."
     },
     "STEP_3": {
-      "TITLE": "Upscayl'ı nasıl kullanacağım? 🚀",
+      "TITLE": "Upscayl-Next'ı nasıl kullanacağım? 🚀",
       "DESCRIPTION": "Bu kısa videoyu izleyerek en yeni özellikleri öğrenin"
     },
     "STEP_4": {
       "TITLE": "Hazır ve nazırsınız! 🎉",
-      "DESCRIPTION": "Upscayl ile görsellerinizi iyileştirmeye hazırsınız!"
+      "DESCRIPTION": "Upscayl-Next ile görsellerinizi iyileştirmeye hazırsınız!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

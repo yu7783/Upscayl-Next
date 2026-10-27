@@ -1,14 +1,14 @@
 {
-  "name": "upscayl",
+  "name": "upscayl-next",
   "private": true,
-  "version": "2.15.0",
-  "productName": "Upscayl",
+  "version": "1.0.0",
+  "productName": "Upscayl-Next",
   "author": {
     "name": "Nayam Amarshe",
     "email": "nayam.emikx@aleeas.com",
     "url": "https://github.com/NayamAmarshe"
   },
-  "homepage": "https://github.com/TGS963/upscayl",
+  "homepage": "https://github.com/yu7783/Upscayl-Next",
   "contributors": [
     {
       "name": "Nayam Amarshe",
@@ -23,7 +23,7 @@
   ],
   "email": "nayam.emikx@aleeas.com",
   "license": "AGPL-3.0",
-  "description": "Upscayl - Free and Open Source AI Image Upscaler",
+  "description": "Upscayl-Next - Free and Open Source AI Image Upscaler",
   "keywords": [
     "AI",
     "Upscaler",
@@ -41,6 +41,7 @@
     "dev": "tsc && electron .",
     "build": "tsc && npm run validate-schema && next build renderer",
     "tsc": "tsc",
+    "test": "tsc && node --test tests",
     "pack-app": "tsc && npm run build && electron-builder --dir",
     "dist": "tsc && npm run build && cross-env DEBUG=* electron-builder",
     "dist:appimage": "tsc && npm run build && cross-env DEBUG=* electron-builder build -l AppImage",
@@ -71,9 +72,9 @@
     "validate-schema": "node scripts/validate-schema.js"
   },
   "build": {
-    "productName": "Upscayl",
-    "appId": "org.upscayl.Upscayl",
-    "artifactName": "${name}-${version}-${os}.${ext}",
+    "productName": "Upscayl-Next",
+    "appId": "org.upscaylnext.UpscaylNext",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "afterSign": "./notarize.js",
     "asar": true,
     "asarUnpack": [
@@ -114,7 +115,7 @@
       "provisioningProfile": "embedded.provisionprofile",
       "mergeASARs": false,
       "gatekeeperAssess": false,
-      "icon": "build/icon.icns",
+      "icon": "build/icon.png",
       "x64ArchFiles": "*",
       "target": [
         {
@@ -180,7 +181,7 @@
       "icon": "resources/icons/"
     },
     "win": {
-      "publisherName": "Upscayl Team",
+      "publisherName": "Upscayl-Next Team",
       "target": [
         "nsis",
         "zip"
@@ -188,10 +189,18 @@
       "icon": "build/icon.png"
     },
     "nsis": {
+      "include": "build/installer.nsh",
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
       "allowElevation": true,
-      "perMachine": true
+      "perMachine": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Upscayl-Next",
+      "runAfterFinish": true,
+      "installerSidebar": "build/anim/installerSidebar.bmp",
+      "uninstallerSidebar": "build/anim/installerSidebar.bmp",
+      "installerHeader": "build/anim/installerHeader.bmp"
     },
     "files": [
       "export",
@@ -199,8 +208,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "upscayl",
-      "repo": "upscayl"
+      "owner": "yu7783",
+      "repo": "Upscayl-Next"
     }
   },
   "devDependencies": {
@@ -244,8 +253,6 @@
     "firebase": "^11.1.0",
     "gray-matter": "^4.0.3",
     "jotai": "^2.11.0",
-    "lucide-react": "^0.469.0",
-    "posthog-js": "^1.203.2",
     "react-compare-slider": "^3.1.0",
     "react-markdown": "^9.0.1",
     "react-resizable-panels": "^2.1.7",

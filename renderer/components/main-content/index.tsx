@@ -10,6 +10,8 @@ import {
   progressAtom,
   viewTypeAtom,
   rememberOutputFolderAtom,
+  upscaylPassAtom,
+  batchProgressAtom,
 } from "../../atoms/user-settings-atom";
 import { useToast } from "@/components/ui/use-toast";
 import { sanitizePath } from "@common/sanitize-path";
@@ -36,7 +38,6 @@ type MainContentProps = {
   selectImageHandler: () => void;
   upscaledImagePath: string;
   batchFolderPath: string;
-  doubleUpscaylCounter: number;
   setDimensions: React.Dispatch<
     React.SetStateAction<{
       width: number;
@@ -55,7 +56,6 @@ const MainContent = ({
   selectImageHandler,
   upscaledImagePath,
   batchFolderPath,
-  doubleUpscaylCounter,
   setDimensions,
 }: MainContentProps) => {
   const t = useTranslation();
@@ -66,6 +66,8 @@ const MainContent = ({
   const [outputPath, setOutputPath] = useAtom(savedOutputPathAtom);
   const progress = useAtomValue(progressAtom);
   const batchMode = useAtomValue(batchModeAtom);
+  const upscaylPass = useAtomValue(upscaylPassAtom);
+  const batchProgress = useAtomValue(batchProgressAtom);
 
   const viewType = useAtomValue(viewTypeAtom);
   const lensSize = useAtomValue(lensSizeAtom);
@@ -282,8 +284,8 @@ const MainContent = ({
           <ProgressBar
             batchMode={batchMode}
             progress={progress}
-            doubleUpscaylCounter={doubleUpscaylCounter}
-            resetImagePaths={resetImagePaths}
+            upscaylPass={upscaylPass}
+            batchProgress={batchProgress}
           />
         )}
 

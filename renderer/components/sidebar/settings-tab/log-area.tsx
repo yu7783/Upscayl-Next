@@ -44,8 +44,12 @@ export function LogArea({
           </p>
         )}
 
-        {logData.map((logLine: any) => {
-          return <p className="">{logLine}</p>;
+        {logData.map((logLine: string, index: number) => {
+          return (
+            <p key={`${index}-${logLine}`} className="">
+              {logLine}
+            </p>
+          );
         })}
       </code>
     </div>

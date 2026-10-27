@@ -25,7 +25,7 @@
     "entitlements": "resources/entitlements.mas.plist",
     "entitlementsInherit": "resources/entitlements.mas.inherit.plist",
     "provisioningProfile": "embedded.provisionprofile",
-    "icon": "build/icon.icns",
+    "icon": "build/icon.png",
     "x64ArchFiles": "*",
     "target": [
       {
@@ -42,7 +42,7 @@
     "electronLanguages": ["en"],
     "x64ArchFiles": "*",
     "type": "distribution",
-    "icon": "build/icon.icns",
+    "icon": "build/icon.png",
     "category": "public.app-category.photography",
     "entitlements": "resources/entitlements.mac.plist",
     "entitlementsInherit": "resources/entitlements.mac.plist",

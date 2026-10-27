@@ -159,7 +159,7 @@ const LensViewer = ({
           }}
         >
           <span className="absolute bottom-0 w-full bg-black bg-opacity-60 px-2 py-1 text-center text-xs text-white">
-            Upscayl AI
+            Upscayl-Next AI
           </span>
         </div>
       </div>

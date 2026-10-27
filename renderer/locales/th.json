@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "แนะนำ Upscayl คลาวด์!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "แนะนำ Upscayl-Next คลาวด์!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "ติดดาวให้เราบน GitHub 😁",
     "DESCRIPTION": "ขยายรูปด้วย AI"
   },
   "FOOTER": {
-    "NEWS_TITLE": "ข่าวสาร UPSCAYL",
-    "COPYRIGHT": "ลิขสิทธิ์ ©",
+    "NEWS_TITLE": "ข่าวสาร UPSCAYL-NEXT",
     "TITLE": "โดย ",
-    "LINK_TITLE": "ทีม Upscayl"
+    "LINK_TITLE": "ทีม Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "การตั้งค่า",
-    "CHANGE_LANGUAGE": { "TITLE": "เปลี่ยนภาษา" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "เปลี่ยนภาษา"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "การบีบอัดรูป",
       "DESCRIPTION": "การบีบอัด PNG จะไม่มีการสูญเสียข้อมูล ซึ่งอาจไม่ช่วยลดขนาดของไฟล์ได้มากนัก และการบีบอัดด้วยค่าที่สูงอาจส่งผลต่อประสิทธิภาพ ส่วนการบีบอัดด้วย JPG และ WebP จะเกิดการสูญเสียข้อมูล"
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ไอดี GPU",
-      "DESCRIPTION": "โปรดอ่านเอกสารประกอบของ Upscayl สำหรับข้อมูลเพิ่มเติม",
+      "DESCRIPTION": "โปรดอ่านเอกสารประกอบของ Upscayl-Next สำหรับข้อมูลเพิ่มเติม",
       "ADDITIONAL_DESCRIPTION": "เปิดใช้โหมดประสิทธิภาพบนวินโดวส์เพื่อผลลัพธ์ที่ดียิ่งขึ้น"
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "ขนาดรูป",
-      "DESCRIPTION": "สิ่งที่มากกว่า 4 เท่า (ยกเว้น Upscayl 16 เท่า 2 รอบ) จะขยายขนาดรูปเท่านั้น ไม่มีการใช้ AI ในการขยาย",
+      "DESCRIPTION": "สิ่งที่มากกว่า 4 เท่า (ยกเว้น Upscayl-Next 16 เท่า 2 รอบ) จะขยายขนาดรูปเท่านั้น ไม่มีการใช้ AI ในการขยาย",
       "WARNING": "สิ่งที่มากกว่า 5 เท่า อาจส่งผลให้เกิดปัญหาด้านประสิทธิภาพขึ้นกับอุปกรณ์บางอย่างได้",
       "ADDITIONAL_WARNING": "นี่อาจส่งผลให้เกิดปัญหาด้านประสิทธิภาพขึ้นกับอุปกรณ์บางอย่างได้!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "เขียนทับการขยายก่อนหน้า",
-      "DESCRIPTION": "หากเปิดใช้งาน Upscayl จะประมวลผลรูปใหม่อีกครั้งแทนที่จะโหลดโดยตรง"
+      "DESCRIPTION": "หากเปิดใช้งาน Upscayl-Next จะประมวลผลรูปใหม่อีกครั้งแทนที่จะโหลดโดยตรง"
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "คืนค่า UPSCAYL",
-      "ALERT": "Upscayl จะถูกคืนค่า โปรดปิดแล้วเปิดแอพใหม่"
+      "BUTTON_TITLE": "คืนค่า UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next จะถูกคืนค่า โปรดปิดแล้วเปิดแอพใหม่"
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "จัดเก็บโฟลเดอร์ปลายทาง",
       "DESCRIPTION": "หากเปิดใช้งาน โฟลเดอร์ปลายทางจะถูกจดจำไว้ระหว่างช่วงนั้น"
     },
     "AUTO_UPDATE": {
-      "TITLE": "อัพเดท UPSCAYL อัตโนมัติ",
+      "TITLE": "อัพเดท UPSCAYL-NEXT อัตโนมัติ",
       "DESCRIPTION": "หากเปิดใช้งาน แอพลิเคชั่นจะตรวจหาเวอร์ชั่นใหม่และแจ้งเตือนคุณ"
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "ช่วยปรับปรุง UPSCAYL",
-      "DESCRIPTION": "หากเปิดใช้งาน Upscayl จะรวบรวมข้อมูลการใช้งานโดยไม่ระบุตัวตนเพื่อปรับปรุงส่วนติดต่อแลัคุณสมบัติของแอพลเคชั่น"
-    },
     "THEME": {
-      "TITLE": "ธีม UPSCAYL"
+      "TITLE": "ธีม UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "ภาษา UPSCAYL"
+      "TITLE": "ภาษา UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "ขนาดไทล์แบบกำหนดเอง",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "ปิดการแจ้งเตือน",
-      "DESCRIPTION": "หากเปิดใช้งาน Upscayl จะไม่ส่งการแจ้งเตือนระบบเมื่อเสร็จสิ้นหรือล้มเหลว"
+      "DESCRIPTION": "หากเปิดใช้งาน Upscayl-Next จะไม่ส่งการแจ้งเตือนระบบเมื่อเสร็จสิ้นหรือล้มเหลว"
     },
     "SUPPORT": {
       "TITLE": "พบปัญหา?",
@@ -108,13 +115,23 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "ข้อมูลระบบ"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Upscayl แบบกลุ่ม",
-      "DESCRIPTION": "วิธีนี้จะช่วยให้คุณ Upscayl ไฟล์ทั้งหมดในโฟลเดอร์พร้อมกันได้"
+      "TITLE": "Upscayl-Next แบบกลุ่ม",
+      "DESCRIPTION": "วิธีนี้จะช่วยให้คุณ Upscayl-Next ไฟล์ทั้งหมดในโฟลเดอร์พร้อมกันได้"
     },
     "FILE_SELECTION": {
       "TITLE": "ขั้นตอนที่ 1",
@@ -130,11 +147,11 @@
       "ZOOM": "ขยาย",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl แบบมาตรฐาน",
+          "NAME": "Upscayl-Next แบบมาตรฐาน",
           "DESCRIPTION": "เหมาะกับรูปส่วนใหญ่"
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl แบบเล็ก",
+          "NAME": "Upscayl-Next แบบเล็ก",
           "DESCRIPTION": "เหมาะกับรูปส่วนใหญ่ เป็นการเพิ่มขนาดด้วยความเร็วสูงและมีการสูญเสียคุณภาพน้อย"
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Upscayl 2 รอบ",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Upscayl-Next 2 รอบ",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "เปิดใช้งานตัวเลือกนี้เพื่อเรียกใช้ upscayl กับรูป 2 รอบ โปรดทราบว่านี่อาจทำให้เวลาการประมวลผลเพิ่มขึ้นอย่างมีนัยสำคัญ และอาจเกิดปัญหาประสิทธิภาพสำหรับการขยายขนาดมากกว่า 4 เท่า"
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "ขั้นตอนที่ 3",
-      "MAC_APP_STORE_ALERT": "เนื่องจากข้อจำกัดด้านความปลอดภัยของร้านค้าแอพบน MacOS Upscayl จำเป็นต้องให้คุณเลือกโฟลเดอร์ปลายทางทุกครั้งที่เริ่มใช้งาน\n\nเพื่อหลีกเลี่ยงสิ่งนี้ คุณสามารถบันทึกโฟลเดอร์ปลายทางเริ่มต้นแบบถาวรได้ในแท็บ 'การตั้งค่า' ของ Upscayl",
+      "MAC_APP_STORE_ALERT": "เนื่องจากข้อจำกัดด้านความปลอดภัยของร้านค้าแอพบน MacOS Upscayl-Next จำเป็นต้องให้คุณเลือกโฟลเดอร์ปลายทางทุกครั้งที่เริ่มใช้งาน\n\nเพื่อหลีกเลี่ยงสิ่งนี้ คุณสามารถบันทึกโฟลเดอร์ปลายทางเริ่มต้นแบบถาวรได้ในแท็บ 'การตั้งค่า' ของ Upscayl-Next",
       "NOT_SELECTED": "ไม่ถูกเลือก",
       "DEFAULT_IMG_PATH": "ใช้ตามที่ตั้งรูปตามค่าพื้นฐาน",
       "DEFAULT_FOLDER_PATH": "ใช้ตามที่ตั้งโฟลเดอร์ตามค่าพื้นฐาน",
@@ -193,8 +212,14 @@
       "LAST_USED_AT": "ใช้ครั้งล่าสุดเมื่อ"
     },
     "PROGRESS_BAR": {
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
       "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "กำลังขยายรูปแบบกลุ่ม:",
-      "IN_PROGRESS_TITLE": "Upscayl กำลังร่ายเวทมนตร์...",
+      "IN_PROGRESS_TITLE": "Upscayl-Next กำลังร่ายเวทมนตร์...",
       "STOP_BUTTON_TITLE": "หยุด"
     },
     "RESET_BUTTON_TITLE": "คืนค่า",
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "ข้อผิดพลาดของระบบ",
-      "DESCRIPTION": "Upscayl พบข้อผิดพลาด เป็นไปได้ว่าไบนารีของ Upscayl ไม่สามารถประมวลผลคำสั่งได้อย่างถูกต้อง ลองตรวจสอบบันทึกการทำงานเพื่อดูว่ามีข้อมูลเพิ่มเติมหรือไม่ คุณสามารถโพสต์ปัญหาในที่เก็บบน GitHub ของ Upscayl เพื่อขอความช่วยเหลือเพิ่มเติม"
+      "DESCRIPTION": "Upscayl-Next พบข้อผิดพลาด เป็นไปได้ว่าไบนารีของ Upscayl-Next ไม่สามารถประมวลผลคำสั่งได้อย่างถูกต้อง ลองตรวจสอบบันทึกการทำงานเพื่อดูว่ามีข้อมูลเพิ่มเติมหรือไม่ คุณสามารถโพสต์ปัญหาในที่เก็บบน GitHub ของ Upscayl-Next เพื่อขอความช่วยเหลือเพิ่มเติม"
     },
     "GENERIC_ERROR": {
       "TITLE": "ข้อผิดพลาด"
@@ -281,9 +306,9 @@
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "เร็ว ๆ นี้!",
     "CATCHY_PHRASE_1": "ไม่มีข้อผิดพลาด ปัญหาเกี่ยวกับฮาร์ดแวร์ การบีบอัดคุณภาพ หรือเวลาโหลดที่ยาวนานอีกต่อไป!",
-    "CATCHY_PHRASE_2": "🌐 ใช้ Upscayl ได้ทุกที่ ทุกเวลา ทุกอุปกรณ์\n☁️ ไม่ต้องใช้การ์ดจอหรืออุปกรณ์เสริม\n👩 การเพิ่มคุณภาพใบหน้า\n🦋 เลือกจากโมเดลได้มากกว่า 10 แบบ\n🏎 เร็วกว่า Upscayl บนเดสก์ท็อป 5 เท่า\n🎞 การขยายขนาดวิดีโอ\n💰 ใช้งานเชิงพาณิชย์ได้\n😴 ใช้ Upscayl ขณะคุณนอนหลับ",
+    "CATCHY_PHRASE_2": "🌐 ใช้ Upscayl-Next ได้ทุกที่ ทุกเวลา ทุกอุปกรณ์\n☁️ ไม่ต้องใช้การ์ดจอหรืออุปกรณ์เสริม\n👩 การเพิ่มคุณภาพใบหน้า\n🦋 เลือกจากโมเดลได้มากกว่า 10 แบบ\n🏎 เร็วกว่า Upscayl-Next บนเดสก์ท็อป 5 เท่า\n🎞 การขยายขนาดวิดีโอ\n💰 ใช้งานเชิงพาณิชย์ได้\n😴 ใช้ Upscayl-Next ขณะคุณนอนหลับ",
     "ALREADY_REGISTERED_ALERT": "ขอขอบคุณ {name}! แต่ดูเหมือนว่าอีเมลของคุณได้ถูกลงทะเบียนไว้แล้ว :D หากไม่ใช่ โปรดลองอีกครั้ง",
-    "ADD_SUCCESS": "ขอบคุณสำหรับการเข้าร่วมรายชื่อรอ! เราจะแจ้งให้คุณทราบเมื่อ Upscayl คลาว์ พร้อมใช้งานสำหรับคุณ",
+    "ADD_SUCCESS": "ขอบคุณสำหรับการเข้าร่วมรายชื่อรอ! เราจะแจ้งให้คุณทราบเมื่อ Upscayl-Next คลาว์ พร้อมใช้งานสำหรับคุณ",
     "INCORRECT_FIELDS_ALERT": "โปรดกรอกทุกช่องให้ถูกต้อง",
     "JOIN_WAITLIST": "เข้าร่วมรายชื่อรอ",
     "DONT_SHOW_AGAIN": "ไม่ต้องแสดงอีก"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "เริ่มใช้งาน",
     "SETTINGS_NOTE": "คุณสามารถเปลี่ยนการตั้งค่าเหล่านี้ได้ในภายหลังตลอดเวลา",
     "STEP_1": {
-      "TITLE": "ยินดีต้อนรับเข้าสู่ Upscayl 🎉",
+      "TITLE": "ยินดีต้อนรับเข้าสู่ Upscayl-Next 🎉",
       "DESCRIPTION": "มาเริ่มต้นกันด้วยขั้นตอนง่าย ๆ เพียงไม่กี่ขั้นตอน"
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "กำหนดค่าการตั้งค่าพื้นฐานของคุณ"
     },
     "STEP_3": {
-      "TITLE": "ฉันจะใช้ Upscayl อย่างไร? 🚀",
+      "TITLE": "ฉันจะใช้ Upscayl-Next อย่างไร? 🚀",
       "DESCRIPTION": "รับชมวิดีโอสั้นนี้เพื่อเรียนรู้เกี่ยวกับคุณลักษณะใหม่"
     },
     "STEP_4": {
       "TITLE": "คุณพร้อมแล้ว! 🎉",
-      "DESCRIPTION": "คุณพร้อมที่จะเริ่มการขยายรูปด้วย Upscayl แล้ว!"
+      "DESCRIPTION": "คุณพร้อมที่จะเริ่มการขยายรูปด้วย Upscayl-Next แล้ว!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }

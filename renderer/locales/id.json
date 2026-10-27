@@ -1,19 +1,30 @@
 {
-  "TITLE": "Upscayl",
-  "INTRO": "Memperkenalkan Upscayl Cloud!",
+  "TITLE": "Upscayl-Next",
+  "INTRO": "Memperkenalkan Upscayl-Next Cloud!",
   "HEADER": {
     "GITHUB_BUTTON_TITLE": "Beri bintang di GitHub 😁",
     "DESCRIPTION": "Peningkat Gambar AI"
   },
   "FOOTER": {
-    "NEWS_TITLE": "BERITA UPSCAYL",
-    "COPYRIGHT": "Hak Cipta ©",
+    "NEWS_TITLE": "BERITA UPSCAYL-NEXT",
     "TITLE": "Oleh ",
-    "LINK_TITLE": "Tim Upscayl"
+    "LINK_TITLE": "Tim Upscayl-Next"
   },
   "SETTINGS": {
     "TITLE": "Pengaturan",
-    "CHANGE_LANGUAGE": { "TITLE": "Ubah Bahasa" },
+    "BACK_TO_UPSCAYL-NEXT": "Back to Upscayl-Next",
+    "SECTIONS": {
+      "DESCRIPTION": "Settings are grouped by category so you can find what you need quickly.",
+      "IMAGE": "Image & Output",
+      "PERFORMANCE": "Performance",
+      "INTERFACE": "Interface",
+      "MODELS": "Models",
+      "SYSTEM": "System",
+      "SUPPORT": "Support"
+    },
+    "CHANGE_LANGUAGE": {
+      "TITLE": "Ubah Bahasa"
+    },
     "IMAGE_COMPRESSION": {
       "TITLE": "Kompresi Gambar",
       "DESCRIPTION": "Kompresi PNG bersifat lossless, sehingga mungkin tidak mengurangi ukuran file secara signifikan dan nilai kompresi yang lebih tinggi dapat mempengaruhi kinerja. Kompresi JPG dan WebP bersifat lossy."
@@ -35,7 +46,7 @@
     },
     "GPU_ID_INPUT": {
       "TITLE": "ID GPU",
-      "DESCRIPTION": "Silakan baca Dokumentasi Upscayl untuk informasi lebih lanjut.",
+      "DESCRIPTION": "Silakan baca Dokumentasi Upscayl-Next untuk informasi lebih lanjut.",
       "ADDITIONAL_DESCRIPTION": "Aktifkan mode kinerja tinggi di Windows untuk hasil yang lebih baik."
     },
     "IMAGE_FORMAT": {
@@ -54,7 +65,7 @@
     },
     "IMAGE_SCALE": {
       "TITLE": "Skala Gambar",
-      "DESCRIPTION": "Apa pun di atas 4X (kecuali 16X Double Upscayl) hanya mengubah ukuran gambar dan tidak menggunakan peningkatan AI.",
+      "DESCRIPTION": "Apa pun di atas 4X (kecuali 16X Double Upscayl-Next) hanya mengubah ukuran gambar dan tidak menggunakan peningkatan AI.",
       "WARNING": "Nilai di atas 5X dapat menyebabkan masalah kinerja pada beberapa perangkat!",
       "ADDITIONAL_WARNING": "Hal ini dapat menyebabkan masalah kinerja pada beberapa perangkat!"
     },
@@ -65,29 +76,25 @@
     },
     "OVERWRITE_TOGGLE": {
       "TITLE": "TIMPA UPSCALE SEBELUMNYA",
-      "DESCRIPTION": "Jika diaktifkan, Upscayl akan memproses gambar itu lagi alih-alih memuatnya secara langsung."
+      "DESCRIPTION": "Jika diaktifkan, Upscayl-Next akan memproses gambar itu lagi alih-alih memuatnya secara langsung."
     },
     "RESET_SETTINGS": {
-      "BUTTON_TITLE": "RESET UPSCAYL",
-      "ALERT": "Upscayl telah direset. Silakan restart aplikasi."
+      "BUTTON_TITLE": "RESET UPSCAYL-NEXT",
+      "ALERT": "Upscayl-Next telah direset. Silakan restart aplikasi."
     },
     "SAVE_OUTPUT_FOLDER": {
       "TITLE": "SIMPAN FOLDER OUTPUT",
       "DESCRIPTION": "Jika diaktifkan, folder output akan diingat antara sesi."
     },
     "AUTO_UPDATE": {
-      "TITLE": "PEMBARUAN OTOMATIS UPSCAYL",
+      "TITLE": "PEMBARUAN OTOMATIS UPSCAYL-NEXT",
       "DESCRIPTION": "Jika diaktifkan, aplikasi akan memeriksa pembaruan baru dan memberi tahu Anda."
     },
-    "ENABLE_CONTRIBUTION": {
-      "TITLE": "BANTU TINGKATKAN UPSCAYL",
-      "DESCRIPTION": "Jika diaktifkan, Upscayl akan mengumpulkan data penggunaan anonim untuk meningkatkan antarmuka dan fitur aplikasi."
-    },
     "THEME": {
-      "TITLE": "TEMA UPSCAYL"
+      "TITLE": "TEMA UPSCAYL-NEXT"
     },
     "LANGUAGE": {
-      "TITLE": "BAHASA UPSCAYL"
+      "TITLE": "BAHASA UPSCAYL-NEXT"
     },
     "CUSTOM_TILE_SIZE": {
       "TITLE": "UKURAN TILE KUSTOM",
@@ -95,7 +102,7 @@
     },
     "TURN_OFF_NOTIFICATIONS": {
       "TITLE": "MATIKAN NOTIFIKASI",
-      "DESCRIPTION": "Jika diaktifkan, Upscayl tidak akan mengirim pemberitahuan sistem apapun ketika berhasil ataupun gagal."
+      "DESCRIPTION": "Jika diaktifkan, Upscayl-Next tidak akan mengirim pemberitahuan sistem apapun ketika berhasil ataupun gagal."
     },
     "SUPPORT": {
       "TITLE": "Mengalami masalah?",
@@ -108,13 +115,23 @@
     },
     "SYSTEM_INFO": {
       "TITLE": "Info Sistem"
+    },
+    "THREADS": {
+      "TITLE": "THREAD COUNT",
+      "DESCRIPTION": "Worker thread split in \"load:process:save\" format. Leave empty to let Upscayl-Next choose automatically.",
+      "RESET": "AUTO",
+      "INVALID": "Use the format load:process:save, for example 2:2:2."
+    },
+    "AUTO_OPTIMIZE": {
+      "TITLE": "AUTO-OPTIMIZE SETTINGS",
+      "DESCRIPTION": "When you pick a built-in model, automatically apply its recommended scale, tile size, TTA and thread settings. Custom models keep your own settings."
     }
   },
   "APP": {
-    "TITLE": "Upscayl",
+    "TITLE": "Upscayl-Next",
     "BATCH_MODE": {
-      "TITLE": "Upscayl Massal",
-      "DESCRIPTION": "Ini akan memungkinkan Anda untuk Upscayl semua file dalam folder sekaligus"
+      "TITLE": "Upscayl-Next Massal",
+      "DESCRIPTION": "Ini akan memungkinkan Anda untuk Upscayl-Next semua file dalam folder sekaligus"
     },
     "FILE_SELECTION": {
       "TITLE": "Langkah 1",
@@ -130,11 +147,11 @@
       "ZOOM": "Perbesar",
       "MODELS": {
         "upscayl-standard-4x": {
-          "NAME": "Upscayl Standard",
+          "NAME": "Upscayl-Next Standard",
           "DESCRIPTION": "Cocok untuk sebagian besar gambar."
         },
         "upscayl-lite-4x": {
-          "NAME": "Upscayl Lite",
+          "NAME": "Upscayl-Next Lite",
           "DESCRIPTION": "Cocok untuk sebagian besar gambar. Upscaling berkecepatan tinggi dengan kehilangan kualitas minimal."
         },
         "remacri-4x": {
@@ -159,13 +176,15 @@
         }
       }
     },
-    "DOUBLE_UPSCAYL": {
-      "TITLE": "Double Upscayl",
+    "DOUBLE_UPSCAYL-NEXT": {
+      "TITLE": "Double Upscayl-Next",
+      "BATCH_TITLE": "Double Upscayl-Next (2 passes)",
+      "BATCH_DESCRIPTION": "Runs every image in the folder through Upscayl-Next twice (2 passes). This significantly increases processing time.",
       "DESCRIPTION": "Aktifkan opsi ini untuk menjalankan upscayl dua kali pada gambar. Perlu diingat bahwa ini dapat menyebabkan peningkatan waktu pengolahan yang signifikan dan kemungkinan masalah kinerja untuk skala lebih dari 4X."
     },
     "OUTPUT_PATH_SELECTION": {
       "TITLE": "Langkah 3",
-      "MAC_APP_STORE_ALERT": "Karena pembatasan keamanan App Store MacOS, Upscayl mengharuskan Anda untuk memilih folder output setiap kali Anda memulainya.\n\nUntuk menghindari ini, Anda dapat menyimpan folder output default secara permanen di tab 'Pengaturan' Upscayl.",
+      "MAC_APP_STORE_ALERT": "Karena pembatasan keamanan App Store MacOS, Upscayl-Next mengharuskan Anda untuk memilih folder output setiap kali Anda memulainya.\n\nUntuk menghindari ini, Anda dapat menyimpan folder output default secara permanen di tab 'Pengaturan' Upscayl-Next.",
       "NOT_SELECTED": "Tidak Dipilih",
       "DEFAULT_IMG_PATH": "Default ke lokasi Gambar",
       "DEFAULT_FOLDER_PATH": "Default ke lokasi Folder",
@@ -173,10 +192,10 @@
     },
     "SCALE_SELECTION": {
       "TITLE": "Langkah 4",
-      "FROM_TITLE": "Upscayl dari ",
+      "FROM_TITLE": "Upscayl-Next dari ",
       "TO_TITLE": " ke ",
       "NO_OUTPUT_FOLDER_ALERT": "Silakan pilih folder output terlebih dahulu",
-      "START_BUTTON_TITLE": "Upscayl 🚀",
+      "START_BUTTON_TITLE": "Upscayl-Next 🚀",
       "IN_PROGRESS_BUTTON_TITLE": "Upscayling ⏳"
     },
     "MORE_OPTIONS_DRAWER": {
@@ -184,17 +203,23 @@
       "LENS_VIEW_TITLE": "Tampilan Lensa",
       "SLIDER_VIEW_TITLE": "Tampilan Slider",
       "ZOOM_AMOUNT_TITLE": "Jumlah Pembesaran",
-      "TOTAL_UPSCAYLS": "Total Upscayl",
-      "TOTAL_BATCH_UPSCAYLS": "Total Upscayl Massal",
-      "TOTAL_IMAGE_UPSCAYLS": "Total Upscayl Gambar",
-      "TOTAL_DOUBLE_UPSCAYLS": "Total Double Upscayl",
-      "AVERAGE_UPSCAYL_TIME": "Waktu Rata-rata Upscayl",
-      "LAST_UPSCAYL_DURATION": "Durasi Upscayl Terakhir",
+      "TOTAL_UPSCAYLS": "Total Upscayl-Next",
+      "TOTAL_BATCH_UPSCAYLS": "Total Upscayl-Next Massal",
+      "TOTAL_IMAGE_UPSCAYLS": "Total Upscayl-Next Gambar",
+      "TOTAL_DOUBLE_UPSCAYLS": "Total Double Upscayl-Next",
+      "AVERAGE_UPSCAYL_TIME": "Waktu Rata-rata Upscayl-Next",
+      "LAST_UPSCAYL_DURATION": "Durasi Upscayl-Next Terakhir",
       "LAST_USED_AT": "Terakhir Digunakan Pada"
     },
     "PROGRESS_BAR": {
-      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Upscayl Massal Sedang Berlangsung:",
-      "IN_PROGRESS_TITLE": "Melakukan sihir Upscayl...",
+      "PASS_TITLE": "Pass {pass} of {totalPasses}",
+      "BATCH_COUNT_TITLE": "Batch Progress: {completed}/{total} ({percent}%)",
+      "ELAPSED_TITLE": "Elapsed: {time}",
+      "REMAINING_TITLE": "Remaining: {time}",
+      "ESTIMATING_TITLE": "Estimating...",
+      "REMAINING_FILES_TITLE": "{count} files left",
+      "BATCH_UPSCAYL_IN_PROGRESS_TITLE": "Upscayl-Next Massal Sedang Berlangsung:",
+      "IN_PROGRESS_TITLE": "Melakukan sihir Upscayl-Next...",
       "STOP_BUTTON_TITLE": "HENTIKAN"
     },
     "RESET_BUTTON_TITLE": "Reset",
@@ -209,16 +234,16 @@
       "PROCESSING_TITLE": "Memproses gambar...",
       "SCALING_CONVERTING_TITLE": "Memperbesar dan mengonversi gambar...",
       "WAIT_TITLE": "Tunggu sebentar...",
-      "SUCCESS_TITLE": "Upscayl Berhasil!",
+      "SUCCESS_TITLE": "Upscayl-Next Berhasil!",
       "BATCH": {
         "SELECTED_FOLDER_TITLE": "Folder yang dipilih:",
         "DONE_TITLE": "Semua selesai!",
-        "OPEN_UPSCAYLED_FOLDER_TITLE": "Buka Folder Upscayl"
+        "OPEN_UPSCAYLED_FOLDER_TITLE": "Buka Folder Upscayl-Next"
       }
     },
     "SLIDER": {
       "ORIGINAL_TITLE": "Asli",
-      "UPSCAYLED_TITLE": "Upscayl"
+      "UPSCAYLED_TITLE": "Upscayl-Next"
     },
     "DIALOG_BOX": {
       "CLOSE": "Tutup"
@@ -243,7 +268,7 @@
     },
     "EXCEPTION_ERROR": {
       "TITLE": "Galat Sistem",
-      "DESCRIPTION": "Upscayl mengalami galat. Mungkin, binari upscayl gagal mengeksekusi perintah dengan benar. Coba periksa log untuk melihat apakah Anda mendapatkan informasi. Anda dapat memposting masalah di repositori GitHub Upscayl untuk bantuan lebih lanjut."
+      "DESCRIPTION": "Upscayl-Next mengalami galat. Mungkin, binari upscayl gagal mengeksekusi perintah dengan benar. Coba periksa log untuk melihat apakah Anda mendapatkan informasi. Anda dapat memposting masalah di repositori GitHub Upscayl-Next untuk bantuan lebih lanjut."
     },
     "GENERIC_ERROR": {
       "TITLE": "Galat"
@@ -281,9 +306,9 @@
   "UPSCAYL_CLOUD": {
     "COMING_SOON": "Segera hadir!",
     "CATCHY_PHRASE_1": "Tidak ada lagi galat, masalah perangkat keras, kompromi kualitas atau waktu pemuatan yang lama!",
-    "CATCHY_PHRASE_2": "🌐 Upscayl di mana saja, kapan saja, di perangkat apapun\n☁️ Tidak perlu Kartu Grafis atau perangkat keras\n👩 Peningkatan Wajah\n🦋 10+ model untuk dipilih\n🏎 5x lebih cepat daripada Upscayl Desktop\n🎞 Peningkatan Video\n💰 Penggunaan Komersial\n😴 Upscayl saat Anda tidur",
+    "CATCHY_PHRASE_2": "🌐 Upscayl-Next di mana saja, kapan saja, di perangkat apapun\n☁️ Tidak perlu Kartu Grafis atau perangkat keras\n👩 Peningkatan Wajah\n🦋 10+ model untuk dipilih\n🏎 5x lebih cepat daripada Upscayl-Next Desktop\n🎞 Peningkatan Video\n💰 Penggunaan Komersial\n😴 Upscayl-Next saat Anda tidur",
     "ALREADY_REGISTERED_ALERT": "Terima kasih {name}! Sepertinya email Anda sudah terdaftar :D Jika tidak, silakan coba lagi.",
-    "ADD_SUCCESS": "Terima kasih telah bergabung dalam daftar tunggu! Kami akan memberi tahu Anda saat Upscayl Cloud siap untuk Anda.",
+    "ADD_SUCCESS": "Terima kasih telah bergabung dalam daftar tunggu! Kami akan memberi tahu Anda saat Upscayl-Next Cloud siap untuk Anda.",
     "INCORRECT_FIELDS_ALERT": "Silakan isi semua kolom dengan benar.",
     "JOIN_WAITLIST": "Bergabung dengan daftar tunggu",
     "DONT_SHOW_AGAIN": "JANGAN TAMPILKAN LAGI"
@@ -294,7 +319,7 @@
     "GET_STARTED_BUTTON_TITLE": "Mulai",
     "SETTINGS_NOTE": "Anda selalu bisa mengubah pengaturan ini nanti.",
     "STEP_1": {
-      "TITLE": "Selamat datang di Upscayl 🎉",
+      "TITLE": "Selamat datang di Upscayl-Next 🎉",
       "DESCRIPTION": "Mari kita mulai dengan beberapa langkah cepat."
     },
     "STEP_2": {
@@ -302,12 +327,23 @@
       "DESCRIPTION": "Konfigurasikan pengaturan awal Anda."
     },
     "STEP_3": {
-      "TITLE": "Bagaimana cara menggunakan Upscayl? 🚀",
+      "TITLE": "Bagaimana cara menggunakan Upscayl-Next? 🚀",
       "DESCRIPTION": "Tonton video singkat ini untuk mempelajari fitur baru."
     },
     "STEP_4": {
       "TITLE": "Anda sudah siap! 🎉",
-      "DESCRIPTION": "Anda siap untuk mulai meningkatkan gambar dengan Upscayl!"
+      "DESCRIPTION": "Anda siap untuk mulai meningkatkan gambar dengan Upscayl-Next!"
     }
+  },
+  "VIDEO_UPSCAYL": {
+    "TAB_IMAGE": "Image",
+    "TAB_VIDEO": "Video",
+    "SELECT_VIDEO": "Select Video",
+    "SELECT_VIDEO_BUTTON": "Select Video File",
+    "NO_VIDEO_SELECTED": "No video selected",
+    "NO_OUTPUT_FOLDER": "No output folder selected",
+    "MODEL_TITLE": "Model",
+    "START_BUTTON": "Upscale Video",
+    "SUCCESS_TITLE": "Video upscaled successfully"
   }
 }
