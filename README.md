@@ -21,27 +21,92 @@ without losing quality.
 > This fork currently publishes **Windows x64 builds only**. For Linux and macOS,
 > use the upstream [Upscayl releases](https://github.com/upscayl/upscayl/releases).
 
-# ✨ What's new in this fork?
+# ✨ What's changed from upstream?
 
-- **🎬 Video upscaling (experimental)** — extract frames with FFmpeg, upscale every
-  frame, and re-encode the video with its audio track.
-- **🧠 Automatic VRAM recovery** — detects `vkAllocateMemory failed`,
-  `vk Allocated memory failed` and related Vulkan errors, then retries with a
-  smaller tile size (`512 → 256 → 128 → 64 → 32`) for single images, batch,
-  double upscale and video frames.
-- **⚡ Per-model auto-optimization** — bundled models come with recommended scale,
-  tile size, TTA, compression and thread settings. Enable *Auto-optimize settings*
-  to apply them automatically.
-- **🧵 Thread split tuning** — advanced users can pin the `load:process:save`
-  thread split (`-j`) used by the NCNN backend.
-- **🎛 Tile size control** — lower the tile size manually on GPUs with very little VRAM.
-- **🖼 Metadata copy** — keep EXIF metadata in upscaled images.
-- **📦 Animated Windows installer** — custom NSIS welcome page with an animated
-  Upscayl-Next banner, branded sidebar and header.
+Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
+versioning and starts at **1.0.0**.
+
+Compared with the upstream tree, this release contains **174 changed files**
+(**+5,939 / −2,232** lines; 57 added, 86 modified, 31 deleted).
+
+## Added
+
+| Area | Change | Main files |
+| --- | --- | --- |
+| Video upscaling | Extract frames with FFmpeg, upscale each frame, re-encode to MP4 with audio | `electron/commands/video-upscayl.ts`, `select-video.ts`, `common/video-formats.ts` |
+| VRAM recovery | Detect `vkAllocateMemory failed` / `vk Allocated memory failed` and retry at `512→256→128→64→32` tile sizes | `common/vulkan-memory.ts`, all upscale commands |
+| Batch + double | Process a whole folder twice; batch takes priority over double (fixes #1405) | `common/resolve-upscayl-mode.ts`, `batch-upscayl.ts` |
+| Model profiles | Recommended scale, tile size, TTA, compression and threads per bundled model | `common/model-profiles.ts`, `auto-optimize-toggle.tsx` |
+| Thread tuning | Auto or manual `load:process:save` split (`-j`) based on CPU cores | `common/thread-count.ts`, `input-threads.tsx`, `get-arguments.ts` |
+| Model compatibility | Detect NCNN `.param/.bin` plus ONNX / PyTorch extensions and label them in the UI | `common/model-compatibility.ts`, `get-models.ts` |
+| Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
+| Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
+| Animated installer | NSIS welcome page playing an AVI banner, plus branded sidebar/header | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1` |
+| Release manifest | Asset list, SHA-256 checksums and v1.0.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.0.0.md` |
+
+## Improved and fixed
+
+- **Windows paths containing `%`** no longer crash `decodeURIComponent`; the raw path is used as a fallback.
+- **Progress parsing** no longer allocates a match array for every log line (`count-occurrences.ts`).
+- **Batch input validation** prevents the cryptic "both must be a file or a directory" error.
+- **Batch double-upscale** uses a temporary folder and falls back to the OS temp directory.
+- **Batch metadata copy** runs in chunks of 8 to avoid opening thousands of handles.
+- **Double upscale progress** now reports the overall two-pass progress instead of restarting at 100%.
+- **Image input validation** checks the input file, output folder and Windows path length.
+- **Video error handling** cleans up temporary frames after failures and reports each stage.
+- **Auto-update** now opens fork release notes under `yu7783/Upscayl-Next`.
+- **Custom model folder** accepts NCNN, ONNX and PyTorch checkpoint extensions.
+
+## UI and UX
+
+- Rebranded the UI from Upscayl to Upscayl-Next (header, footer, logo, version badge and locales).
+- Header and footer links point to the fork repository.
+- Added a video tab alongside image and batch modes.
+- Reworked the progress overlay with batch/pass progress, elapsed time and ETA.
+- Added Auto-optimize settings and thread-split controls.
+- Replaced `lucide-react` icons with a bundled icon set.
+- Replaced upstream model-comparison images with `original-placeholder.svg`.
+- Removed PostHog telemetry and the contributions toggle.
+
+## Build and release
+
+- `name`: `upscayl` → `upscayl-next`
+- `productName`: `Upscayl` → `Upscayl-Next`
+- `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
+- `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
+- Versioning starts at `1.0.0` instead of upstream `2.15.0`.
+- Artifacts are named `Upscayl-Next-Setup-1.0.0.exe` / `.zip`.
+- GitHub publish target is `yu7783/Upscayl-Next`.
+- Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
+- macOS config uses PNG icons instead of `.icns`.
+- Added `npm test` (`tsc && node --test tests`).
+
+## Removed
+
+- Upstream demo media: `1080p_banner.jpg`, `1080p_explainer.jpg`, `download.jpg`,
+  `screen1.png`, `to_upscale.jpeg`, `ups/to_upscale.jpeg`, `upscayl.mp4`.
+- Upstream model-comparison WebP images.
+- Sample images `scripts/baboon.png` and `scripts/baboon_upscaled.png`.
+- PostHog integration and the "Enable contributions" toggle.
+- macOS `.icns` icons.
+
+## Tests and docs
+
+- Added tests for model compatibility, model profiles, thread/performance helpers,
+  mode resolution and Vulkan memory handling.
+- Rewrote this README for the Windows-only fork.
+- Updated `scripts/test.py` to generate a synthetic test image instead of using bundled photos.
+- Removed the deleted macOS screenshot reference from the troubleshooting docs.
+- Added installer artwork generation and Windows build/release instructions.
+
+## Not changed
+
+- The bundled NCNN models and the core upscaling quality.
+- Existing upstream workflows such as single image, batch and double upscale.
 
 # Contents
 
-- [✨ What's new in this fork?](#-whats-new-in-this-fork)
+- [✨ What's changed from upstream?](#-whats-changed-from-upstream)
 - [👨‍💻 Installation](#-installation)
 - [🚀 Quick start](#-quick-start)
 - [🩺 Troubleshooting](#-troubleshooting)
