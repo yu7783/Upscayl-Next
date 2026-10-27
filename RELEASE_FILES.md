@@ -75,6 +75,7 @@ release. All installer artifacts are generated into `dist/`.
 - `Real-ESRGAN_LICENSE.txt`
 - `COMPARISONS.MD`
 - `RELEASE_FILES.md`
+- `RELEASE_NOTES_v1.0.0.md`
 
 ## Build and verification
 
