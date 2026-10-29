@@ -117,4 +117,5 @@ Get-FileHash dist/Upscayl-Next-Setup-1.1.0.exe -Algorithm SHA256
 - [x] Auto-update metadata (`latest.yml`) generated
 - [x] SHA-256 checksums generated
 - [x] `README.md` updated with added features and install steps
-- [ ] GitHub Release `v1.1.0` created and assets uploaded
+- [x] GitHub Release `v1.1.0` created and assets uploaded
+  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.1.0)
