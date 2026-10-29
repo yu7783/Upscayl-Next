@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/yu7783/Upscayl-Next/total.svg?style=for-the-badge)](https://github.com/yu7783/Upscayl-Next/releases)
 
 [Download the latest release](https://github.com/yu7783/Upscayl-Next/releases/latest) ·
-[Release notes](RELEASE_NOTES_v1.0.0.md) ·
+[Release notes](RELEASE_NOTES_v1.1.0.md) ·
 [Report an issue](https://github.com/yu7783/Upscayl-Next/issues)
 
 </div>
@@ -24,7 +24,7 @@ without losing quality.
 # ✨ What's changed from upstream?
 
 Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
-versioning and starts at **1.0.0**.
+versioning and starts at **1.0.0** (current release: **1.1.0**).
 
 Compared with the upstream tree, this release contains **174 changed files**
 (**+5,939 / −2,232** lines; 57 added, 86 modified, 31 deleted).
@@ -39,10 +39,11 @@ Compared with the upstream tree, this release contains **174 changed files**
 | Model profiles | Recommended scale, tile size, TTA, compression and threads per bundled model | `common/model-profiles.ts`, `auto-optimize-toggle.tsx` |
 | Thread tuning | Auto or manual `load:process:save` split (`-j`) based on CPU cores | `common/thread-count.ts`, `input-threads.tsx`, `get-arguments.ts` |
 | Model compatibility | Detect NCNN `.param/.bin` plus ONNX / PyTorch extensions and label them in the UI | `common/model-compatibility.ts`, `get-models.ts` |
+| Native HAT / DAT / SUPIR | Run transformer and diffusion upscalers in a bundled Python backend (spandrel, ONNX Runtime, official SUPIR), routed automatically by model name/extension | `native/`, `common/model-runtime.ts`, `electron/utils/spawn-upscayl.ts` |
 | Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
 | Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
 | Animated installer | NSIS welcome page playing an AVI banner, plus branded sidebar/header | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1` |
-| Release manifest | Asset list, SHA-256 checksums and v1.0.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.0.0.md` |
+| Release manifest | Asset list, SHA-256 checksums and v1.1.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.1.0.md` |
 
 ## Improved and fixed
 
@@ -75,7 +76,7 @@ Compared with the upstream tree, this release contains **174 changed files**
 - `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
 - `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
 - Versioning starts at `1.0.0` instead of upstream `2.15.0`.
-- Artifacts are named `Upscayl-Next-Setup-1.0.0.exe` / `.zip`.
+- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.1.0`).
 - GitHub publish target is `yu7783/Upscayl-Next`.
 - Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
 - macOS config uses PNG icons instead of `.icns`.
@@ -99,6 +100,50 @@ Compared with the upstream tree, this release contains **174 changed files**
 - Removed the deleted macOS screenshot reference from the troubleshooting docs.
 - Added installer artwork generation and Windows build/release instructions.
 
+## Native HAT / DAT / SUPIR support
+
+Transformer and diffusion upscalers cannot run in the NCNN Vulkan binary, so the
+fork ships a small Python worker in `native/` that speaks the same command-line
+interface as `upscayl-bin`:
+
+| Family | Checkpoints | Engine |
+| --- | --- | --- |
+| HAT (Hybrid Attention Transformer) | `*.pth`, `*.safetensors` | [spandrel](https://github.com/chaiNNer-org/spandrel) |
+| DAT / DAT2 (Dual Aggregation Transformer) | `*.pth`, `*.safetensors` | spandrel |
+| SUPIR (Super-Scale Image Restoration) | `SUPIR-v0Q.ckpt`, `SUPIR-v0F.ckpt` | official SUPIR pipeline + SDXL |
+| Any other SR model | `*.onnx` | ONNX Runtime |
+
+Routing is automatic: `.param`/`.bin` pairs keep using the bundled Vulkan binary,
+while `.pth`/`.pt`/`.ckpt`/`.safetensors`/`.onnx` files and HAT/DAT/SUPIR model
+names run in the native worker. Tiling (`-t`), TTA (`-x`), custom width (`-w`),
+compression (`-c`) and the output format are all supported for native models.
+
+### Enable the native backend
+
+```powershell
+cd upscayl
+npm run native:setup
+```
+
+This creates `native/.venv` with Python 3.10/3.11 and installs PyTorch, spandrel
+and ONNX Runtime. Packaged builds copy `native/` into the app resources; point
+`UPSCAYL_PYTHON` at a compatible interpreter if you prefer an existing venv.
+
+### Using the models
+
+1. Download HAT/DAT/SUPIR weights into a folder of their own.
+2. In Upscayl-Next open **Settings → Custom models folder** and select it.
+3. Pick the model in the model selector. The badge shows the engine
+   (`HAT`, `DAT / DAT2`, `SUPIR`, `ONNX`, `PyTorch`).
+
+SUPIR additionally needs a clone of
+[Fanghua-Yu/SUPIR](https://github.com/Fanghua-Yu/SUPIR) and an SDXL base
+checkpoint; set `UPSCAYL_SUPIR_REPO` and `UPSCAYL_SUPIR_SDXL_CKPT`, or edit the
+repository's `options/SUPIR_v0.yaml`. SUPIR is diffusion-based and requires CUDA,
+so expect minutes rather than seconds per image. See
+[`native/README.md`](native/README.md) for every environment variable and for
+troubleshooting.
+
 ## Not changed
 
 - The bundled NCNN models and the core upscaling quality.
@@ -107,6 +152,7 @@ Compared with the upstream tree, this release contains **174 changed files**
 # Contents
 
 - [✨ What's changed from upstream?](#-whats-changed-from-upstream)
+- [🧠 Native HAT / DAT / SUPIR support](#-native-hat--dat--supir-support)
 - [👨‍💻 Installation](#-installation)
 - [🚀 Quick start](#-quick-start)
 - [🩺 Troubleshooting](#-troubleshooting)
@@ -123,11 +169,13 @@ Compared with the upstream tree, this release contains **174 changed files**
 - A **Vulkan-compatible GPU** (most integrated GPUs are not supported)
 - **FFmpeg and FFprobe** in `PATH` for video upscaling
 - At least 2 GB of free disk space for the app and bundled models
+- **Python 3.10 or 3.11** (optional) only when you want native HAT/DAT/SUPIR
+  models; the bundled NCNN models do not need Python
 
 ## Windows installer
 
 1. Open the [latest release](https://github.com/yu7783/Upscayl-Next/releases/latest).
-2. Download **`Upscayl-Next-Setup-1.0.0.exe`**.
+2. Download **`Upscayl-Next-Setup-1.1.0.exe`**.
 3. Run the installer. The first page plays the animated Upscayl-Next banner.
 4. Choose an installation folder and finish the wizard.
 5. Launch **Upscayl-Next** from the Start Menu or the desktop shortcut.
@@ -138,7 +186,7 @@ Compared with the upstream tree, this release contains **174 changed files**
 
 ## Portable ZIP
 
-1. Download **`Upscayl-Next-Setup-1.0.0.zip`** from the same release.
+1. Download **`Upscayl-Next-Setup-1.1.0.zip`** from the same release.
 2. Extract the archive to a folder of your choice.
 3. Run `Upscayl-Next.exe`.
 
@@ -178,8 +226,8 @@ upscale** to process it again.
 - [Before/after comparisons](COMPARISONS.MD)
 - [Additional custom models](https://github.com/upscayl/custom-models)
 - [Upstream troubleshooting guide](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
-- [Release manifest for v1.0.0](RELEASE_FILES.md)
-- [Release notes for v1.0.0](RELEASE_NOTES_v1.0.0.md)
+- [Release manifest for v1.1.0](RELEASE_FILES.md)
+- [Release notes for v1.1.0](RELEASE_NOTES_v1.1.0.md)
 
 # 🛠 Development
 
@@ -218,15 +266,15 @@ npm run dist:win
 
 Outputs:
 
-- `dist/Upscayl-Next-Setup-1.0.0.exe`
-- `dist/Upscayl-Next-Setup-1.0.0.exe.blockmap`
-- `dist/Upscayl-Next-Setup-1.0.0.zip`
+- `dist/Upscayl-Next-Setup-1.1.0.exe`
+- `dist/Upscayl-Next-Setup-1.1.0.exe.blockmap`
+- `dist/Upscayl-Next-Setup-1.1.0.zip`
 - `dist/latest.yml`
 
 Generate or verify checksums with:
 
 ```powershell
-Get-FileHash dist\Upscayl-Next-Setup-1.0.0.exe -Algorithm SHA256
+Get-FileHash dist\Upscayl-Next-Setup-1.1.0.exe -Algorithm SHA256
 ```
 
 ## Installer artwork

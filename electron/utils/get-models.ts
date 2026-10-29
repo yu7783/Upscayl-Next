@@ -32,7 +32,7 @@ const getModels = async (folderPath: string | undefined) => {
       type: "error",
       title: "Invalid Folder",
       message:
-        "The selected folder does not contain valid model files. Make sure you select the folder that ONLY contains '.param' and '.bin' files.",
+        "The selected folder does not contain valid model files. Use a folder with NCNN (.param/.bin), ONNX (.onnx) or PyTorch (.pth/.pt/.ckpt/.safetensors) models such as HAT, DAT or SUPIR.",
       buttons: ["OK"],
     };
     dialog.showMessageBoxSync(options);

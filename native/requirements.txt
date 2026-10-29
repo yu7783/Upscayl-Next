@@ -1,0 +1,9 @@
+# Core native backend (HAT, DAT and generic PyTorch/ONNX models).
+# spandrel currently requires Python < 3.12.
+torch>=2.1
+torchvision>=0.16
+numpy>=1.24
+pillow>=10.0
+safetensors>=0.4.0
+spandrel>=0.4.0
+onnxruntime>=1.17.0

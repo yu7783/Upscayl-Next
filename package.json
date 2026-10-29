@@ -1,7 +1,7 @@
 {
   "name": "upscayl-next",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "productName": "Upscayl-Next",
   "author": {
     "name": "Nayam Amarshe",
@@ -42,6 +42,8 @@
     "build": "tsc && npm run validate-schema && next build renderer",
     "tsc": "tsc",
     "test": "tsc && node --test tests",
+    "native:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File native/setup.ps1",
+    "native:setup:unix": "bash native/setup.sh",
     "pack-app": "tsc && npm run build && electron-builder --dir",
     "dist": "tsc && npm run build && cross-env DEBUG=* electron-builder",
     "dist:appimage": "tsc && npm run build && cross-env DEBUG=* electron-builder build -l AppImage",
@@ -102,6 +104,18 @@
       {
         "from": "resources/icons/512x512.png",
         "to": "resources/512x512.png"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "native",
+        "to": "native",
+        "filter": [
+          "**/*",
+          "!.venv/**",
+          "!**/__pycache__/**",
+          "!**/*.pyc"
+        ]
       }
     ],
     "mas": {

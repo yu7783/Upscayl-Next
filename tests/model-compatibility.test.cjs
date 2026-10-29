@@ -40,6 +40,21 @@ test("DAT and DAT2 transformer models are reported as supported", () => {
   }
 });
 
+test("HAT (Hybrid Attention Transformer) models are reported as supported", () => {
+  for (const id of ["4x-HAT", "HAT-SRx4", "hat_gan", "Hybrid Attention Transformer"]) {
+    const compatibility = getModelCompatibility(id);
+    assert.equal(compatibility.engine, "transformer", id);
+    assert.equal(compatibility.supportedByBuiltInEngine, true, id);
+    assert.match(compatibility.label, /HAT/);
+  }
+});
+
+test("the HAT token does not match unrelated words", () => {
+  for (const id of ["what-is-this", "that-model", "shadow-upscaler"]) {
+    assert.equal(getModelCompatibility(id).engine, "ncnn", id);
+  }
+});
+
 test("getModelCompatibility detects ONNX and PyTorch extensions", () => {
   const onnx = getModelCompatibility("my-model.onnx");
   assert.equal(onnx.engine, "onnx");
@@ -55,6 +70,26 @@ test("getModelCompatibility detects ONNX and PyTorch extensions", () => {
     assert.equal(pytorch.engine, "pytorch", file);
     assert.equal(pytorch.supportedByBuiltInEngine, true, file);
   }
+});
+
+test("external checkpoints keep the architecture in the label", () => {
+  const hat = getModelCompatibility("4x-HAT.pth");
+  assert.equal(hat.engine, "pytorch");
+  assert.match(hat.label, /PyTorch/);
+  assert.match(hat.label, /HAT/);
+
+  const dat = getModelCompatibility("DAT2_x2.safetensors");
+  assert.equal(dat.engine, "pytorch");
+  assert.match(dat.label, /DAT/);
+
+  const supir = getModelCompatibility("SUPIR-v0Q.ckpt");
+  assert.equal(supir.engine, "pytorch");
+  assert.match(supir.label, /SUPIR/);
+
+  const onnx = getModelCompatibility("4x-HAT.onnx");
+  assert.equal(onnx.engine, "onnx");
+  assert.match(onnx.label, /ONNX/);
+  assert.match(onnx.label, /HAT/);
 });
 
 test("tokens inside unrelated words are not treated as DAT", () => {
@@ -102,6 +137,15 @@ test("DAT / DAT2 checkpoints are accepted directly", () => {
     assert.equal(support.engine, "pytorch", file);
     assert.match(support.label, /PyTorch/);
     assert.match(support.label, /DAT/);
+  }
+});
+
+test("HAT checkpoints are accepted directly", () => {
+  for (const file of ["4x-HAT.pth", "4x-HAT.safetensors", "HAT_x2.pt"]) {
+    const support = getModelFileSupport(file);
+    assert.equal(support.supportedByBuiltInEngine, true, file);
+    assert.equal(support.engine, "pytorch", file);
+    assert.match(support.label, /HAT/);
   }
 });
 

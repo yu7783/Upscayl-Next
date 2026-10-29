@@ -1,16 +1,16 @@
-# Upscayl-Next v1.0.0 Release Manifest
+# Upscayl-Next v1.1.0 Release Manifest
 
-This file lists every artifact and source file required for the GitHub `v1.0.0`
+This file lists every artifact and source file required for the GitHub `v1.1.0`
 release. All installer artifacts are generated into `dist/`.
 
 ## GitHub Release assets (upload these)
 
 | File | Size (bytes) | SHA-256 | Purpose |
 | --- | ---: | --- | --- |
-| `Upscayl-Next-Setup-1.0.0.exe` | 268,971,799 | `b7d22cac2f146d65902eb09f9c5b481d9a0489b1a1fac482bda2d0f7050c5a4c` | Windows installer (animated NSIS welcome page) |
-| `Upscayl-Next-Setup-1.0.0.exe.blockmap` | 282,194 | `a6fc04367b8ece492fd7e13fa9b885a5633b2166728ade54a02f0f3bfa418358` | Electron auto-update block map |
-| `Upscayl-Next-Setup-1.0.0.zip` | 314,407,675 | `947642b61a7951010619ba204c0f73da2b3819283e0c2385d30902e309e448de` | Portable ZIP build |
-| `latest.yml` | 353 | `3ee5cf0f3de32e73faa1590f52ba516f457870fd06978a6d8c3dde45e93cc6fd` | electron-updater feed metadata |
+| `Upscayl-Next-Setup-1.1.0.exe` | 268,995,568 | `4effe3cf162186bb1950e21e2c79392bb4ee95fdd1b97ddd09541d2a7f1ed461` | Windows installer (animated NSIS welcome page) |
+| `Upscayl-Next-Setup-1.1.0.exe.blockmap` | 282,452 | `1c1c8c657272d679ec7e88e398e5a17837c15f4667775c402eea1b6ce7cdfe89` | Electron auto-update block map |
+| `Upscayl-Next-Setup-1.1.0.zip` | 314,431,745 | `ef295d0875b4318e86bcb3c0798618e4c198c03933f902e024fb53427dcf3c6d` | Portable ZIP build |
+| `latest.yml` | 353 | `743ae1ab43467f39121d90b1a0c141a18bbcdcec5f7b2c1d5540ca6e97231b98` | electron-updater feed metadata |
 | `SHA256SUMS.txt` | 375 | — | Checksums for the assets above |
 
 ## Source files required to reproduce the build
@@ -49,6 +49,14 @@ release. All installer artifacts are generated into `dist/`.
 - `common/`
 - `tests/`
 
+### Native HAT/DAT/SUPIR backend
+- `native/upscayl_native/`
+- `native/requirements.txt`
+- `native/setup.ps1`
+- `native/setup.sh`
+- `native/make_test_checkpoint.py`
+- `native/README.md`
+
 ### Renderer (Next.js UI)
 - `renderer/`
 
@@ -76,6 +84,7 @@ release. All installer artifacts are generated into `dist/`.
 - `COMPARISONS.MD`
 - `RELEASE_FILES.md`
 - `RELEASE_NOTES_v1.0.0.md`
+- `RELEASE_NOTES_v1.1.0.md`
 
 ## Build and verification
 
@@ -95,12 +104,12 @@ npm run dist:win
 
 # 5. Verify checksums
 Get-Content dist/SHA256SUMS.txt
-Get-FileHash dist/Upscayl-Next-Setup-1.0.0.exe -Algorithm SHA256
+Get-FileHash dist/Upscayl-Next-Setup-1.1.0.exe -Algorithm SHA256
 ```
 
 ## Release checklist
 
-- [x] Version set to `1.0.0` in `package.json`
+- [x] Version set to `1.1.0` in `package.json`
 - [x] Animated NSIS welcome page configured (`build/installer.nsh`)
 - [x] Animated banner and branded sidebar/header generated
 - [x] Windows NSIS installer built
@@ -108,4 +117,4 @@ Get-FileHash dist/Upscayl-Next-Setup-1.0.0.exe -Algorithm SHA256
 - [x] Auto-update metadata (`latest.yml`) generated
 - [x] SHA-256 checksums generated
 - [x] `README.md` updated with added features and install steps
-- [ ] GitHub Release `v1.0.0` created and assets uploaded
+- [ ] GitHub Release `v1.1.0` created and assets uploaded

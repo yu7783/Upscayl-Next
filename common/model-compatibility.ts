@@ -62,24 +62,29 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     };
   }
 
-  if (extension === ".onnx") {
-    return {
-      engine: "onnx",
-      supportedByBuiltInEngine: true,
-      label: "ONNX",
-    };
-  }
+  if ((EXTERNAL_MODEL_EXTENSIONS as readonly string[]).includes(extension)) {
+    // External checkpoints/graphs are classified by their file type, but the
+    // model name still tells us the architecture. Keep both in the label so the
+    // UI shows e.g. "PyTorch / HAT" or "PyTorch / Diffusion / SUPIR".
+    const baseName = value.slice(0, value.length - extension.length);
+    const byName = getModelCompatibility(baseName);
+    const architectureLabel =
+      byName.engine === "diffusion" || byName.engine === "transformer"
+        ? byName.label
+        : "";
 
-  if (
-    extension === ".pth" ||
-    extension === ".pt" ||
-    extension === ".ckpt" ||
-    extension === ".safetensors"
-  ) {
+    if (extension === ".onnx") {
+      return {
+        engine: "onnx",
+        supportedByBuiltInEngine: true,
+        label: architectureLabel ? `ONNX / ${architectureLabel}` : "ONNX",
+      };
+    }
+
     return {
       engine: "pytorch",
       supportedByBuiltInEngine: true,
-      label: "PyTorch",
+      label: architectureLabel ? `PyTorch / ${architectureLabel}` : "PyTorch",
     };
   }
 
@@ -99,7 +104,25 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     };
   }
 
-  if (value.includes("nomos8kdat") || hasToken(value, ["dat", "dat2"])) {
+  // HAT (Hybrid Attention Transformer) - e.g. "4x-HAT", "HAT-SRx4",
+  // "hat_gan". The token check keeps words like "what" from matching.
+  if (
+    hasToken(value, ["hat"]) ||
+    value.includes("hybrid attention") ||
+    value.includes("hybridattention")
+  ) {
+    return {
+      engine: "transformer",
+      supportedByBuiltInEngine: true,
+      label: "HAT",
+    };
+  }
+
+  if (
+    value.includes("nomos8kdat") ||
+    hasToken(value, ["dat", "dat2"]) ||
+    value.includes("dual aggregation")
+  ) {
     return {
       engine: "transformer",
       supportedByBuiltInEngine: true,

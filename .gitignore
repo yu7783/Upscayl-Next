@@ -57,3 +57,8 @@ main/utils/*.js
 flags.ts
 *.p12
 dockerfile
+
+# native HAT/DAT/SUPIR backend
+/native/.venv/
+/native/**/__pycache__/
+/native/**/*.pyc
