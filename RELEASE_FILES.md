@@ -1,6 +1,6 @@
-# Upscayl-Next v1.2.3 Release Manifest
+# Upscayl-Next v1.2.4 Release Manifest
 
-This file lists every artifact and source file required for the GitHub `v1.2.3`
+This file lists every artifact and source file required for the GitHub `v1.2.4`
 release. App artifacts are generated into `dist/`; the custom installer is
 generated into `installer/dist/`.
 
@@ -8,11 +8,11 @@ generated into `installer/dist/`.
 
 | File | Size (bytes) | SHA-256 | Purpose |
 | --- | ---: | --- | --- |
-| `Upscayl-Next-Installer-1.2.3.exe` | 74,358,840 | `d6eab2c535d15fbe9c89c333c17091d08c0156627fb5cb09194752418ea9c60e` | Custom modern Electron downloader (recommended) |
-| `Upscayl-Next-Setup-1.2.3.exe` | 269,521,139 | `3ca9d660dc990f87b124ff9a999cfde4bc3f507dc849cde62b46c61fff191933` | Legacy NSIS installer / auto-update fallback |
-| `Upscayl-Next-Setup-1.2.3.exe.blockmap` | 282,909 | `91de82ea501459bf777d867fd643a7a209290b538c039802b882b355eb243d1e` | Electron auto-update block map |
-| `Upscayl-Next-Setup-1.2.3.zip` | 314,448,601 | `31b5297823ec037eaefe03682c4313490ea341bc5099bc2d3dbda441b378c954` | Portable ZIP package downloaded by the custom installer |
-| `latest.yml` | 353 | `c54345f324e9a486360ea141df52f69efab74391a055d543b25534320bfa7460` | electron-updater feed metadata |
+| `Upscayl-Next-Installer-1.2.4.exe` | 74,358,721 | `f2d8df9121b4cf75469a150ceff92a60cc1d1496ddcec2ecb9add774a2833012` | Custom modern Electron downloader (recommended) |
+| `Upscayl-Next-Setup-1.2.4.exe` | 269,520,996 | `1867689fe8ac8ec3d08d23c464cdab28cd058d1e6125eb1b097d93f801ff1dff` | Legacy NSIS installer / auto-update fallback |
+| `Upscayl-Next-Setup-1.2.4.exe.blockmap` | 282,871 | `03a443432922e3201e12d8602dd0d4b448fa0c03bd1ac469192f5df090c56450` | Electron auto-update block map |
+| `Upscayl-Next-Setup-1.2.4.zip` | 314,448,584 | `b3845a4977e90a607a711e87a3c1bafb8745b42dde7ab466ee7b6975523a35a4` | Portable ZIP package downloaded by the custom installer |
+| `latest.yml` | 353 | `e66f4662cb9cd0edc348a923e1b443741ae90716dde7f05d69dd38bbb634401c` | electron-updater feed metadata |
 | `SHA256SUMS.txt` | 475 | — | Checksums for the assets above |
 
 ## Source files required to reproduce the build
@@ -108,6 +108,7 @@ generated into `installer/dist/`.
 - `RELEASE_NOTES_v1.2.1.md`
 - `RELEASE_NOTES_v1.2.2.md`
 - `RELEASE_NOTES_v1.2.3.md`
+- `RELEASE_NOTES_v1.2.4.md`
 
 ## Build and verification
 
@@ -123,21 +124,21 @@ npm run installer-app
 
 # 4. Verify checksums
 Get-Content dist/SHA256SUMS.txt
-Get-FileHash dist/Upscayl-Next-Setup-1.2.3.exe -Algorithm SHA256
-Get-FileHash installer/dist/Upscayl-Next-Installer-1.2.3.exe -Algorithm SHA256
+Get-FileHash dist/Upscayl-Next-Setup-1.2.4.exe -Algorithm SHA256
+Get-FileHash installer/dist/Upscayl-Next-Installer-1.2.4.exe -Algorithm SHA256
 ```
 
 ## Release checklist
 
-- [x] Version set to `1.2.3` in `package.json` and `package-lock.json`
+- [x] Version set to `1.2.4` in `package.json` and `package-lock.json`
 - [x] Four animated NSIS pages configured (`build/installer.nsh`)
 - [x] Optional AI backend setup, Start Menu shortcut and credits page added
 - [x] Animated AVIs and branded sidebar/header generated
 - [x] Legacy Windows NSIS installer built
 - [x] Portable ZIP built (downloaded by the custom installer)
-- [x] Custom modern Electron downloader built (`installer/dist/Upscayl-Next-Installer-1.2.3.exe`)
+- [x] Custom modern Electron downloader built (`installer/dist/Upscayl-Next-Installer-1.2.4.exe`)
 - [x] Auto-update metadata (`latest.yml`) generated
 - [x] SHA-256 checksums generated
 - [x] `README.md` updated with added features and install steps
-- [ ] GitHub Release `v1.2.3` created and assets uploaded
-  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.2.3)
+- [ ] GitHub Release `v1.2.4` created and assets uploaded
+  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.2.4)

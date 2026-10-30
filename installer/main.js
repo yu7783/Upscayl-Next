@@ -197,6 +197,51 @@ function escapePowerShell(value) {
   return String(value).replace(/'/g, "''");
 }
 
+function formatFsError(error) {
+  const parts = [];
+  if (error && error.message) parts.push(error.message);
+  if (error && error.path) parts.push(`path: ${error.path}`);
+  if (error && error.dest) parts.push(`dest: ${error.dest}`);
+  if (error && error.code === "ENOTDIR") {
+    parts.push(
+      "The installation path contains a file where a folder is required. Choose another folder.",
+    );
+  }
+  return parts.join(" | ");
+}
+
+/**
+ * Create a directory and tolerate a stale file at the final path (for example
+ * `%LOCALAPPDATA%\Programs\Upscayl-Next` left as a file by an interrupted
+ * install). If an intermediate path is a file we stop with a clear message
+ * instead of Node's bare ENOTDIR.
+ */
+function ensureDirectory(directory) {
+  const resolved = path.resolve(directory);
+  const root = path.parse(resolved).root;
+  const parts = resolved
+    .slice(root.length)
+    .split(path.sep)
+    .filter((part) => part.length > 0);
+
+  let current = root;
+  for (let index = 0; index < parts.length; index += 1) {
+    current = path.join(current, parts[index]);
+    if (fs.existsSync(current)) {
+      const stat = fs.lstatSync(current);
+      if (stat.isDirectory()) continue;
+      if (index === parts.length - 1) {
+        fs.rmSync(current, { recursive: true, force: true });
+      } else {
+        throw new Error(
+          `The installation path contains a file where a folder is required: ${current}. Choose another folder.`,
+        );
+      }
+    }
+    fs.mkdirSync(current);
+  }
+}
+
 function runProcess(file, args, onLine, cwd) {
   return new Promise((resolve, reject) => {
     const child = spawn(file, args, {
@@ -274,6 +319,13 @@ async function getLatestRelease() {
 }
 
 function findAppExecutable(installDir) {
+  try {
+    const installStat = fs.statSync(installDir);
+    if (!installStat.isDirectory()) return null;
+  } catch {
+    return null;
+  }
+
   const preferred = path.join(installDir, APP_EXE_NAME);
   if (fs.existsSync(preferred)) return preferred;
 
@@ -333,8 +385,51 @@ async function verifySha256(filePath, checksumsPath, expectedName) {
   sendLog(`SHA-256 verified: ${actual}`);
 }
 
+function validateExtractedPackage(destination) {
+  const asarPath = path.join(destination, "resources", "app.asar");
+  if (fs.existsSync(asarPath)) {
+    const stat = fs.lstatSync(asarPath);
+    if (stat.isDirectory()) {
+      try {
+        fs.rmSync(asarPath, { recursive: true, force: true });
+      } catch {
+        // Ignore cleanup failure; the error below is what matters.
+      }
+      throw new Error(
+        "The package was extracted incorrectly: resources/app.asar became a folder. Please try again.",
+      );
+    }
+  }
+}
+
 async function extractZip(zipPath, destination) {
-  fs.mkdirSync(destination, { recursive: true });
+  ensureDirectory(destination);
+
+  // Windows PowerShell 5.1's Expand-Archive mishandles ZIPs that contain both
+  // "resources/app.asar" (file) and "resources/app.asar.unpacked" (folder):
+  // it can create app.asar as a directory. tar.exe (bsdtar) handles it
+  // correctly and is available on Windows 10/11.
+  try {
+    sendLog("Extracting the package with tar.exe...");
+    const tarResult = await runProcess(
+      "tar.exe",
+      ["-xf", zipPath, "-C", destination],
+      (line) => sendLog(line),
+    );
+    if (tarResult.code === 0) {
+      validateExtractedPackage(destination);
+      return;
+    }
+    sendLog(
+      `tar.exe exited with code ${tarResult.code}; falling back to PowerShell.`,
+    );
+  } catch (error) {
+    sendLog(
+      `tar.exe was not available (${error.message}); falling back to PowerShell.`,
+    );
+  }
+
+  sendLog("Extracting the package with PowerShell...");
   const command =
     "$ErrorActionPreference = 'Stop'; " +
     `Expand-Archive -LiteralPath '${escapePowerShell(zipPath)}' ` +
@@ -349,6 +444,7 @@ async function extractZip(zipPath, destination) {
       "Could not extract the downloaded package. Make sure no antivirus is blocking the temporary folder.",
     );
   }
+  validateExtractedPackage(destination);
 }
 
 /**
@@ -389,7 +485,7 @@ function copyTree(source, destination) {
 
 
 function writePowerShellScript(file, content) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
+  ensureDirectory(path.dirname(file));
   // Windows PowerShell 5.1 needs the BOM to treat the file as UTF-8.
   fs.writeFileSync(file, "\uFEFF" + content, "utf8");
 }
@@ -602,7 +698,7 @@ async function installApp(options) {
     await extractZip(zipPath, staging);
 
     sendProgress("copy", "Installing Upscayl-Next...");
-    fs.mkdirSync(installDir, { recursive: true });
+    ensureDirectory(installDir);
     copyTree(staging, installDir);
     sendLog(`Installed application files to ${installDir}`);
 
@@ -635,8 +731,7 @@ async function installApp(options) {
     });
     return { success: true, installDir, version: release.version, backend };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : String(error);
+    const message = formatFsError(error);
     send("installer:done", { success: false, error: message });
     return { success: false, error: message };
   } finally {

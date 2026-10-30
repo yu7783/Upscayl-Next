@@ -1,6 +1,6 @@
 {
   "name": "upscayl-next-installer",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "description": "Modern downloader and installer for Upscayl-Next",
   "author": "Upscayl-Next contributors",
