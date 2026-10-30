@@ -32,8 +32,12 @@
     "CUSTOM_MODELS": {
       "TITLE": "カスタムモデルを追加",
       "BUTTON_FOLDER": "フォルダを選択",
-      "DESCRIPTION": "簡単に独自のモデルを追加できます。詳細については：",
-      "LINK_TITLE": "カスタムモデルリポジトリ"
+      "DESCRIPTION": "選んだフォルダから自分のモデルを読み込みます。NCNN（.param + .bin）はすぐに使えます。ONNX（.onnx）とPyTorch（.pth、.pt、.ckpt、.safetensors）のHAT/DAT/SUPIRなどは、オプションのAIバックエンドが必要です。",
+      "SUPPORTED_FORMATS": "対応形式: NCNN（.param + .bin）、ONNX（.onnx）、PyTorch（.pth、.pt、.ckpt、.safetensors）",
+      "BACKEND_NOTE": "HAT/DAT/SUPIRや多くのPyTorch/ONNXモデルを使うには、スタートメニューの「Upscayl-Next - Set up AI backend」からオプションのAIバックエンドをインストールしてください。",
+      "NO_FOLDER": "フォルダがまだ選択されていません。",
+      "LINK_TITLE": "カスタムモデル配布ページ",
+      "LINK_BACKEND": "AIバックエンドのセットアップ手順"
     },
     "CUSTOM_INPUT_RESOLUTION": {
       "TITLE": "カスタム出力幅",
@@ -145,34 +149,50 @@
       "BEFORE": "前",
       "AFTER": "後",
       "ZOOM": "ズーム",
+      "GUIDE_TITLE": "モデルの選び方",
+      "GUIDE_BUNDLED": "同梱のNCNNモデルはVulkanランタイムですぐに使えます。まずは「Upscayl-Nextスタンダード」、GPUが遅い場合は「Upscayl-Nextライト」をお試しください。",
+      "GUIDE_CUSTOM": "カスタムモデルは「インポートされたカスタムモデル」に表示されます。NCNN（.param + .bin）はすぐに使え、ONNXやPyTorch（HAT/DAT/SUPIR）は追加セットアップが必要です。",
+      "GUIDE_BACKEND": "HAT/DAT/SUPIRや多くのPyTorch/ONNXモデルを使うには、オプションのAIバックエンドをインストールしてください: スタートメニュー →「Upscayl-Next - Set up AI backend」。",
+      "GUIDE_LICENSE": "同梱モデルには非商用のものがあります。商用利用の前にモデル名と同梱の通知を確認してください。",
+      "GUIDE_LINK_CUSTOM_MODELS": "カスタムモデルを探す",
+      "GUIDE_LINK_BACKEND": "AIバックエンドのセットアップ手順",
+      "BUNDLED": "同梱",
+      "CUSTOM": "カスタム",
+      "RECOMMENDED": "おすすめ",
+      "BACKEND_REQUIRED": "オプションのAIバックエンドが必要",
+      "BACKEND_NOT_REQUIRED": "追加セットアップ不要",
+      "CUSTOM_MODELS_NOTE": "これらのモデルは「設定 → モデル」で選択したフォルダから読み込まれます。",
+      "NO_CUSTOM_TITLE": "カスタムモデルが読み込まれていません",
+      "NO_CUSTOM_DESCRIPTION": "「設定 → モデル」でNCNN/ONNX/PyTorchモデルを追加してください。NCNNはすぐに使えます。HAT/DAT/SUPIRや多くのPyTorch/ONNXモデルにはオプションのAIバックエンドが必要です。",
+      "NO_CUSTOM_LINK": "カスタムモデルの追加方法",
       "MODELS": {
         "upscayl-standard-4x": {
           "NAME": "Upscayl-Nextスタンダード",
-          "DESCRIPTION": "ほとんどの画像に適しています。"
+          "DESCRIPTION": "ほとんどの写真におすすめの最初の選択肢。NCNNで追加セットアップ不要。"
         },
         "upscayl-lite-4x": {
           "NAME": "Upscayl-Nextライト",
-          "DESCRIPTION": "ほとんどの画像に適しています。最小限の品質損失で高速アップスケーリング。"
+          "DESCRIPTION": "低スペックGPU向けの最速モデル。品質はやや控えめ。NCNNで追加セットアップ不要。"
         },
         "remacri-4x": {
           "NAME": "Remacri（非商用）",
-          "DESCRIPTION": "自然な画像に適しています。シャープネスとディテールが追加されます。商用利用不可。"
+          "DESCRIPTION": "自然な画像向け。シャープネスとディテールを強化。非商用利用のみ。"
         },
         "ultramix-balanced-4x": {
           "NAME": "Ultramix（非商用）",
-          "DESCRIPTION": "シャープネスとディテールのバランスが取れた自然な画像に適しています。"
+          "DESCRIPTION": "自然な画像向け。シャープネスとディテールのバランス型。非商用利用のみ。"
         },
         "ultrasharp-4x": {
           "NAME": "Ultrasharp（非商用）",
-          "DESCRIPTION": "シャープネスに重点を置いた自然な画像に適しています。"
+          "DESCRIPTION": "自然な画像向け。シャープネス重視。非商用利用のみ。"
         },
         "digital-art-4x": {
           "NAME": "デジタルアート",
-          "DESCRIPTION": "デジタルアートやイラストに適しています。"
+          "DESCRIPTION": "イラスト・アニメ・デジタルアート向け。NCNNで追加セットアップ不要。"
         },
         "high-fidelity-4x": {
           "NAME": "高忠実度",
-          "DESCRIPTION": "リアルなディテールと滑らかなテクスチャに重点を置いたあらゆる種類の画像に適しています。"
+          "DESCRIPTION": "あらゆる画像向け。リアルなディテールと滑らかなテクスチャ。NCNNで追加セットアップ不要。"
         }
       }
     },

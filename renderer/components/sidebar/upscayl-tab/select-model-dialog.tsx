@@ -28,6 +28,25 @@ import useTranslation from "@/components/hooks/use-translation";
 import { getModelCompatibility } from "@common/model-compatibility";
 import { resolveModelSettings } from "@common/model-profiles";
 
+const CUSTOM_MODELS_URL = "https://github.com/upscayl/custom-models";
+const BACKEND_GUIDE_URL =
+  "https://github.com/yu7783/Upscayl-Next/blob/main/native/README.md";
+
+const engineBadgeClass = (engine: string) => {
+  switch (engine) {
+    case "ncnn":
+      return "badge-success";
+    case "onnx":
+    case "pytorch":
+      return "badge-info";
+    case "diffusion":
+    case "transformer":
+      return "badge-warning";
+    default:
+      return "badge-error";
+  }
+};
+
 const SelectModelDialog = () => {
   const t = useTranslation();
   const [selectedModelId, setSelectedModelId] = useAtom(selectedModelIdAtom);
@@ -98,22 +117,71 @@ const SelectModelDialog = () => {
           <DialogHeader>
             <DialogTitle>{t("APP.MODEL_SELECTION.DESCRIPTION")}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[600px] pr-4">
+
+          <div className="rounded-box border border-base-content/10 bg-base-200/70 p-3 text-xs leading-relaxed">
+            <p className="mb-2 text-sm font-semibold">
+              {t("APP.MODEL_SELECTION.GUIDE_TITLE")}
+            </p>
+            <ul className="list-disc space-y-1 pl-4 text-base-content/80">
+              <li>{t("APP.MODEL_SELECTION.GUIDE_BUNDLED")}</li>
+              <li>{t("APP.MODEL_SELECTION.GUIDE_CUSTOM")}</li>
+              <li>{t("APP.MODEL_SELECTION.GUIDE_BACKEND")}</li>
+              <li>{t("APP.MODEL_SELECTION.GUIDE_LICENSE")}</li>
+            </ul>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <a
+                href={CUSTOM_MODELS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="link link-primary"
+              >
+                {t("APP.MODEL_SELECTION.GUIDE_LINK_CUSTOM_MODELS")}
+              </a>
+              <a
+                href={BACKEND_GUIDE_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="link link-primary"
+              >
+                {t("APP.MODEL_SELECTION.GUIDE_LINK_BACKEND")}
+              </a>
+            </div>
+          </div>
+
+          <ScrollArea className="max-h-[520px] pr-4">
             <div className="flex flex-col gap-4">
               {Object.entries(MODELS).map((modelData) => {
                 const modelId = modelData[0] as ModelId;
-                const model = modelData[1];
+                const compatibility = getModelCompatibility(modelId);
                 return (
                   <button
                     key={modelId}
                     className="btn !h-auto !w-full !flex-col !items-start !rounded-sm !p-4"
                     onClick={() => handleModelSelect(modelId)}
                   >
-                    <p className="font-semibold">
-                      {t(`APP.MODEL_SELECTION.MODELS.${modelId}.NAME`)}
-                    </p>
-                    <p className="mb-2 text-left font-normal leading-normal text-base-content/70">
+                    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                      <p className="font-semibold">
+                        {t(`APP.MODEL_SELECTION.MODELS.${modelId}.NAME`)}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1">
+                        {modelId === "upscayl-standard-4x" && (
+                          <span className="badge badge-sm badge-primary">
+                            {t("APP.MODEL_SELECTION.RECOMMENDED")}
+                          </span>
+                        )}
+                        <span
+                          className={`badge badge-sm ${engineBadgeClass(compatibility.engine)}`}
+                        >
+                          {compatibility.label}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="mb-1 text-left font-normal leading-normal text-base-content/70">
                       {t(`APP.MODEL_SELECTION.MODELS.${modelId}.DESCRIPTION`)}
+                    </p>
+                    <p className="mb-2 text-xs text-base-content/60">
+                      {t("APP.MODEL_SELECTION.BUNDLED")} ·{" "}
+                      {t("APP.MODEL_SELECTION.BACKEND_NOT_REQUIRED")}
                     </p>
                     <div className="relative h-52 w-full overflow-hidden rounded-sm">
                       <div className="flex h-full w-full">
@@ -152,29 +220,60 @@ const SelectModelDialog = () => {
                   </button>
                 );
               })}
-              {customModelIds.length > 0 && (
+              <div className="mt-2 flex flex-col gap-2 border-t border-base-content/10 pt-4">
                 <p className="font-semibold text-base-content">
                   {t("APP.MODEL_SELECTION.IMPORTED_CUSTOM_MODELS")}
                 </p>
-              )}
-              {customModelIds.map((customModel) => {
-                const compatibility = getModelCompatibility(customModel);
-                return (
-                  <button
-                    key={customModel}
-                    className="btn h-auto w-full flex-col items-start gap-1 p-4"
-                    onClick={() => handleModelSelect(customModel)}
-                    title={customModel}
-                  >
-                    <span className="flex w-full items-center justify-between gap-2">
-                      <span className="truncate text-left">{customModel}</span>
-                      <span className="badge badge-sm badge-success">
-                        {compatibility.label}
+                <p className="text-xs text-base-content/60">
+                  {t("APP.MODEL_SELECTION.CUSTOM_MODELS_NOTE")}
+                </p>
+
+                {customModelIds.length === 0 && (
+                  <div className="rounded-box border border-dashed border-base-content/20 bg-base-200/40 p-4 text-xs">
+                    <p className="font-semibold">
+                      {t("APP.MODEL_SELECTION.NO_CUSTOM_TITLE")}
+                    </p>
+                    <p className="mt-1 text-base-content/70">
+                      {t("APP.MODEL_SELECTION.NO_CUSTOM_DESCRIPTION")}
+                    </p>
+                    <a
+                      href={CUSTOM_MODELS_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="link link-primary mt-2 inline-block"
+                    >
+                      {t("APP.MODEL_SELECTION.NO_CUSTOM_LINK")}
+                    </a>
+                  </div>
+                )}
+
+                {customModelIds.map((customModel) => {
+                  const compatibility = getModelCompatibility(customModel);
+                  return (
+                    <button
+                      key={customModel}
+                      className="btn h-auto w-full flex-col items-start gap-1 p-4"
+                      onClick={() => handleModelSelect(customModel)}
+                      title={customModel}
+                    >
+                      <span className="flex w-full items-center justify-between gap-2">
+                        <span className="truncate text-left">{customModel}</span>
+                        <span
+                          className={`badge badge-sm ${engineBadgeClass(compatibility.engine)}`}
+                        >
+                          {compatibility.label}
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                );
-              })}
+                      <span className="text-xs text-base-content/60">
+                        {t("APP.MODEL_SELECTION.CUSTOM")} ·{" "}
+                        {compatibility.requiresOptionalBackend
+                          ? t("APP.MODEL_SELECTION.BACKEND_REQUIRED")
+                          : t("APP.MODEL_SELECTION.BACKEND_NOT_REQUIRED")}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </ScrollArea>
         </DialogContent>

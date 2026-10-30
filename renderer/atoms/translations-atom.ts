@@ -20,9 +20,12 @@ import { atomWithStorage } from "jotai/utils";
 
 // Define the shape of the translations
 type Translations = typeof en;
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
+};
 type Locales = "ar" | "en" | "tr" | "ru" | "uk" | "ja" | "zh" | "es" | "fr" | "de" | "vi" | "pt" | "ptBR" | "id" | "caVAL" | "hu" | "pl";
 
-const translations: Record<Locales, Translations> = {
+const translations: Record<Locales, DeepPartial<Translations>> = {
   ar,
   en,
   tr,
@@ -51,22 +54,29 @@ type NestedKeyOf<Object> = Object extends object
     }[keyof Object]
   : never;
 
-// Utility function to access nested translation keys
+// Utility function to access nested translation keys. Missing keys fall back to
+// English first so a partially translated locale never shows a raw key path.
+const findNestedTranslation = (
+  obj: DeepPartial<Translations> | undefined,
+  key: string,
+): string | undefined => {
+  let current: unknown = obj;
+  for (const part of key.split(".")) {
+    if (!current || typeof current !== "object") return undefined;
+    current = (current as Record<string, unknown>)[part];
+  }
+  return typeof current === "string" ? current : undefined;
+};
+
 const getNestedTranslation = (
-  obj: Translations,
+  obj: DeepPartial<Translations>,
   key: NestedKeyOf<Translations>,
 ): string => {
-  // Split the key into an array of nested parts
-  const keyParts = key.split(".");
-
-  // Traverse the object using the key parts
-  const result = keyParts.reduce((currentObj, part) => {
-    // If currentObj is falsy or doesn't have the property, return undefined
-    return currentObj && currentObj[part];
-  }, obj);
-
-  // Return the found translation or the original key if not found
-  return result || key;
+  return (
+    findNestedTranslation(obj, key) ??
+    findNestedTranslation(en, key) ??
+    key
+  );
 };
 
 // Atom to store the current locale

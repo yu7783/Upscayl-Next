@@ -1,16 +1,16 @@
-# Upscayl-Next v1.2.1 Release Manifest
+# Upscayl-Next v1.2.2 Release Manifest
 
-This file lists every artifact and source file required for the GitHub `v1.2.1`
+This file lists every artifact and source file required for the GitHub `v1.2.2`
 release. All installer artifacts are generated into `dist/`.
 
 ## GitHub Release assets (upload these)
 
 | File | Size (bytes) | SHA-256 | Purpose |
 | --- | ---: | --- | --- |
-| `Upscayl-Next-Setup-1.2.1.exe` | 269,520,601 | `e041d9c6b0b287f3deba63c714bf1ac296e5af13668f3ebf6be062b7db68d154` | Windows installer (four animated NSIS pages, fixed layout) |
-| `Upscayl-Next-Setup-1.2.1.exe.blockmap` | 282,840 | `a93b185eb6ddaa6823bd1364479648faa2d5d704a2609f6168801fb547b7f7b6` | Electron auto-update block map |
-| `Upscayl-Next-Setup-1.2.1.zip` | 314,446,315 | `3fe30b319aadf3f7054f114b75996b40b3e388ec7b51e08ac343a52769a8ae18` | Portable ZIP build |
-| `latest.yml` | 353 | `55693954d1e19d1478a213ec08ecf8407169c451d20b7fda5b18305a8a185484` | electron-updater feed metadata |
+| `Upscayl-Next-Setup-1.2.2.exe` | 269,521,204 | `b717f330f4fe1fa1187b6708eaef433ca3669d299c6c9ae3c5e6bdec187c2ce1` | Windows installer (four animated NSIS pages, fixed layout) |
+| `Upscayl-Next-Setup-1.2.2.exe.blockmap` | 282,894 | `9603bd95a132bb8456aa80fdf9b9ec6bea9b4021f58c82994239167d70be5377` | Electron auto-update block map |
+| `Upscayl-Next-Setup-1.2.2.zip` | 314,448,596 | `3ac200e6d91c80978e61dcba97e66cd82a4f0a5751dc51ed566c724b5d58cf06` | Portable ZIP build |
+| `latest.yml` | 353 | `f1e915d617b5e574302bbb511fc5004b97c358460d83f797b2e4f32682c19eec` | electron-updater feed metadata |
 | `SHA256SUMS.txt` | 375 | — | Checksums for the assets above |
 
 ## Source files required to reproduce the build
@@ -93,6 +93,7 @@ release. All installer artifacts are generated into `dist/`.
 - `RELEASE_NOTES_v1.1.0.md`
 - `RELEASE_NOTES_v1.2.0.md`
 - `RELEASE_NOTES_v1.2.1.md`
+- `RELEASE_NOTES_v1.2.2.md`
 
 ## Build and verification
 
@@ -105,12 +106,12 @@ npm run dist:win
 
 # 3. Verify checksums
 Get-Content dist/SHA256SUMS.txt
-Get-FileHash dist/Upscayl-Next-Setup-1.2.1.exe -Algorithm SHA256
+Get-FileHash dist/Upscayl-Next-Setup-1.2.2.exe -Algorithm SHA256
 ```
 
 ## Release checklist
 
-- [x] Version set to `1.2.1` in `package.json` and `package-lock.json`
+- [x] Version set to `1.2.2` in `package.json` and `package-lock.json`
 - [x] Four animated NSIS pages configured (`build/installer.nsh`)
 - [x] Optional AI backend setup, Start Menu shortcut and credits page added
 - [x] Animated AVIs and branded sidebar/header generated
@@ -119,5 +120,5 @@ Get-FileHash dist/Upscayl-Next-Setup-1.2.1.exe -Algorithm SHA256
 - [x] Auto-update metadata (`latest.yml`) generated
 - [x] SHA-256 checksums generated
 - [x] `README.md` updated with added features and install steps
-- [x] GitHub Release `v1.2.1` created and assets uploaded
-  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.2.1)
+- [x] GitHub Release `v1.2.2` created and assets uploaded
+  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.2.2)

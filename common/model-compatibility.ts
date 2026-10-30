@@ -9,6 +9,13 @@ export type ModelEngine =
 export type ModelCompatibility = {
   engine: ModelEngine;
   supportedByBuiltInEngine: boolean;
+  /**
+   * True when the model is executed by the optional Python backend rather than
+   * the bundled NCNN/Vulkan binary. The UI uses this to explain that HAT, DAT,
+   * SUPIR, ONNX and PyTorch models need `native/setup.ps1` (or the Start Menu
+   * "Set up AI backend" shortcut) before they can run.
+   */
+  requiresOptionalBackend: boolean;
   label: string;
 };
 
@@ -58,6 +65,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     return {
       engine: "ncnn",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: false,
       label: "NCNN",
     };
   }
@@ -77,6 +85,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
       return {
         engine: "onnx",
         supportedByBuiltInEngine: true,
+        requiresOptionalBackend: true,
         label: architectureLabel ? `ONNX / ${architectureLabel}` : "ONNX",
       };
     }
@@ -84,6 +93,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     return {
       engine: "pytorch",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: true,
       label: architectureLabel ? `PyTorch / ${architectureLabel}` : "PyTorch",
     };
   }
@@ -100,6 +110,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     return {
       engine: "diffusion",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: true,
       label: "Diffusion / SUPIR",
     };
   }
@@ -114,6 +125,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     return {
       engine: "transformer",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: true,
       label: "HAT",
     };
   }
@@ -126,6 +138,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
     return {
       engine: "transformer",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: true,
       label: "DAT / DAT2",
     };
   }
@@ -133,6 +146,7 @@ export function getModelCompatibility(modelId: string): ModelCompatibility {
   return {
     engine: "ncnn",
     supportedByBuiltInEngine: true,
+    requiresOptionalBackend: false,
     label: "NCNN",
   };
 }
@@ -156,6 +170,7 @@ export function getModelFileSupport(fileName: string): ModelFileSupport {
     return {
       engine: "ncnn",
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: false,
       label: "NCNN",
       extension,
     };
@@ -190,6 +205,7 @@ export function getModelFileSupport(fileName: string): ModelFileSupport {
     return {
       engine,
       supportedByBuiltInEngine: true,
+      requiresOptionalBackend: true,
       label,
       extension,
     };
@@ -198,6 +214,7 @@ export function getModelFileSupport(fileName: string): ModelFileSupport {
   return {
     engine: "unknown",
     supportedByBuiltInEngine: false,
+    requiresOptionalBackend: true,
     label: "Unknown",
     extension,
   };

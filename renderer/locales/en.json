@@ -32,8 +32,12 @@
     "CUSTOM_MODELS": {
       "TITLE": "ADD CUSTOM MODELS",
       "BUTTON_FOLDER": "Select Folder",
-      "DESCRIPTION": "You can add your own models easily. For more details:",
-      "LINK_TITLE": "Custom Models Repository"
+      "DESCRIPTION": "Load your own models from a folder. NCNN (.param + .bin) works immediately. ONNX (.onnx) and PyTorch (.pth, .pt, .ckpt, .safetensors) such as HAT, DAT and SUPIR need the optional AI backend.",
+      "SUPPORTED_FORMATS": "Supported: NCNN (.param + .bin), ONNX (.onnx), PyTorch (.pth, .pt, .ckpt, .safetensors).",
+      "BACKEND_NOTE": "For HAT/DAT/SUPIR and most PyTorch/ONNX models, install the optional AI backend from the Start Menu shortcut “Upscayl-Next - Set up AI backend”.",
+      "NO_FOLDER": "No folder selected yet.",
+      "LINK_TITLE": "Custom Models Repository",
+      "LINK_BACKEND": "AI backend setup guide"
     },
     "CUSTOM_INPUT_RESOLUTION": {
       "TITLE": "CUSTOM OUTPUT WIDTH",
@@ -145,34 +149,50 @@
       "BEFORE": "Before",
       "AFTER": "After",
       "ZOOM": "Zoom",
+      "GUIDE_TITLE": "How to choose a model",
+      "GUIDE_BUNDLED": "Bundled NCNN models work immediately with the Vulkan runtime. Start with Upscayl-Next Standard, or Lite on slower GPUs.",
+      "GUIDE_CUSTOM": "Custom models appear under Imported Custom Models. NCNN (.param + .bin) works immediately; ONNX and PyTorch checkpoints (HAT, DAT, SUPIR) need extra setup.",
+      "GUIDE_BACKEND": "For HAT/DAT/SUPIR and most PyTorch/ONNX models, install the optional AI backend: Start Menu → Upscayl-Next - Set up AI backend.",
+      "GUIDE_LICENSE": "Some bundled models are non-commercial. Check the model name and the bundled notices before commercial use.",
+      "GUIDE_LINK_CUSTOM_MODELS": "Browse custom models",
+      "GUIDE_LINK_BACKEND": "AI backend setup guide",
+      "BUNDLED": "Bundled",
+      "CUSTOM": "Custom",
+      "RECOMMENDED": "Recommended",
+      "BACKEND_REQUIRED": "Needs optional AI backend",
+      "BACKEND_NOT_REQUIRED": "Works out of the box",
+      "CUSTOM_MODELS_NOTE": "These models are loaded from the folder selected in Settings → Models.",
+      "NO_CUSTOM_TITLE": "No custom models loaded",
+      "NO_CUSTOM_DESCRIPTION": "Add NCNN, ONNX or PyTorch models in Settings → Models. NCNN works immediately; HAT/DAT/SUPIR and most PyTorch/ONNX models require the optional AI backend.",
+      "NO_CUSTOM_LINK": "How to add custom models",
       "MODELS": {
         "upscayl-standard-4x": {
           "NAME": "Upscayl-Next Standard",
-          "DESCRIPTION": "Suitable for most images."
+          "DESCRIPTION": "Best starting point for most photos. NCNN, works without extra setup."
         },
         "upscayl-lite-4x": {
           "NAME": "Upscayl-Next Lite",
-          "DESCRIPTION": "Suitable for most images. High-speed upscaling with minimal quality loss."
+          "DESCRIPTION": "Fastest model for low-end GPUs. Slightly lower quality. NCNN, works without extra setup."
         },
         "remacri-4x": {
           "NAME": "Remacri (Non-Commercial)",
-          "DESCRIPTION": "For natural images. Added sharpness and detail. No commercial use."
+          "DESCRIPTION": "Natural images with extra sharpness and detail. Non-commercial use only."
         },
         "ultramix-balanced-4x": {
           "NAME": "Ultramix (Non-Commercial)",
-          "DESCRIPTION": "For natural images with a balance of sharpness and detail."
+          "DESCRIPTION": "Balanced sharpness and detail for natural images. Non-commercial use only."
         },
         "ultrasharp-4x": {
           "NAME": "Ultrasharp (Non-Commercial)",
-          "DESCRIPTION": "For natural images with a focus on sharpness."
+          "DESCRIPTION": "Sharpness-focused for natural images. Non-commercial use only."
         },
         "digital-art-4x": {
           "NAME": "Digital Art",
-          "DESCRIPTION": "For digital art and illustrations."
+          "DESCRIPTION": "For illustrations, anime and digital art. NCNN, works without extra setup."
         },
         "high-fidelity-4x": {
           "NAME": "High Fidelity",
-          "DESCRIPTION": "For all kinds of images with a focus on realistic details and smooth textures."
+          "DESCRIPTION": "Realistic details and smooth textures for all kinds of images. NCNN, works without extra setup."
         }
       }
     },
