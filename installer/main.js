@@ -15,6 +15,7 @@ const fs = require("fs");
 const os = require("os");
 const https = require("https");
 const crypto = require("crypto");
+const extractZipPackage = require("extract-zip");
 const { spawn } = require("child_process");
 
 const REPO = "yu7783/Upscayl-Next";
@@ -402,15 +403,39 @@ function validateExtractedPackage(destination) {
   }
 }
 
+function resetDirectory(directory) {
+  if (fs.existsSync(directory)) {
+    const stat = fs.lstatSync(directory);
+    if (stat.isDirectory()) {
+      fs.rmSync(directory, { recursive: true, force: true });
+    } else {
+      fs.rmSync(directory, { force: true });
+    }
+  }
+  ensureDirectory(directory);
+}
+
 async function extractZip(zipPath, destination) {
   ensureDirectory(destination);
 
-  // Windows PowerShell 5.1's Expand-Archive mishandles ZIPs that contain both
-  // "resources/app.asar" (file) and "resources/app.asar.unpacked" (folder):
-  // it can create app.asar as a directory. tar.exe (bsdtar) handles it
-  // correctly and is available on Windows 10/11.
+  // Primary strategy: a Node ZIP extractor. It does not depend on tar.exe or
+  // PowerShell, and it correctly treats "resources/app.asar" as a file even
+  // when "resources/app.asar.unpacked" is also present in the archive.
   try {
-    sendLog("Extracting the package with tar.exe...");
+    sendLog("Extracting the package...");
+    await extractZipPackage(zipPath, { dir: destination });
+    validateExtractedPackage(destination);
+    return;
+  } catch (error) {
+    sendLog(`Built-in extraction failed: ${formatFsError(error)}`);
+    resetDirectory(destination);
+  }
+
+  // Fallback 1: tar.exe (available on Windows 10/11). PowerShell 5.1's
+  // Expand-Archive can mis-handle the app.asar / app.asar.unpacked pair, so
+  // tar is preferred when the Node extractor is unavailable.
+  try {
+    sendLog("Retrying extraction with tar.exe...");
     const tarResult = await runProcess(
       "tar.exe",
       ["-xf", zipPath, "-C", destination],
@@ -429,7 +454,8 @@ async function extractZip(zipPath, destination) {
     );
   }
 
-  sendLog("Extracting the package with PowerShell...");
+  resetDirectory(destination);
+  sendLog("Retrying extraction with PowerShell...");
   const command =
     "$ErrorActionPreference = 'Stop'; " +
     `Expand-Archive -LiteralPath '${escapePowerShell(zipPath)}' ` +

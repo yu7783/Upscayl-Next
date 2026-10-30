@@ -1,6 +1,6 @@
 {
   "name": "upscayl-next-installer",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "private": true,
   "description": "Modern downloader and installer for Upscayl-Next",
   "author": "Upscayl-Next contributors",
@@ -20,6 +20,7 @@
       "preload.js",
       "renderer/**/*",
       "assets/**/*",
+      "node_modules/**/*",
       "package.json"
     ],
     "win": {
@@ -31,5 +32,8 @@
     "portable": {
       "requestExecutionLevel": "user"
     }
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1"
   }
 }
