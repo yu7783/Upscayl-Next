@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Upscayl-Next Installer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true">
+      <span class="orb orb-a"></span>
+      <span class="orb orb-b"></span>
+      <span class="orb orb-c"></span>
+      <div class="grid"></div>
+      <div class="scanline"></div>
+    </div>
+
+    <header class="titlebar">
+      <div class="brand">
+        <img src="../assets/icon.png" alt="" class="brand-logo" />
+        <span class="brand-name">Upscayl-Next</span>
+        <span class="brand-sub">Installer</span>
+      </div>
+      <div class="window-controls">
+        <button id="min-btn" class="window-btn" aria-label="最小化">
+          <svg viewBox="0 0 12 12"><path d="M3 6h6" /></svg>
+        </button>
+        <button id="close-win-btn" class="window-btn close" aria-label="閉じる">
+          <svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div id="error-banner" class="banner error hidden" role="alert">
+      <span id="error-text"></span>
+      <button id="error-close" aria-label="閉じる">×</button>
+    </div>
+
+    <main class="shell">
+      <aside class="rail">
+        <div class="rail-head">
+          <span class="rail-pulse"></span>
+          <span>SETUP</span>
+        </div>
+        <div class="rail-steps">
+          <div class="rail-step active" data-step="welcome">
+            <span class="num">1</span>
+            <div><strong>ようこそ</strong><small>はじめに</small></div>
+          </div>
+          <div class="rail-step" data-step="options">
+            <span class="num">2</span>
+            <div><strong>設定</strong><small>インストール先</small></div>
+          </div>
+          <div class="rail-step" data-step="download">
+            <span class="num">3</span>
+            <div><strong>ダウンロード</strong><small>最新版を取得</small></div>
+          </div>
+          <div class="rail-step" data-step="install">
+            <span class="num">4</span>
+            <div><strong>インストール</strong><small>ファイル展開</small></div>
+          </div>
+          <div class="rail-step" data-step="finish">
+            <span class="num">5</span>
+            <div><strong>完了</strong><small>すぐ使えます</small></div>
+          </div>
+        </div>
+        <div class="rail-foot">
+          <span class="shield"></span>
+          <span>SHA-256 検証つき</span>
+        </div>
+      </aside>
+
+      <section class="stage">
+        <div class="panel active" data-panel="welcome">
+          <div class="hero">
+            <div class="hero-glow"></div>
+            <div class="logo-stack">
+              <div class="logo-ring"></div>
+              <img src="../assets/icon.png" alt="Upscayl-Next" class="hero-logo" />
+            </div>
+            <p class="eyebrow">MODERN AI UPSCALER</p>
+            <h1>Upscayl-Next</h1>
+            <p class="lede">
+              AI画像・動画アップスケーラーを、<br />
+              ワンクリックで最新版に。
+            </p>
+            <div class="version-chip" id="welcome-version">
+              最新リリースを確認しています…
+            </div>
+            <div class="hero-actions">
+              <button id="start-btn" class="btn primary" disabled>
+                はじめる <span class="arrow">→</span>
+              </button>
+              <button id="release-link" class="btn ghost">リリースノート</button>
+            </div>
+            <p class="fine">
+              AGPL-3.0 · クレジットとライセンスはインストーラー内に表示されます。
+            </p>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="options">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 02</p>
+            <h2>インストール設定</h2>
+            <p class="sub">インストール先と、必要なオプションを選んでください。</p>
+          </div>
+
+          <div class="settings">
+            <label class="field">
+              <span class="field-label">インストール先</span>
+              <div class="path-row">
+                <input id="install-dir" type="text" readonly />
+                <button id="browse-btn" class="btn small">変更</button>
+              </div>
+            </label>
+
+            <label class="toggle">
+              <input id="desktop-shortcut" type="checkbox" checked />
+              <span class="toggle-ui"></span>
+              <span class="toggle-copy">
+                <strong>デスクトップにショートカット</strong>
+                <small>デスクトップからすぐ起動できます。</small>
+              </span>
+            </label>
+
+            <label class="toggle">
+              <input id="start-menu-shortcut" type="checkbox" checked />
+              <span class="toggle-ui"></span>
+              <span class="toggle-copy">
+                <strong>スタートメニューに登録</strong>
+                <small>スタートメニューから検索して起動できます。</small>
+              </span>
+            </label>
+
+            <label class="toggle">
+              <input id="install-backend" type="checkbox" />
+              <span class="toggle-ui"></span>
+              <span class="toggle-copy">
+                <strong>オプションのAIバックエンドをインストール</strong>
+                <small>
+                  HAT / DAT / SUPIR などを使う場合に必要です。Python 3.10/3.11 とインターネット接続、約2GBの空き容量が必要です。後からスタートメニューで実行することもできます。
+                </small>
+              </span>
+            </label>
+
+            <label class="license">
+              <input id="accept-license" type="checkbox" />
+              <span>
+                <strong>AGPL-3.0ライセンスとクレジットに同意します</strong>
+                <small>
+                  Upscayl-Next は AGPL-3.0 で公開されています。同梱モデルには非商用のものがあります。
+                  <button id="license-link" class="link-button" type="button">
+                    ライセンスとクレジットを見る
+                  </button>
+                </small>
+              </span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button id="back-btn" class="btn ghost">戻る</button>
+            <button id="install-btn" class="btn primary" disabled>
+              インストール <span class="arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="download">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 03</p>
+            <h2>最新版をダウンロード</h2>
+            <p class="sub" id="download-sub">GitHub から最新のポータブル版を取得します。</p>
+          </div>
+
+          <div class="progress-hero">
+            <div class="ring-wrap">
+              <svg class="ring" viewBox="0 0 180 180">
+                <circle class="ring-track" cx="90" cy="90" r="74"></circle>
+                <circle id="download-ring" class="ring-value" cx="90" cy="90" r="74"></circle>
+              </svg>
+              <div class="ring-label">
+                <strong id="download-percent">0%</strong>
+                <span>DOWNLOAD</span>
+              </div>
+            </div>
+            <div class="stats">
+              <div><span>受信</span><strong id="download-received">0 MB</strong></div>
+              <div><span>速度</span><strong id="download-speed">—</strong></div>
+              <div><span>残り時間</span><strong id="download-eta">—</strong></div>
+              <div><span>バージョン</span><strong id="download-version">—</strong></div>
+            </div>
+          </div>
+
+          <div class="bar"><span id="download-bar"></span></div>
+          <details class="log-box" id="download-log-box">
+            <summary>詳細ログ</summary>
+            <pre id="download-log"></pre>
+          </details>
+        </div>
+
+        <div class="panel" data-panel="install">
+          <div class="panel-head">
+            <p class="eyebrow">STEP 04</p>
+            <h2>インストール中</h2>
+            <p class="sub" id="install-sub">ファイルを展開しています…</p>
+          </div>
+
+          <div class="install-visual">
+            <div class="spinner">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="install-steps" id="install-steps">
+              <div class="install-line"><span></span>アプリケーションファイル</div>
+              <div class="install-line"><span></span>ショートカット</div>
+              <div class="install-line"><span></span>アンインストーラー</div>
+              <div class="install-line"><span></span>オプションのAIバックエンド</div>
+            </div>
+          </div>
+
+          <div class="bar indeterminate"><span></span></div>
+          <details class="log-box" open>
+            <summary>詳細ログ</summary>
+            <pre id="install-log"></pre>
+          </details>
+        </div>
+
+        <div class="panel" data-panel="finish">
+          <div class="finish-hero">
+            <svg class="check" viewBox="0 0 96 96" aria-hidden="true">
+              <circle class="check-ring" cx="48" cy="48" r="38"></circle>
+              <path class="check-mark" d="M30 49l12 12 24-28"></path>
+            </svg>
+            <p class="eyebrow">INSTALLATION COMPLETE</p>
+            <h2>インストール完了</h2>
+            <p class="sub" id="finish-message">Upscayl-Next を使い始められます。</p>
+            <div class="finish-meta" id="finish-meta"></div>
+            <div class="actions center">
+              <button id="launch-btn" class="btn primary">Upscayl-Next を起動</button>
+              <button id="open-folder-btn" class="btn ghost">フォルダを開く</button>
+              <button id="close-win-btn-2" class="btn ghost">閉じる</button>
+            </div>
+            <div class="confetti" id="confetti" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <span class="status-dot"></span>
+      <span id="status-text">準備中…</span>
+      <span id="status-right">Upscayl-Next Installer</span>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+

@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/yu7783/Upscayl-Next/total.svg?style=for-the-badge)](https://github.com/yu7783/Upscayl-Next/releases)
 
 [Download the latest release](https://github.com/yu7783/Upscayl-Next/releases/latest) ·
-[Release notes](RELEASE_NOTES_v1.2.2.md) ·
+[Release notes](RELEASE_NOTES_v1.2.3.md) ·
 [Report an issue](https://github.com/yu7783/Upscayl-Next/issues)
 
 </div>
@@ -24,7 +24,7 @@ without losing quality.
 # ✨ What's changed from upstream?
 
 Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
-versioning and starts at **1.0.0** (current release: **1.2.2**).
+versioning and starts at **1.0.0** (current release: **1.2.3**).
 
 Compared with the upstream tree, this release contains **more than 200 changed
 files**, including a complete Windows installer overhaul with animated pages,
@@ -44,8 +44,9 @@ optional AI backend setup and packaged license notices.
 | Native HAT / DAT / SUPIR | Run transformer and diffusion upscalers in a bundled Python backend (spandrel, ONNX Runtime, official SUPIR), routed automatically by model name/extension | `native/`, `common/model-runtime.ts`, `electron/utils/spawn-upscayl.ts` |
 | Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
 | Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
-| Modern installer | Dark animated NSIS wizard (welcome, credits, options and finish pages), optional one-click native backend setup, AGPL/credits page and a Start Menu shortcut for installing the backend later | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1`, `native/setup-launcher.ps1` |
-| Release manifest | Asset list, SHA-256 checksums and v1.2.2 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.2.md` |
+| Custom modern installer | Electron downloader with animated dark UI, step rail, download progress ring with speed/ETA, SHA-256 verification, per-user install, shortcuts, uninstaller and optional AI backend | `installer/`, `package.json` |
+| Legacy NSIS installer | Dark animated NSIS wizard (welcome, credits, options and finish pages) kept for auto-update and fallback | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1`, `native/setup-launcher.ps1` |
+| Release manifest | Asset list, SHA-256 checksums and v1.2.3 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.3.md` |
 
 ## Improved and fixed
 
@@ -78,7 +79,7 @@ optional AI backend setup and packaged license notices.
 - `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
 - `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
 - Versioning starts at `1.0.0` instead of upstream `2.15.0`.
-- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.2`).
+- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.3`).
 - GitHub publish target is `yu7783/Upscayl-Next`.
 - Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
 - macOS config uses PNG icons instead of `.icns`.
@@ -183,23 +184,27 @@ troubleshooting.
 
 ## Windows installer
 
+The recommended download is the custom **modern downloader**:
+
 1. Open the [latest release](https://github.com/yu7783/Upscayl-Next/releases/latest).
-2. Download **`Upscayl-Next-Setup-1.2.2.exe`**.
-3. Run the installer. The animated welcome page introduces Upscayl-Next, and
-   the license/credits page shows the AGPL-3.0 notice and upstream credits.
-4. Choose an installation folder. On the options page you can tick
-   **Install the optional AI backend now** to set up HAT/DAT/SUPIR support
-   automatically, or leave it off and use the Start Menu shortcut later.
-5. Finish the wizard and launch **Upscayl-Next** from the Start Menu or the
-   desktop shortcut.
+2. Download **`Upscayl-Next-Installer-1.2.3.exe`**.
+3. Run it. The animated downloader checks GitHub for the latest portable
+   package, verifies its SHA-256 checksum and installs it per-user.
+4. Choose the installation folder and shortcuts. You can optionally install the
+   HAT/DAT/SUPIR AI backend during setup.
+5. Finish and launch **Upscayl-Next** from the Start Menu or desktop shortcut.
+
+The older NSIS installer (`Upscayl-Next-Setup-1.2.3.exe`) is still published for
+auto-update and as a fallback, but new users should use the custom downloader.
 
 > [!NOTE]
 > The installer is **not code-signed**, so Windows SmartScreen may show a warning.
-> Click **More Info → Run Anyway** to continue.
+> Click **More Info → Run Anyway** to continue. The custom downloader needs an
+> internet connection to fetch the latest package.
 
 ## Portable ZIP
 
-1. Download **`Upscayl-Next-Setup-1.2.2.zip`** from the same release.
+1. Download **`Upscayl-Next-Setup-1.2.3.zip`** from the same release.
 2. Extract the archive to a folder of your choice.
 3. Run `Upscayl-Next.exe`.
 
@@ -239,8 +244,8 @@ upscale** to process it again.
 - [Before/after comparisons](COMPARISONS.MD)
 - [Additional custom models](https://github.com/upscayl/custom-models)
 - [Upstream troubleshooting guide](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
-- [Release manifest for v1.2.2](RELEASE_FILES.md)
-- [Release notes for v1.2.2](RELEASE_NOTES_v1.2.2.md)
+- [Release manifest for v1.2.3](RELEASE_FILES.md)
+- [Release notes for v1.2.3](RELEASE_NOTES_v1.2.3.md)
 
 # 🛠 Development
 
@@ -288,18 +293,41 @@ npm run installer-assets
 
 Outputs:
 
-- `dist/Upscayl-Next-Setup-1.2.2.exe`
-- `dist/Upscayl-Next-Setup-1.2.2.exe.blockmap`
-- `dist/Upscayl-Next-Setup-1.2.2.zip`
+- `dist/Upscayl-Next-Setup-1.2.3.exe` (legacy NSIS installer / auto-update)
+- `dist/Upscayl-Next-Setup-1.2.3.exe.blockmap`
+- `dist/Upscayl-Next-Setup-1.2.3.zip` (portable app package used by the downloader)
 - `dist/latest.yml`
+
+Build the custom modern downloader (Electron app in `installer/`):
+
+```powershell
+npm run installer-app
+```
+
+Output:
+
+- `installer/dist/Upscayl-Next-Installer-1.2.3.exe`
+
+The custom installer downloads the portable ZIP from the latest GitHub release,
+verifies `SHA256SUMS.txt`, extracts the app, creates shortcuts, registers an
+uninstaller and optionally runs `resources/native/setup.ps1`.
 
 Generate or verify checksums with:
 
 ```powershell
-Get-FileHash dist\Upscayl-Next-Setup-1.2.2.exe -Algorithm SHA256
+Get-FileHash dist\Upscayl-Next-Setup-1.2.3.exe -Algorithm SHA256
+Get-FileHash installer\dist\Upscayl-Next-Installer-1.2.3.exe -Algorithm SHA256
 ```
 
 ## Installer artwork and pages
+
+The modern downloader in `installer/` is the primary installer. It uses a
+frameless dark window, animated background orbs, a step rail, a download
+progress ring with speed/ETA, install log and an animated completion screen.
+
+The legacy `build/installer.nsh` remains for the NSIS fallback and is loaded
+through the `nsis.include` option in `package.json`. It uses four dark animated
+pages:
 
 `build/installer.nsh` is loaded through the `nsis.include` option in
 `package.json`. It replaces the default wizard with four dark animated pages:

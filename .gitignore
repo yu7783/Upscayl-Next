@@ -73,3 +73,11 @@ nsis-build.log
 *.nsis-build.log
 build-v*.log
 build-*.log
+
+# custom Electron installer build output
+/installer/dist/
+/installer/node_modules/
+/installer/*.log
+/installer/test-*
+/installer/*.png
+/installer/*.jpg
