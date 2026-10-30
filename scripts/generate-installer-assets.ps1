@@ -273,7 +273,10 @@ $hc.Bitmap.Save((Join-Path $outDir "installerHeader.bmp"), [System.Drawing.Imagi
 
 # ---------------------------------------------------------------------------
 # Convert the generated BMP frame sequences into AVI animations.
-# The NSIS SysAnimate32 control needs an uncompressed AVI for reliability.
+# The NSIS SysAnimate32 control is unreliable with ffmpeg's rawvideo output
+# (the stream tag is 0 and the control shows a blank white area). Microsoft
+# RLE (BI_RLE8) is understood by the animation control without extra codecs,
+# so encode with msrle/pal8 instead.
 # ---------------------------------------------------------------------------
 function Convert-FramesToAvi {
     param(
@@ -286,7 +289,7 @@ function Convert-FramesToAvi {
     }
     $pattern = Join-Path $outDir "$Name%02d.bmp"
     $avi = Join-Path $outDir "$Name.avi"
-    & $ffmpeg -y -loglevel error -framerate $Fps -i $pattern -c:v rawvideo -pix_fmt bgr24 $avi
+    & $ffmpeg -y -loglevel error -framerate $Fps -i $pattern -c:v msrle -pix_fmt pal8 $avi
     if ($LASTEXITCODE -ne 0) {
         throw "ffmpeg failed while creating $avi"
     }

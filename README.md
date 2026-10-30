@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/yu7783/Upscayl-Next/total.svg?style=for-the-badge)](https://github.com/yu7783/Upscayl-Next/releases)
 
 [Download the latest release](https://github.com/yu7783/Upscayl-Next/releases/latest) ·
-[Release notes](RELEASE_NOTES_v1.2.0.md) ·
+[Release notes](RELEASE_NOTES_v1.2.1.md) ·
 [Report an issue](https://github.com/yu7783/Upscayl-Next/issues)
 
 </div>
@@ -24,7 +24,7 @@ without losing quality.
 # ✨ What's changed from upstream?
 
 Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
-versioning and starts at **1.0.0** (current release: **1.2.0**).
+versioning and starts at **1.0.0** (current release: **1.2.1**).
 
 Compared with the upstream tree, this release contains **more than 200 changed
 files**, including a complete Windows installer overhaul with animated pages,
@@ -44,7 +44,7 @@ optional AI backend setup and packaged license notices.
 | Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
 | Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
 | Modern installer | Dark animated NSIS wizard (welcome, credits, options and finish pages), optional one-click native backend setup, AGPL/credits page and a Start Menu shortcut for installing the backend later | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1`, `native/setup-launcher.ps1` |
-| Release manifest | Asset list, SHA-256 checksums and v1.2.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.0.md` |
+| Release manifest | Asset list, SHA-256 checksums and v1.2.1 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.1.md` |
 
 ## Improved and fixed
 
@@ -77,7 +77,7 @@ optional AI backend setup and packaged license notices.
 - `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
 - `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
 - Versioning starts at `1.0.0` instead of upstream `2.15.0`.
-- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.0`).
+- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.1`).
 - GitHub publish target is `yu7783/Upscayl-Next`.
 - Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
 - macOS config uses PNG icons instead of `.icns`.
@@ -183,7 +183,7 @@ troubleshooting.
 ## Windows installer
 
 1. Open the [latest release](https://github.com/yu7783/Upscayl-Next/releases/latest).
-2. Download **`Upscayl-Next-Setup-1.2.0.exe`**.
+2. Download **`Upscayl-Next-Setup-1.2.1.exe`**.
 3. Run the installer. The animated welcome page introduces Upscayl-Next, and
    the license/credits page shows the AGPL-3.0 notice and upstream credits.
 4. Choose an installation folder. On the options page you can tick
@@ -198,7 +198,7 @@ troubleshooting.
 
 ## Portable ZIP
 
-1. Download **`Upscayl-Next-Setup-1.2.0.zip`** from the same release.
+1. Download **`Upscayl-Next-Setup-1.2.1.zip`** from the same release.
 2. Extract the archive to a folder of your choice.
 3. Run `Upscayl-Next.exe`.
 
@@ -238,8 +238,8 @@ upscale** to process it again.
 - [Before/after comparisons](COMPARISONS.MD)
 - [Additional custom models](https://github.com/upscayl/custom-models)
 - [Upstream troubleshooting guide](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
-- [Release manifest for v1.2.0](RELEASE_FILES.md)
-- [Release notes for v1.2.0](RELEASE_NOTES_v1.2.0.md)
+- [Release manifest for v1.2.1](RELEASE_FILES.md)
+- [Release notes for v1.2.1](RELEASE_NOTES_v1.2.1.md)
 
 # 🛠 Development
 
@@ -287,15 +287,15 @@ npm run installer-assets
 
 Outputs:
 
-- `dist/Upscayl-Next-Setup-1.2.0.exe`
-- `dist/Upscayl-Next-Setup-1.2.0.exe.blockmap`
-- `dist/Upscayl-Next-Setup-1.2.0.zip`
+- `dist/Upscayl-Next-Setup-1.2.1.exe`
+- `dist/Upscayl-Next-Setup-1.2.1.exe.blockmap`
+- `dist/Upscayl-Next-Setup-1.2.1.zip`
 - `dist/latest.yml`
 
 Generate or verify checksums with:
 
 ```powershell
-Get-FileHash dist\Upscayl-Next-Setup-1.2.0.exe -Algorithm SHA256
+Get-FileHash dist\Upscayl-Next-Setup-1.2.1.exe -Algorithm SHA256
 ```
 
 ## Installer artwork and pages
