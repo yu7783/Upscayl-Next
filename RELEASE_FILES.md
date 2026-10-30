@@ -1,16 +1,16 @@
-# Upscayl-Next v1.1.0 Release Manifest
+# Upscayl-Next v1.2.0 Release Manifest
 
-This file lists every artifact and source file required for the GitHub `v1.1.0`
+This file lists every artifact and source file required for the GitHub `v1.2.0`
 release. All installer artifacts are generated into `dist/`.
 
 ## GitHub Release assets (upload these)
 
 | File | Size (bytes) | SHA-256 | Purpose |
 | --- | ---: | --- | --- |
-| `Upscayl-Next-Setup-1.1.0.exe` | 268,995,568 | `4effe3cf162186bb1950e21e2c79392bb4ee95fdd1b97ddd09541d2a7f1ed461` | Windows installer (animated NSIS welcome page) |
-| `Upscayl-Next-Setup-1.1.0.exe.blockmap` | 282,452 | `1c1c8c657272d679ec7e88e398e5a17837c15f4667775c402eea1b6ce7cdfe89` | Electron auto-update block map |
-| `Upscayl-Next-Setup-1.1.0.zip` | 314,431,745 | `ef295d0875b4318e86bcb3c0798618e4c198c03933f902e024fb53427dcf3c6d` | Portable ZIP build |
-| `latest.yml` | 353 | `743ae1ab43467f39121d90b1a0c141a18bbcdcec5f7b2c1d5540ca6e97231b98` | electron-updater feed metadata |
+| `Upscayl-Next-Setup-1.2.0.exe` | 269,855,955 | `1a044c7a7b03c518c09a9b9e86888d36f1d3929aec73ea897658d5d0011a20a1` | Windows installer (four animated NSIS pages) |
+| `Upscayl-Next-Setup-1.2.0.exe.blockmap` | 283,423 | `7fd568fd2d1095947ef5b24db7c3d49a13a3f7156c09573c319bc14111846612` | Electron auto-update block map |
+| `Upscayl-Next-Setup-1.2.0.zip` | 314,446,283 | `d0559565ae0a77cdf6e50abb54277fbf2585505e346d75b0c03a855c5d32487b` | Portable ZIP build |
+| `latest.yml` | 353 | `71939e0e19278b237c385e56a7bc8246f2a7c92787c537571467ed565e82529d` | electron-updater feed metadata |
 | `SHA256SUMS.txt` | 375 | — | Checksums for the assets above |
 
 ## Source files required to reproduce the build
@@ -53,6 +53,7 @@ release. All installer artifacts are generated into `dist/`.
 - `native/upscayl_native/`
 - `native/requirements.txt`
 - `native/setup.ps1`
+- `native/setup-launcher.ps1`
 - `native/setup.sh`
 - `native/make_test_checkpoint.py`
 - `native/README.md`
@@ -63,7 +64,12 @@ release. All installer artifacts are generated into `dist/`.
 ### Installer assets and scripts
 - `build/icon.png`
 - `build/installer.nsh`
-- `build/anim/banner.avi`
+- `build/THIRD_PARTY_NOTICES.txt`
+- `build/anim/welcome.avi`
+- `build/anim/credits.avi`
+- `build/anim/options.avi`
+- `build/anim/finish.avi`
+- `build/anim/banner.avi` (legacy fallback)
 - `build/anim/installerHeader.bmp`
 - `build/anim/installerSidebar.bmp`
 - `scripts/generate-installer-assets.ps1`
@@ -85,37 +91,32 @@ release. All installer artifacts are generated into `dist/`.
 - `RELEASE_FILES.md`
 - `RELEASE_NOTES_v1.0.0.md`
 - `RELEASE_NOTES_v1.1.0.md`
+- `RELEASE_NOTES_v1.2.0.md`
 
 ## Build and verification
 
 ```powershell
-# 1. Generate the animated installer artwork
-pwsh -NoProfile -File scripts/generate-installer-assets.ps1
-
-# 2. Build the animated AVI banner
-ffmpeg -y -framerate 8 -i build/anim/banner%02d.bmp \
-  -c:v rawvideo -pix_fmt bgr24 build/anim/banner.avi
-
-# 3. Run tests
+# 1. Run tests
 npm test
 
-# 4. Build the Windows installer
+# 2. Build the Windows installer (predist:win regenerates the artwork)
 npm run dist:win
 
-# 5. Verify checksums
+# 3. Verify checksums
 Get-Content dist/SHA256SUMS.txt
-Get-FileHash dist/Upscayl-Next-Setup-1.1.0.exe -Algorithm SHA256
+Get-FileHash dist/Upscayl-Next-Setup-1.2.0.exe -Algorithm SHA256
 ```
 
 ## Release checklist
 
-- [x] Version set to `1.1.0` in `package.json`
-- [x] Animated NSIS welcome page configured (`build/installer.nsh`)
-- [x] Animated banner and branded sidebar/header generated
+- [x] Version set to `1.2.0` in `package.json` and `package-lock.json`
+- [x] Four animated NSIS pages configured (`build/installer.nsh`)
+- [x] Optional AI backend setup, Start Menu shortcut and credits page added
+- [x] Animated AVIs and branded sidebar/header generated
 - [x] Windows NSIS installer built
 - [x] Portable ZIP built
 - [x] Auto-update metadata (`latest.yml`) generated
 - [x] SHA-256 checksums generated
 - [x] `README.md` updated with added features and install steps
-- [x] GitHub Release `v1.1.0` created and assets uploaded
-  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.1.0)
+- [x] GitHub Release `v1.2.0` created and assets uploaded
+  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.2.0)

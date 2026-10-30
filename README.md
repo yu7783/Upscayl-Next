@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/yu7783/Upscayl-Next/total.svg?style=for-the-badge)](https://github.com/yu7783/Upscayl-Next/releases)
 
 [Download the latest release](https://github.com/yu7783/Upscayl-Next/releases/latest) ·
-[Release notes](RELEASE_NOTES_v1.1.0.md) ·
+[Release notes](RELEASE_NOTES_v1.2.0.md) ·
 [Report an issue](https://github.com/yu7783/Upscayl-Next/issues)
 
 </div>
@@ -24,10 +24,11 @@ without losing quality.
 # ✨ What's changed from upstream?
 
 Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
-versioning and starts at **1.0.0** (current release: **1.1.0**).
+versioning and starts at **1.0.0** (current release: **1.2.0**).
 
-Compared with the upstream tree, this release contains **174 changed files**
-(**+5,939 / −2,232** lines; 57 added, 86 modified, 31 deleted).
+Compared with the upstream tree, this release contains **more than 200 changed
+files**, including a complete Windows installer overhaul with animated pages,
+optional AI backend setup and packaged license notices.
 
 ## Added
 
@@ -42,8 +43,8 @@ Compared with the upstream tree, this release contains **174 changed files**
 | Native HAT / DAT / SUPIR | Run transformer and diffusion upscalers in a bundled Python backend (spandrel, ONNX Runtime, official SUPIR), routed automatically by model name/extension | `native/`, `common/model-runtime.ts`, `electron/utils/spawn-upscayl.ts` |
 | Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
 | Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
-| Animated installer | NSIS welcome page playing an AVI banner, plus branded sidebar/header | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1` |
-| Release manifest | Asset list, SHA-256 checksums and v1.1.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.1.0.md` |
+| Modern installer | Dark animated NSIS wizard (welcome, credits, options and finish pages), optional one-click native backend setup, AGPL/credits page and a Start Menu shortcut for installing the backend later | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1`, `native/setup-launcher.ps1` |
+| Release manifest | Asset list, SHA-256 checksums and v1.2.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.0.md` |
 
 ## Improved and fixed
 
@@ -76,7 +77,7 @@ Compared with the upstream tree, this release contains **174 changed files**
 - `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
 - `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
 - Versioning starts at `1.0.0` instead of upstream `2.15.0`.
-- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.1.0`).
+- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.0`).
 - GitHub publish target is `yu7783/Upscayl-Next`.
 - Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
 - macOS config uses PNG icons instead of `.icns`.
@@ -119,6 +120,13 @@ names run in the native worker. Tiling (`-t`), TTA (`-x`), custom width (`-w`),
 compression (`-c`) and the output format are all supported for native models.
 
 ### Enable the native backend
+
+The Windows installer offers an **optional AI backend** checkbox on its options
+page. When selected, setup runs automatically during installation. If you skip
+it, open **Start Menu → Upscayl-Next – Set up AI backend** at any time; the
+launcher asks for administrator permission and runs the same setup script.
+
+For source builds you can still run it manually:
 
 ```powershell
 cd upscayl
@@ -175,10 +183,14 @@ troubleshooting.
 ## Windows installer
 
 1. Open the [latest release](https://github.com/yu7783/Upscayl-Next/releases/latest).
-2. Download **`Upscayl-Next-Setup-1.1.0.exe`**.
-3. Run the installer. The first page plays the animated Upscayl-Next banner.
-4. Choose an installation folder and finish the wizard.
-5. Launch **Upscayl-Next** from the Start Menu or the desktop shortcut.
+2. Download **`Upscayl-Next-Setup-1.2.0.exe`**.
+3. Run the installer. The animated welcome page introduces Upscayl-Next, and
+   the license/credits page shows the AGPL-3.0 notice and upstream credits.
+4. Choose an installation folder. On the options page you can tick
+   **Install the optional AI backend now** to set up HAT/DAT/SUPIR support
+   automatically, or leave it off and use the Start Menu shortcut later.
+5. Finish the wizard and launch **Upscayl-Next** from the Start Menu or the
+   desktop shortcut.
 
 > [!NOTE]
 > The installer is **not code-signed**, so Windows SmartScreen may show a warning.
@@ -186,7 +198,7 @@ troubleshooting.
 
 ## Portable ZIP
 
-1. Download **`Upscayl-Next-Setup-1.1.0.zip`** from the same release.
+1. Download **`Upscayl-Next-Setup-1.2.0.zip`** from the same release.
 2. Extract the archive to a folder of your choice.
 3. Run `Upscayl-Next.exe`.
 
@@ -226,8 +238,8 @@ upscale** to process it again.
 - [Before/after comparisons](COMPARISONS.MD)
 - [Additional custom models](https://github.com/upscayl/custom-models)
 - [Upstream troubleshooting guide](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
-- [Release manifest for v1.1.0](RELEASE_FILES.md)
-- [Release notes for v1.1.0](RELEASE_NOTES_v1.1.0.md)
+- [Release manifest for v1.2.0](RELEASE_FILES.md)
+- [Release notes for v1.2.0](RELEASE_NOTES_v1.2.0.md)
 
 # 🛠 Development
 
@@ -260,37 +272,60 @@ This runs `tsc` and the Node.js test suite in `tests/`.
 
 ## Building the Windows installer
 
+The `predist:win` hook regenerates the animated installer artwork before the
+build, so a normal build is enough:
+
 ```sh
 npm run dist:win
 ```
 
+You can also refresh the artwork on its own (requires ffmpeg on PATH):
+
+```powershell
+npm run installer-assets
+```
+
 Outputs:
 
-- `dist/Upscayl-Next-Setup-1.1.0.exe`
-- `dist/Upscayl-Next-Setup-1.1.0.exe.blockmap`
-- `dist/Upscayl-Next-Setup-1.1.0.zip`
+- `dist/Upscayl-Next-Setup-1.2.0.exe`
+- `dist/Upscayl-Next-Setup-1.2.0.exe.blockmap`
+- `dist/Upscayl-Next-Setup-1.2.0.zip`
 - `dist/latest.yml`
 
 Generate or verify checksums with:
 
 ```powershell
-Get-FileHash dist\Upscayl-Next-Setup-1.1.0.exe -Algorithm SHA256
+Get-FileHash dist\Upscayl-Next-Setup-1.2.0.exe -Algorithm SHA256
 ```
 
-## Installer artwork
-
-The animated welcome banner and branded installer images are generated from
-`build/icon.png`:
-
-```sh
-pwsh -NoProfile -File scripts/generate-installer-assets.ps1
-
-ffmpeg -y -framerate 8 -i build/anim/banner%02d.bmp \
-  -c:v rawvideo -pix_fmt bgr24 build/anim/banner.avi
-```
+## Installer artwork and pages
 
 `build/installer.nsh` is loaded through the `nsis.include` option in
-`package.json`.
+`package.json`. It replaces the default wizard with four dark animated pages:
+
+| Page | Animation | Purpose |
+| --- | --- | --- |
+| Welcome | `build/anim/welcome.avi` | Product intro and Vulkan/GPU notice |
+| License & credits | `build/anim/credits.avi` | AGPL-3.0 notice, upstream and model credits, acceptance checkbox |
+| Options | `build/anim/options.avi` | Optional HAT/DAT/SUPIR Python backend |
+| Finish | `build/anim/finish.avi` | Completion message and launch checkbox |
+
+The pages also create a Start Menu shortcut named
+**Upscayl-Next – Set up AI backend**, which runs
+`native/setup-launcher.ps1` and self-elevates. The optional backend can be
+installed during setup or later from that shortcut.
+
+All artwork is generated from `build/icon.png`; no third-party photos, icons,
+music or video clips are embedded. The script also writes the static
+`installerHeader.bmp` and `installerSidebar.bmp` and converts the BMP frame
+sequences to raw AVI with ffmpeg:
+
+```powershell
+pwsh -NoProfile -File scripts/generate-installer-assets.ps1
+```
+
+If ffmpeg is unavailable the script keeps existing AVI files and falls back to
+the legacy `banner.avi` for all animated pages.
 
 ## Publishing
 

@@ -1,7 +1,7 @@
 {
   "name": "upscayl-next",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "productName": "Upscayl-Next",
   "author": {
     "name": "Nayam Amarshe",
@@ -44,6 +44,7 @@
     "test": "tsc && node --test tests",
     "native:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File native/setup.ps1",
     "native:setup:unix": "bash native/setup.sh",
+    "installer-assets": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-installer-assets.ps1",
     "pack-app": "tsc && npm run build && electron-builder --dir",
     "dist": "tsc && npm run build && cross-env DEBUG=* electron-builder",
     "dist:appimage": "tsc && npm run build && cross-env DEBUG=* electron-builder build -l AppImage",
@@ -60,6 +61,7 @@
     "dist:mac-arm64": "tsc && npm run build && electron-builder --mac --arm64",
     "dist:mas": "npm run enable-store && tsc && npm run build && electron-builder --mac mas --universal -c mas.json && npm run disable-store",
     "dist:mas-dev": "npm run enable-store && tsc && npm run build && electron-builder --mac mas-dev --universal -c mas-dev.json && npm run disable-store",
+    "predist:win": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-installer-assets.ps1",
     "dist:win": "tsc && npm run build && electron-builder --win",
     "dist:linux": "tsc && npm run build && electron-builder --linux",
     "publish-app": "tsc && npm run build && electron-builder -wlm --publish always",
@@ -104,6 +106,18 @@
       {
         "from": "resources/icons/512x512.png",
         "to": "resources/512x512.png"
+      },
+      {
+        "from": "LICENSE",
+        "to": "resources/LICENSE"
+      },
+      {
+        "from": "Real-ESRGAN_LICENSE.txt",
+        "to": "resources/Real-ESRGAN_LICENSE.txt"
+      },
+      {
+        "from": "build/THIRD_PARTY_NOTICES.txt",
+        "to": "resources/THIRD_PARTY_NOTICES.txt"
       }
     ],
     "extraResources": [

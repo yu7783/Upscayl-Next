@@ -1,0 +1,62 @@
+Upscayl-Next — third-party notices
+=================================
+
+Upscayl-Next is distributed under the GNU Affero General Public License,
+version 3 or later (AGPL-3.0-or-later). The full license text is installed
+as resources/LICENSE.
+
+Upstream project
+----------------
+Upscayl-Next is a fork of Upscayl by Nayam Amarshe and TGS963.
+Upstream repository: https://github.com/upscayl/upscayl
+Upstream license: AGPL-3.0.
+
+NCNN / Vulkan backend
+---------------------
+The bundled upscayl-bin binary comes from the upscayl-ncnn project:
+https://github.com/upscayl/upscayl-ncnn
+Please refer to that repository for its license text and source code.
+
+Real-ESRGAN
+-----------
+Real-ESRGAN is Copyright (c) 2021, Xintao Wang.
+It is licensed under the BSD 3-Clause License. The full text is installed as
+resources/Real-ESRGAN_LICENSE.txt.
+
+Model weights
+-------------
+Bundled model weights keep their upstream licenses. Credits include:
+- Helaman for the HFA2k model (bundled as High Fidelity)
+- Foolhardy for the Remacri model
+- Kim2091 for UltraSharp and Ultramix Balanced
+- The Real-ESRGAN / animevideo model authors
+See https://upscale.wiki/ and the model distribution pages for details.
+
+Native HAT / DAT / SUPIR backend
+--------------------------------
+The optional backend installs PyTorch, torchvision, spandrel, ONNX Runtime and
+their dependencies from PyPI. Those packages keep their own licenses. SUPIR
+also depends on the upstream SUPIR repository and an SDXL base checkpoint,
+which are downloaded separately by the user.
+
+Video upscaling
+---------------
+Video upscaling uses FFmpeg from the user's PATH. FFmpeg is not bundled with
+Upscayl-Next; its license depends on the FFmpeg build in use.
+
+Application framework
+---------------------
+Upscayl-Next is built with Electron, Chromium and Node.js. Their license files
+are included in the packaged application by electron-builder.
+
+Installer
+---------
+The Windows installer is built with NSIS and electron-builder. Installer
+artwork is generated from build/icon.png by
+scripts/generate-installer-assets.ps1; no third-party photos, icons, music or
+video clips are embedded. Logo credit: @NicKoehler.
+
+Source code
+-----------
+AGPL-3.0 requires that users can obtain the corresponding source code.
+Source: https://github.com/yu7783/Upscayl-Next

@@ -62,3 +62,14 @@ dockerfile
 /native/.venv/
 /native/**/__pycache__/
 /native/**/*.pyc
+
+# installer artwork: keep the AVIs and static BMPs, ignore intermediate frames
+/build/anim/welcome*.bmp
+/build/anim/credits*.bmp
+/build/anim/options*.bmp
+/build/anim/finish*.bmp
+/build/anim/banner*.bmp
+nsis-build.log
+*.nsis-build.log
+build-v*.log
+build-*.log
