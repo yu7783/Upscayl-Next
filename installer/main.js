@@ -11,17 +11,21 @@
 
 const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
 const path = require("path");
-const fs = require("fs");
+// Electron patches `fs` so that paths ending in `.asar` are treated as
+// archives. The installer must handle resources/app.asar as a normal file,
+// otherwise extraction and copying fail with ENOTDIR/ENOTEMPTY. `original-fs`
+// is the unpatched Node.js filesystem module available in the main process.
+const fs = require("original-fs");
 const os = require("os");
 const https = require("https");
 const crypto = require("crypto");
-const extractZipPackage = require("extract-zip");
 const { spawn } = require("child_process");
 
 const REPO = "yu7783/Upscayl-Next";
 const RELEASE_API = `https://api.github.com/repos/${REPO}/releases/latest`;
 const APP_EXE_NAME = "Upscayl-Next.exe";
 const UNINSTALL_KEY = "Upscayl-Next";
+const LOG_PATH = path.join(os.tmpdir(), "upscayl-next-installer.log");
 
 let mainWindow = null;
 let cachedRelease = null;
@@ -63,7 +67,17 @@ function sendProgress(phase, message, extra = {}) {
 
 function sendLog(line) {
   if (!line) return;
-  send("installer:log", String(line));
+  const text = String(line);
+  try {
+    fs.appendFileSync(
+      LOG_PATH,
+      `[${new Date().toISOString()}] ${text}\n`,
+      "utf8",
+    );
+  } catch {
+    // Logging must never break the installer.
+  }
+  send("installer:log", text);
 }
 
 function httpsGetJson(url, redirects = 0) {
@@ -232,7 +246,7 @@ function ensureDirectory(directory) {
       const stat = fs.lstatSync(current);
       if (stat.isDirectory()) continue;
       if (index === parts.length - 1) {
-        fs.rmSync(current, { recursive: true, force: true });
+        removePathSync(current);
       } else {
         throw new Error(
           `The installation path contains a file where a folder is required: ${current}. Choose another folder.`,
@@ -240,6 +254,32 @@ function ensureDirectory(directory) {
       }
     }
     fs.mkdirSync(current);
+  }
+}
+
+function removePathSync(target) {
+  if (!fs.existsSync(target)) return;
+  const stat = fs.lstatSync(target);
+  if (stat.isDirectory()) {
+    fs.rmSync(target, {
+      recursive: true,
+      force: true,
+      maxRetries: 12,
+      retryDelay: 250,
+    });
+  } else {
+    fs.rmSync(target, { force: true, maxRetries: 12, retryDelay: 250 });
+  }
+}
+
+function removePathQuietly(target) {
+  if (!target) return true;
+  try {
+    removePathSync(target);
+    return true;
+  } catch (error) {
+    sendLog(`Cleanup warning: ${formatFsError(error)}`);
+    return false;
   }
 }
 
@@ -391,86 +431,144 @@ function validateExtractedPackage(destination) {
   if (fs.existsSync(asarPath)) {
     const stat = fs.lstatSync(asarPath);
     if (stat.isDirectory()) {
-      try {
-        fs.rmSync(asarPath, { recursive: true, force: true });
-      } catch {
-        // Ignore cleanup failure; the error below is what matters.
-      }
       throw new Error(
-        "The package was extracted incorrectly: resources/app.asar became a folder. Please try again.",
+        "The package was extracted incorrectly: resources/app.asar became a folder.",
       );
     }
   }
+
+  const exePath = path.join(destination, APP_EXE_NAME);
+  if (!fs.existsSync(exePath) || !fs.lstatSync(exePath).isFile()) {
+    throw new Error(
+      "The package was extracted incorrectly: Upscayl-Next.exe is missing.",
+    );
+  }
+  if (!fs.existsSync(asarPath) || !fs.lstatSync(asarPath).isFile()) {
+    throw new Error(
+      "The package was extracted incorrectly: resources/app.asar is missing.",
+    );
+  }
 }
 
-function resetDirectory(directory) {
-  if (fs.existsSync(directory)) {
-    const stat = fs.lstatSync(directory);
-    if (stat.isDirectory()) {
-      fs.rmSync(directory, { recursive: true, force: true });
-    } else {
-      fs.rmSync(directory, { force: true });
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function waitForValidPackage(destination, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  const startedAt = Date.now();
+  let lastError = null;
+  let nextNotice = 5000;
+  while (Date.now() < deadline) {
+    try {
+      validateExtractedPackage(destination);
+      return { ok: true, error: null };
+    } catch (error) {
+      lastError = error;
+      const elapsed = Date.now() - startedAt;
+      if (elapsed >= nextNotice) {
+        sendLog(
+          "Waiting for the extracted files to finish writing (antivirus can delay this)...",
+        );
+        nextNotice += 5000;
+      }
+      await delay(400);
     }
   }
-  ensureDirectory(directory);
+  return { ok: false, error: lastError };
+}
+
+function resolveTarExecutable() {
+  const systemRoot = process.env.SystemRoot || "C:\\Windows";
+  const systemTar = path.join(systemRoot, "System32", "tar.exe");
+  return fs.existsSync(systemTar) ? systemTar : "tar.exe";
 }
 
 async function extractZip(zipPath, destination) {
-  ensureDirectory(destination);
+  // Each attempt uses its own directory. If the built-in extractor fails
+  // halfway through, files can stay locked by antivirus or by the extractor
+  // itself. Retrying in a fresh directory avoids ENOTEMPTY/EBUSY errors when
+  // cleaning up the partial folder.
+  const attempts = [
+    {
+      name: "tar.exe",
+      dir: `${destination}-tar`,
+      timeout: 60000,
+      run: async (dir) => {
+        const result = await runProcess(
+          resolveTarExecutable(),
+          ["-xf", zipPath, "-C", dir],
+          (line) => sendLog(line),
+        );
+        if (result.code !== 0) {
+          throw new Error(`tar.exe exited with code ${result.code}.`);
+        }
+      },
+    },
+    {
+      name: "PowerShell",
+      dir: `${destination}-ps`,
+      timeout: 60000,
+      run: async (dir) => {
+        const command =
+          "$ErrorActionPreference = 'Stop'; " +
+          `Expand-Archive -LiteralPath '${escapePowerShell(zipPath)}' ` +
+          `-DestinationPath '${escapePowerShell(dir)}' -Force`;
+        const result = await runProcess(
+          "powershell.exe",
+          ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command],
+          (line) => sendLog(line),
+        );
+        if (result.code !== 0) {
+          throw new Error(`PowerShell exited with code ${result.code}.`);
+        }
+      },
+    },
+  ];
 
-  // Primary strategy: a Node ZIP extractor. It does not depend on tar.exe or
-  // PowerShell, and it correctly treats "resources/app.asar" as a file even
-  // when "resources/app.asar.unpacked" is also present in the archive.
-  try {
-    sendLog("Extracting the package...");
-    await extractZipPackage(zipPath, { dir: destination });
-    validateExtractedPackage(destination);
-    return;
-  } catch (error) {
-    sendLog(`Built-in extraction failed: ${formatFsError(error)}`);
-    resetDirectory(destination);
-  }
-
-  // Fallback 1: tar.exe (available on Windows 10/11). PowerShell 5.1's
-  // Expand-Archive can mis-handle the app.asar / app.asar.unpacked pair, so
-  // tar is preferred when the Node extractor is unavailable.
-  try {
-    sendLog("Retrying extraction with tar.exe...");
-    const tarResult = await runProcess(
-      "tar.exe",
-      ["-xf", zipPath, "-C", destination],
-      (line) => sendLog(line),
-    );
-    if (tarResult.code === 0) {
-      validateExtractedPackage(destination);
-      return;
+  let lastError = null;
+  for (const attempt of attempts) {
+    let runError = null;
+    try {
+      sendLog(`Extracting the package with ${attempt.name}...`);
+      ensureDirectory(attempt.dir);
+      await attempt.run(attempt.dir);
+    } catch (error) {
+      runError = error;
+      sendLog(`${attempt.name} reported: ${formatFsError(error)}`);
     }
-    sendLog(
-      `tar.exe exited with code ${tarResult.code}; falling back to PowerShell.`,
+
+    // Extraction tools can return before all files are finalized, and
+    // antivirus can briefly expose an intermediate directory. Poll for a
+    // short while so a complete package is not discarded too early.
+    const validation = await waitForValidPackage(
+      attempt.dir,
+      attempt.timeout || 15000,
     );
-  } catch (error) {
+    if (validation.ok) {
+      if (runError) {
+        sendLog(
+          `${attempt.name} reported an error, but the extracted package is complete. Continuing.`,
+        );
+      }
+      return attempt.dir;
+    }
+
+    lastError = validation.error;
     sendLog(
-      `tar.exe was not available (${error.message}); falling back to PowerShell.`,
+      `${attempt.name} did not produce a usable package: ${formatFsError(
+        validation.error,
+      )}`,
     );
+    // Leave the partial folder alone. It is inside the temporary directory
+    // and will be removed best-effort after the installation finishes.
   }
 
-  resetDirectory(destination);
-  sendLog("Retrying extraction with PowerShell...");
-  const command =
-    "$ErrorActionPreference = 'Stop'; " +
-    `Expand-Archive -LiteralPath '${escapePowerShell(zipPath)}' ` +
-    `-DestinationPath '${escapePowerShell(destination)}' -Force`;
-  const result = await runProcess(
-    "powershell.exe",
-    ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", command],
-    (line) => sendLog(line),
+  throw new Error(
+    `Could not extract the downloaded package. ${
+      lastError ? formatFsError(lastError) : ""
+    } Make sure no antivirus is blocking the temporary folder.`.trim(),
   );
-  if (result.code !== 0) {
-    throw new Error(
-      "Could not extract the downloaded package. Make sure no antivirus is blocking the temporary folder.",
-    );
-  }
-  validateExtractedPackage(destination);
 }
 
 /**
@@ -486,7 +584,7 @@ function copyTree(source, destination) {
     if (fs.existsSync(destination)) {
       const destinationStat = fs.lstatSync(destination);
       if (!destinationStat.isDirectory()) {
-        fs.rmSync(destination, { recursive: true, force: true });
+        removePathSync(destination);
       }
     }
     fs.mkdirSync(destination, { recursive: true });
@@ -503,7 +601,7 @@ function copyTree(source, destination) {
   if (fs.existsSync(destination)) {
     const destinationStat = fs.lstatSync(destination);
     if (destinationStat.isDirectory()) {
-      fs.rmSync(destination, { recursive: true, force: true });
+      removePathSync(destination);
     }
   }
   fs.copyFileSync(source, destination);
@@ -720,8 +818,7 @@ async function installApp(options) {
     }
 
     sendProgress("extract", "Extracting the application files...");
-    const staging = path.join(tempDir, "app");
-    await extractZip(zipPath, staging);
+    const staging = await extractZip(zipPath, path.join(tempDir, "app"));
 
     sendProgress("copy", "Installing Upscayl-Next...");
     ensureDirectory(installDir);
@@ -762,11 +859,8 @@ async function installApp(options) {
     return { success: false, error: message };
   } finally {
     if (tempDir) {
-      try {
-        fs.rmSync(tempDir, { recursive: true, force: true });
-      } catch {
-        // Ignore cleanup failures.
-      }
+      // Never let a locked temporary file mask a successful installation.
+      removePathQuietly(tempDir);
     }
   }
 }
@@ -860,7 +954,36 @@ app.on("web-contents-created", (_event, contents) => {
   });
 });
 
+function cleanupStaleTempDirs() {
+  const tempRoot = os.tmpdir();
+  let entries = [];
+  try {
+    entries = fs.readdirSync(tempRoot, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  for (const entry of entries) {
+    if (!entry.isDirectory() || !entry.name.startsWith("upscayl-next-")) {
+      continue;
+    }
+    const fullPath = path.join(tempRoot, entry.name);
+    try {
+      const stat = fs.statSync(fullPath);
+      if (stat.mtimeMs < cutoff) {
+        removePathQuietly(fullPath);
+      }
+    } catch {
+      // Ignore stale temp folders that disappear or are locked.
+    }
+  }
+}
+
 app.whenReady().then(() => {
+  sendLog(
+    `Upscayl-Next Installer ${app.getVersion()} starting (${process.platform}).`,
+  );
+  cleanupStaleTempDirs();
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
