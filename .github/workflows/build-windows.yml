@@ -14,8 +14,6 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -28,36 +26,50 @@ jobs:
         run: |
           npm ci
           npm test
-          npm run dist:win
+          npm run dist:win -- --publish never
           npm run installer-app
 
       - name: Generate SHA256SUMS.txt
         shell: pwsh
         run: |
-          $files = @()
-          $files += Get-ChildItem -Path "installer/dist" -Filter "*.exe" -ErrorAction SilentlyContinue
-          $files += Get-ChildItem -Path "dist" -Include "*.exe","*.blockmap","*.zip","latest.yml" -File -Recurse -Depth 0 -ErrorAction SilentlyContinue
-          $lines = foreach ($f in $files) {
-            $hash = (Get-FileHash -Path $f.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-            "$hash  $($f.Name)"
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $orderedPaths = @(
+            "dist/Upscayl-Next-Setup-$version.exe",
+            "dist/Upscayl-Next-Setup-$version.exe.blockmap",
+            "dist/Upscayl-Next-Setup-$version.zip",
+            "dist/latest.yml",
+            "installer/dist/Upscayl-Next-Installer-$version.exe"
+          )
+          $lines = @()
+          foreach ($rel in $orderedPaths) {
+            if (-not (Test-Path $rel)) {
+              throw "Expected build artifact is missing: $rel"
+            }
+            $item = Get-Item $rel
+            $hash = (Get-FileHash -Path $item.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            $lines += "$hash  $($item.Name)"
           }
           $lines | Set-Content -Path "dist/SHA256SUMS.txt" -Encoding ascii
           Get-Content "dist/SHA256SUMS.txt"
 
       - name: Upload Assets to GitHub Release
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
           $tag = "${{ inputs.tag }}"
           if (-not $tag) {
             $tag = gh release view --json tagName --jq .tagName
           }
-          $assets = @()
-          $assets += (Get-ChildItem -Path "installer/dist/*.exe").FullName
-          $assets += (Get-ChildItem -Path "dist/*.exe").FullName
-          $assets += (Get-ChildItem -Path "dist/*.blockmap").FullName
-          $assets += (Get-ChildItem -Path "dist/*.zip").FullName
-          $assets += (Get-ChildItem -Path "dist/latest.yml").FullName
-          $assets += (Get-ChildItem -Path "dist/SHA256SUMS.txt").FullName
+          $assets = @(
+            "dist/Upscayl-Next-Setup-$version.exe",
+            "dist/Upscayl-Next-Setup-$version.exe.blockmap",
+            "dist/Upscayl-Next-Setup-$version.zip",
+            "dist/latest.yml",
+            "installer/dist/Upscayl-Next-Installer-$version.exe",
+            "dist/SHA256SUMS.txt"
+          )
           gh release upload $tag @assets --clobber
 
       - name: Upload Windows Build Artifact
