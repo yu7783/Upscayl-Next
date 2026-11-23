@@ -4,6 +4,7 @@ import {
   MultiModelProgressInfo,
   VideoCodec,
   VideoContainerFormat,
+  VideoIntermediateFormat,
   VideoProgressInfo,
   VideoQualityPreset,
 } from "@common/types/types";
@@ -105,6 +106,19 @@ export const videoQualityAtom = atomWithStorage<VideoQualityPreset>(
 
 export const videoKeepAudioAtom = atomWithStorage<boolean>(
   "videoKeepAudio",
+  true,
+);
+
+export const videoIntermediateFormatAtom =
+  atomWithStorage<VideoIntermediateFormat>("videoIntermediateFormat", "jpg");
+
+export const videoUseHwEncodeAtom = atomWithStorage<boolean>(
+  "videoUseHwEncode",
+  true,
+);
+
+export const videoDeduplicateFramesAtom = atomWithStorage<boolean>(
+  "videoDeduplicateFrames",
   true,
 );
 

@@ -2,12 +2,29 @@ import { spawnSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import decodePath from "../../common/decode-path";
-import { FfmpegStatus, VideoMediaInfo } from "../../common/types/types";
+import {
+  FfmpegStatus,
+  HardwareVideoEncoder,
+  VideoMediaInfo,
+} from "../../common/types/types";
 import { parseFrameRate } from "../../common/video-upscayl-helpers";
 import { getPlatform } from "../utils/get-device-specs";
 import { execPath } from "../utils/get-resource-paths";
 
 const binExt = () => (getPlatform() === "win" ? ".exe" : "");
+
+const ALL_HW_ENCODERS: HardwareVideoEncoder[] = [
+  "h264_nvenc",
+  "hevc_nvenc",
+  "h264_amf",
+  "hevc_amf",
+  "h264_qsv",
+  "hevc_qsv",
+  "h264_videotoolbox",
+  "hevc_videotoolbox",
+];
+
+const hwEncoderCache = new Map<string, HardwareVideoEncoder[]>();
 
 /**
  * Resolve the executable path for `ffmpeg` or `ffprobe`.
@@ -52,6 +69,97 @@ const probeBinaryVersion = (binaryPath: string): string | null => {
   }
 };
 
+const testEncoderWorks = (
+  ffmpegBin: string,
+  encoder: HardwareVideoEncoder,
+): boolean => {
+  try {
+    const result = spawnSync(
+      ffmpegBin,
+      [
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-f",
+        "lavfi",
+        "-i",
+        "color=c=black:s=256x256:d=0.04",
+        "-frames:v",
+        "1",
+        "-pix_fmt",
+        "yuv420p",
+        "-c:v",
+        encoder,
+        "-f",
+        "null",
+        "-",
+      ],
+      {
+        encoding: "utf8",
+        windowsHide: true,
+        timeout: 4000,
+      },
+    );
+    return !result.error && result.status === 0;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Probe which GPU hardware video encoders actually work on the user's machine.
+ *
+ * Results are cached per FFmpeg binary path so subsequent calls are instant.
+ */
+export function detectHardwareEncoders(
+  ffmpegBin: string,
+): HardwareVideoEncoder[] {
+  const cached = hwEncoderCache.get(ffmpegBin);
+  if (cached) return cached;
+
+  const listed = spawnSync(ffmpegBin, ["-hide_banner", "-encoders"], {
+    encoding: "utf8",
+    windowsHide: true,
+    timeout: 5000,
+  });
+
+  if (listed.error || listed.status !== 0 || !listed.stdout) {
+    hwEncoderCache.set(ffmpegBin, []);
+    return [];
+  }
+
+  const platform = getPlatform();
+  const platformCandidates: HardwareVideoEncoder[] =
+    platform === "mac"
+      ? ["h264_videotoolbox", "hevc_videotoolbox"]
+      : ALL_HW_ENCODERS.filter((e) => !e.endsWith("_videotoolbox"));
+
+  const compiled = platformCandidates.filter((enc) =>
+    listed.stdout.includes(enc),
+  );
+
+  const working: HardwareVideoEncoder[] = [];
+  let foundH264 = false;
+  let foundH265 = false;
+
+  for (const enc of compiled) {
+    const isH264 = enc.startsWith("h264_");
+    if (isH264 && foundH264) continue;
+    if (!isH264 && foundH265) continue;
+
+    if (testEncoderWorks(ffmpegBin, enc)) {
+      working.push(enc);
+      if (isH264) foundH264 = true;
+      else foundH265 = true;
+    }
+
+    if (foundH264 && foundH265) break;
+  }
+
+  hwEncoderCache.set(ffmpegBin, working);
+  return working;
+}
+
 export function checkFfmpegStatus(): FfmpegStatus {
   const ffmpegBin = resolveMediaBinary("ffmpeg");
   const ffprobeBin = resolveMediaBinary("ffprobe");
@@ -60,6 +168,7 @@ export function checkFfmpegStatus(): FfmpegStatus {
 
   const hasFfmpeg = ffmpegVersion !== null;
   const hasFfprobe = ffprobeVersion !== null;
+  const hwEncoders = hasFfmpeg ? detectHardwareEncoders(ffmpegBin) : [];
 
   return {
     available: hasFfmpeg && hasFfprobe,
@@ -68,6 +177,7 @@ export function checkFfmpegStatus(): FfmpegStatus {
     ffmpegPath: hasFfmpeg ? ffmpegBin : null,
     ffprobePath: hasFfprobe ? ffprobeBin : null,
     version: ffmpegVersion,
+    hwEncoders,
   };
 }
 

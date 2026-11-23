@@ -306,7 +306,7 @@ const VideoWorkspace = ({
           <div className="flex flex-wrap items-center gap-2">
             <span className="badge badge-neutral badge-sm">
               {videoDoneInfo.container.toUpperCase()} /{" "}
-              {videoDoneInfo.codec.toUpperCase()}
+              {videoDoneInfo.usedEncoder || videoDoneInfo.codec.toUpperCase()}
             </span>
             <span className="badge badge-neutral badge-sm">
               {formatBytes(videoDoneInfo.fileSize)}
@@ -314,8 +314,22 @@ const VideoWorkspace = ({
             <span className="badge badge-neutral badge-sm">
               {videoDoneInfo.totalFrames} frames
             </span>
+            {videoDoneInfo.skippedDuplicateFrames > 0 && (
+              <span className="badge badge-success badge-sm">
+                ⚡{" "}
+                {t("VIDEO_UPSCAYL.SKIPPED_FRAMES", {
+                  count: String(videoDoneInfo.skippedDuplicateFrames),
+                })}
+              </span>
+            )}
             <span className="badge badge-neutral badge-sm">
               {(videoDoneInfo.durationMs / 1000).toFixed(1)}s
+              {videoDoneInfo.durationMs > 0 && videoDoneInfo.totalFrames > 0
+                ? ` (${(
+                    videoDoneInfo.totalFrames /
+                    (videoDoneInfo.durationMs / 1000)
+                  ).toFixed(1)} fps)`
+                : ""}
             </span>
           </div>
         </div>

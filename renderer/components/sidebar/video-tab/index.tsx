@@ -9,24 +9,30 @@ import {
   progressAtom,
   savedOutputPathAtom,
   scaleAtom,
+  ttaModeAtom,
   useCustomWidthAtom,
   videoCodecAtom,
   videoContainerAtom,
+  videoDeduplicateFramesAtom,
+  videoIntermediateFormatAtom,
   videoKeepAudioAtom,
   videoProgressAtom,
   videoQualityAtom,
+  videoUseHwEncodeAtom,
 } from "@/atoms/user-settings-atom";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import {
   FfmpegStatus,
   VideoCodec,
   VideoContainerFormat,
+  VideoIntermediateFormat,
   VideoMediaInfo,
   VideoQualityPreset,
 } from "@common/types/types";
 import {
   estimateVideoOutputDimensions,
   formatVideoDuration,
+  resolveHardwareEncoder,
 } from "@common/video-upscayl-helpers";
 import useLogger from "../../hooks/use-logger";
 import SelectModelDialog from "../upscayl-tab/select-model-dialog";
@@ -79,10 +85,18 @@ const VideoTab = ({
   const videoProgress = useAtomValue(videoProgressAtom);
   const customWidth = useAtomValue(customWidthAtom);
   const useCustomWidth = useAtomValue(useCustomWidthAtom);
+  const ttaMode = useAtomValue(ttaModeAtom);
   const [videoCodec, setVideoCodec] = useAtom(videoCodecAtom);
   const [videoContainer, setVideoContainer] = useAtom(videoContainerAtom);
   const [videoQuality, setVideoQuality] = useAtom(videoQualityAtom);
   const [keepAudio, setKeepAudio] = useAtom(videoKeepAudioAtom);
+  const [intermediateFormat, setIntermediateFormat] = useAtom(
+    videoIntermediateFormatAtom,
+  );
+  const [useHwEncode, setUseHwEncode] = useAtom(videoUseHwEncodeAtom);
+  const [deduplicateFrames, setDeduplicateFrames] = useAtom(
+    videoDeduplicateFramesAtom,
+  );
 
   const selectedFormatPreset = useMemo(() => {
     const match = FORMAT_PRESETS.find(
@@ -90,6 +104,11 @@ const VideoTab = ({
     );
     return match?.id ?? "mp4-h264";
   }, [videoCodec, videoContainer]);
+
+  const detectedHwEncoder = useMemo(
+    () => resolveHardwareEncoder(videoCodec, ffmpegStatus?.hwEncoders ?? []),
+    [videoCodec, ffmpegStatus?.hwEncoders],
+  );
 
   const estimatedOutput = useMemo(() => {
     if (!videoInfo) return null;
@@ -158,12 +177,21 @@ const VideoTab = ({
           }`}
         >
           {ffmpegStatus.available ? (
-            <p className="font-medium">
-              ✓{" "}
-              {t("VIDEO_UPSCAYL.FFMPEG_READY", {
-                version: ffmpegStatus.version ?? "",
-              })}
-            </p>
+            <div className="flex flex-col gap-1">
+              <p className="font-medium">
+                ✓{" "}
+                {t("VIDEO_UPSCAYL.FFMPEG_READY", {
+                  version: ffmpegStatus.version ?? "",
+                })}
+              </p>
+              <p className="text-[11px] opacity-85">
+                {detectedHwEncoder
+                  ? `⚡ ${t("VIDEO_UPSCAYL.HW_ENCODE_DETECTED", {
+                      encoder: detectedHwEncoder,
+                    })}`
+                  : t("VIDEO_UPSCAYL.HW_ENCODE_CPU_ONLY")}
+              </p>
+            </div>
           ) : (
             <div>
               <p className="font-semibold">
@@ -174,6 +202,12 @@ const VideoTab = ({
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {ttaMode && (
+        <div className="rounded-btn border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
+          ⚠️ {t("VIDEO_UPSCAYL.TTA_WARNING")}
         </div>
       )}
 
@@ -280,7 +314,56 @@ const VideoTab = ({
               </select>
             </label>
 
+            <label className="flex flex-col gap-1 text-xs">
+              <span className="text-base-content/80">
+                {t("VIDEO_UPSCAYL.INTERMEDIATE_LABEL")}
+              </span>
+              <select
+                className="select select-bordered select-sm w-full"
+                value={intermediateFormat}
+                onChange={(e) =>
+                  setIntermediateFormat(
+                    e.target.value as VideoIntermediateFormat,
+                  )
+                }
+                disabled={isRunning}
+              >
+                <option value="jpg">
+                  {t("VIDEO_UPSCAYL.INTERMEDIATE_JPG")}
+                </option>
+                <option value="png">
+                  {t("VIDEO_UPSCAYL.INTERMEDIATE_PNG")}
+                </option>
+              </select>
+            </label>
+
             <label className="flex cursor-pointer items-center justify-between pt-1 text-xs">
+              <span className="text-base-content/80">
+                {t("VIDEO_UPSCAYL.HW_ENCODE_LABEL")}
+              </span>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary toggle-xs"
+                checked={useHwEncode && Boolean(detectedHwEncoder)}
+                onChange={(e) => setUseHwEncode(e.target.checked)}
+                disabled={isRunning || !detectedHwEncoder}
+              />
+            </label>
+
+            <label className="flex cursor-pointer items-center justify-between text-xs">
+              <span className="text-base-content/80">
+                {t("VIDEO_UPSCAYL.DEDUP_LABEL")}
+              </span>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary toggle-xs"
+                checked={deduplicateFrames}
+                onChange={(e) => setDeduplicateFrames(e.target.checked)}
+                disabled={isRunning}
+              />
+            </label>
+
+            <label className="flex cursor-pointer items-center justify-between text-xs">
               <span className="text-base-content/80">
                 {t("VIDEO_UPSCAYL.KEEP_AUDIO")}
               </span>

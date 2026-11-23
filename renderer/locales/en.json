@@ -396,7 +396,16 @@
     "SYNC_RESTART": "Restart",
     "SHOW_IN_FOLDER": "Show in Folder",
     "RESET_VIDEO": "New Video",
-    "STOPPED_NOTICE": "Video upscaling stopped."
+    "STOPPED_NOTICE": "Video upscaling stopped.",
+    "INTERMEDIATE_LABEL": "Frame Pipeline",
+    "INTERMEDIATE_JPG": "Fast (Near-Lossless JPEG · Recommended)",
+    "INTERMEDIATE_PNG": "Lossless (PNG · Slower)",
+    "HW_ENCODE_LABEL": "GPU Hardware Encode",
+    "HW_ENCODE_DETECTED": "GPU Encode: {encoder}",
+    "HW_ENCODE_CPU_ONLY": "CPU fast preset",
+    "DEDUP_LABEL": "Skip identical frames",
+    "TTA_WARNING": "TTA mode is enabled in Settings — video upscaling will be ~8x slower.",
+    "SKIPPED_FRAMES": "{count} duplicate frames skipped"
   },
   "MULTI_MODEL": {
     "TOGGLE_TITLE": "Compare Multiple Models",

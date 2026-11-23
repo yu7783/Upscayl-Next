@@ -1,6 +1,6 @@
-# Upscayl-Next v1.3.0 Release Manifest
+# Upscayl-Next v1.3.1 Release Manifest
 
-This file lists every artifact and source file required for the GitHub `v1.3.0`
+This file lists every artifact and source file required for the GitHub `v1.3.1`
 release. App artifacts are generated into `dist/`; the custom installer is
 generated into `installer/dist/`.
 
@@ -8,10 +8,10 @@ generated into `installer/dist/`.
 
 | File | Purpose |
 | --- | --- |
-| `Upscayl-Next-Installer-1.3.0.exe` | Custom modern Electron downloader (recommended) |
-| `Upscayl-Next-Setup-1.3.0.exe` | Legacy NSIS installer / auto-update fallback |
-| `Upscayl-Next-Setup-1.3.0.exe.blockmap` | Electron auto-update block map |
-| `Upscayl-Next-Setup-1.3.0.zip` | Portable ZIP package downloaded by the custom installer |
+| `Upscayl-Next-Installer-1.3.1.exe` | Custom modern Electron downloader (recommended) |
+| `Upscayl-Next-Setup-1.3.1.exe` | Legacy NSIS installer / auto-update fallback |
+| `Upscayl-Next-Setup-1.3.1.exe.blockmap` | Electron auto-update block map |
+| `Upscayl-Next-Setup-1.3.1.zip` | Portable ZIP package downloaded by the custom installer |
 | `latest.yml` | electron-updater feed metadata |
 | `SHA256SUMS.txt` | Checksums for the assets above |
 
@@ -114,6 +114,7 @@ generated into `installer/dist/`.
 - `RELEASE_NOTES_v1.2.5.md`
 - `RELEASE_NOTES_v1.2.6.md`
 - `RELEASE_NOTES_v1.3.0.md`
+- `RELEASE_NOTES_v1.3.1.md`
 
 ## Build and verification
 
@@ -129,16 +130,15 @@ npm run installer-app
 
 # 4. Verify checksums
 Get-Content dist/SHA256SUMS.txt
-Get-FileHash dist/Upscayl-Next-Setup-1.3.0.exe -Algorithm SHA256
-Get-FileHash installer/dist/Upscayl-Next-Installer-1.3.0.exe -Algorithm SHA256
+Get-FileHash dist/Upscayl-Next-Setup-1.3.1.exe -Algorithm SHA256
+Get-FileHash installer/dist/Upscayl-Next-Installer-1.3.1.exe -Algorithm SHA256
 ```
 
 ## Release checklist
 
-- [x] Version set to `1.3.0` in `package.json`, `package-lock.json`, `installer/package.json`, and `installer/package-lock.json`
-- [x] Multi-Model Sequential Comparison implemented and tested
-- [x] Video Upscaling audited and promoted to official feature
+- [x] Version set to `1.3.1` in `package.json`, `package-lock.json`, `installer/package.json`, and `installer/package-lock.json`
+- [x] Video upscaling pipeline accelerated (GPU HW encoding, fast JPEG intermediate, hwaccel decode, double-buffered async chunks, lossless frame deduplication, GPU-optimal thread split)
 - [x] Unit test suite (`npm test`) and Next.js production build (`npm run build`) verified
-- [x] `README.md` and `RELEASE_NOTES_v1.3.0.md` updated
-- [x] GitHub Release `v1.3.0` published
-  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.3.0)
+- [x] `README.md` and `RELEASE_NOTES_v1.3.1.md` updated
+- [x] GitHub Release `v1.3.1` published with Windows assets
+  (https://github.com/yu7783/Upscayl-Next/releases/tag/v1.3.1)

@@ -3,9 +3,13 @@ const assert = require("node:assert/strict");
 
 const {
   parseFrameRate,
+  getVideoThreadCount,
+  computeOptimalChunkSize,
+  resolveHardwareEncoder,
   resolveVideoEncodingProfile,
   buildVideoExtractArgs,
   buildVideoEncodeArgs,
+  planDeduplicatedChunk,
   computeChunkRanges,
   calculateVideoOverallProgress,
   buildVideoOutputFilename,
@@ -41,6 +45,38 @@ test("parseFrameRate defaults safely to 30/1 when all probe fields are unavailab
   assert.deepEqual(result, { fps: 30, rational: "30/1" });
 });
 
+test("getVideoThreadCount keeps GPU proc threads bounded at 2 (or 1 under VRAM pressure) while scaling save threads", () => {
+  assert.equal(getVideoThreadCount({ cpuCount: 16 }), "4:2:6");
+  assert.equal(
+    getVideoThreadCount({ cpuCount: 16, vramConstrained: true }),
+    "4:1:6",
+  );
+  assert.equal(getVideoThreadCount({ cpuCount: 4 }), "2:2:2");
+  assert.equal(getVideoThreadCount({ cpuCount: 1 }), "1:1:2");
+});
+
+test("computeOptimalChunkSize uses larger chunks for fast JPEG and smaller chunks for lossless PNG", () => {
+  assert.equal(computeOptimalChunkSize(1000, "jpg"), 150);
+  assert.equal(computeOptimalChunkSize(1000, "png"), 60);
+  assert.equal(computeOptimalChunkSize(45, "jpg"), 45);
+});
+
+test("resolveHardwareEncoder picks top-priority encoder per codec and returns null for VP9", () => {
+  assert.equal(
+    resolveHardwareEncoder("h264", ["h264_qsv", "h264_nvenc"]),
+    "h264_nvenc",
+  );
+  assert.equal(
+    resolveHardwareEncoder("h265", ["h264_amf", "hevc_amf"]),
+    "hevc_amf",
+  );
+  assert.equal(
+    resolveHardwareEncoder("vp9", ["h264_nvenc", "hevc_nvenc"]),
+    null,
+  );
+  assert.equal(resolveHardwareEncoder("h264", []), null);
+});
+
 test("resolveVideoEncodingProfile normalizes incompatible container/codec pairs", () => {
   const vp9Mp4 = resolveVideoEncodingProfile({
     codec: "vp9",
@@ -69,19 +105,34 @@ test("resolveVideoEncodingProfile normalizes incompatible container/codec pairs"
   assert.equal(hevcMp4.crf, "22");
 });
 
-test("buildVideoExtractArgs enforces CFR extraction via fps filter", () => {
-  const args = buildVideoExtractArgs({
+test("buildVideoExtractArgs enforces CFR, multi-threading, hwaccel, and fast JPEG / level-1 PNG options", () => {
+  const jpgArgs = buildVideoExtractArgs({
+    inputVideo: "/videos/clip.mp4",
+    outputPattern: "/tmp/frame_%08d.jpg",
+    fpsRational: "30000/1001",
+    intermediateFormat: "jpg",
+    useHwDecode: true,
+  });
+  assert.ok(jpgArgs.includes("-threads"));
+  assert.ok(jpgArgs.includes("-hwaccel"));
+  assert.ok(jpgArgs.includes("fps=30000/1001"));
+  assert.ok(jpgArgs.includes("-q:v"));
+  assert.equal(jpgArgs.includes("-vsync"), false);
+
+  const pngArgs = buildVideoExtractArgs({
     inputVideo: "/videos/clip.mp4",
     outputPattern: "/tmp/frame_%08d.png",
-    fpsRational: "30000/1001",
+    fpsRational: "24/1",
+    intermediateFormat: "png",
+    useHwDecode: false,
   });
-  assert.ok(args.includes("-vf"));
-  assert.ok(args.includes("fps=30000/1001"));
-  assert.equal(args.includes("-vsync"), false);
+  assert.equal(pngArgs.includes("-hwaccel"), false);
+  assert.ok(pngArgs.includes("-compression_level"));
+  assert.ok(pngArgs.includes("1"));
 });
 
-test("buildVideoEncodeArgs includes even-dimension padding, faststart, pipe input, and avoids -shortest truncation", () => {
-  const args = buildVideoEncodeArgs({
+test("buildVideoEncodeArgs supports mjpeg pipe, GPU hardware encoders, fast CPU presets, even padding, and faststart", () => {
+  const nvencArgs = buildVideoEncodeArgs({
     fpsRational: "60/1",
     inputVideo: "/videos/in.mp4",
     outputFile: "/videos/out.mp4",
@@ -91,16 +142,35 @@ test("buildVideoEncodeArgs includes even-dimension padding, faststart, pipe inpu
     keepAudio: true,
     hasAudio: true,
     usePipe: true,
+    intermediateFormat: "jpg",
+    hardwareEncoder: "h264_nvenc",
   });
 
-  assert.ok(args.includes("image2pipe"));
-  assert.ok(args.includes("pipe:0"));
-  assert.ok(args.includes("pad=ceil(iw/2)*2:ceil(ih/2)*2"));
-  assert.ok(args.includes("+faststart"));
-  assert.ok(args.includes("libx264"));
-  assert.ok(args.includes("16"));
-  assert.ok(args.includes("aac"));
-  assert.equal(args.includes("-shortest"), false);
+  assert.ok(nvencArgs.includes("image2pipe"));
+  assert.ok(nvencArgs.includes("mjpeg"));
+  assert.ok(nvencArgs.includes("pipe:0"));
+  assert.ok(nvencArgs.includes("pad=ceil(iw/2)*2:ceil(ih/2)*2"));
+  assert.ok(nvencArgs.includes("+faststart"));
+  assert.ok(nvencArgs.includes("h264_nvenc"));
+  assert.ok(nvencArgs.includes("p4"));
+  assert.ok(nvencArgs.includes("aac"));
+  assert.equal(nvencArgs.includes("-shortest"), false);
+
+  const cpuFastArgs = buildVideoEncodeArgs({
+    fpsRational: "30/1",
+    inputVideo: "/videos/in.mp4",
+    outputFile: "/videos/out.webm",
+    codec: "vp9",
+    container: "webm",
+    quality: "balanced",
+    usePipe: true,
+    intermediateFormat: "png",
+    hardwareEncoder: null,
+  });
+  assert.ok(cpuFastArgs.includes("png"));
+  assert.ok(cpuFastArgs.includes("libvpx-vp9"));
+  assert.ok(cpuFastArgs.includes("-row-mt"));
+  assert.ok(cpuFastArgs.includes("4"));
 });
 
 test("buildVideoEncodeArgs omits audio mapping and passes -an when muted or source has no audio", () => {
@@ -127,7 +197,45 @@ test("buildVideoEncodeArgs omits audio mapping and passes -an when muted or sour
   });
   assert.ok(hevcArgs.includes("-tag:v"));
   assert.ok(hevcArgs.includes("hvc1"));
+  assert.ok(hevcArgs.includes("-preset"));
+  assert.ok(hevcArgs.includes("fast"));
   assert.ok(hevcArgs.includes("-an"));
+});
+
+test("planDeduplicatedChunk skips byte-identical consecutive frames including across chunk boundaries", () => {
+  const chunk1 = planDeduplicatedChunk(
+    [
+      { name: "f1.jpg", hash: "aaa" },
+      { name: "f2.jpg", hash: "aaa" },
+      { name: "f3.jpg", hash: "bbb" },
+    ],
+    null,
+  );
+  assert.deepEqual(chunk1.uniqueFrames, ["f1.jpg", "f3.jpg"]);
+  assert.equal(chunk1.skippedCount, 1);
+  assert.equal(chunk1.lastHash, "bbb");
+  assert.deepEqual(chunk1.emitOrder, [
+    { name: "f1.jpg", sourceFrame: "f1.jpg", reusePreviousChunk: false },
+    { name: "f2.jpg", sourceFrame: "f1.jpg", reusePreviousChunk: false },
+    { name: "f3.jpg", sourceFrame: "f3.jpg", reusePreviousChunk: false },
+  ]);
+
+  // First two frames of chunk 2 match chunk 1's last frame ("bbb")
+  const chunk2 = planDeduplicatedChunk(
+    [
+      { name: "f4.jpg", hash: "bbb" },
+      { name: "f5.jpg", hash: "bbb" },
+      { name: "f6.jpg", hash: "ccc" },
+    ],
+    chunk1.lastHash,
+  );
+  assert.deepEqual(chunk2.uniqueFrames, ["f6.jpg"]);
+  assert.equal(chunk2.skippedCount, 2);
+  assert.deepEqual(chunk2.emitOrder, [
+    { name: "f4.jpg", sourceFrame: null, reusePreviousChunk: true },
+    { name: "f5.jpg", sourceFrame: null, reusePreviousChunk: true },
+    { name: "f6.jpg", sourceFrame: "f6.jpg", reusePreviousChunk: false },
+  ]);
 });
 
 test("computeChunkRanges splits frame counts evenly with bounded chunk sizes", () => {

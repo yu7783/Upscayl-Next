@@ -30,9 +30,12 @@ import {
   threadsAtom,
   videoCodecAtom,
   videoContainerAtom,
+  videoDeduplicateFramesAtom,
+  videoIntermediateFormatAtom,
   videoKeepAudioAtom,
   videoProgressAtom,
   videoQualityAtom,
+  videoUseHwEncodeAtom,
 } from "../../atoms/user-settings-atom";
 import useLogger from "../hooks/use-logger";
 import {
@@ -125,6 +128,9 @@ const Sidebar = ({
   const videoContainer = useAtomValue(videoContainerAtom);
   const videoQuality = useAtomValue(videoQualityAtom);
   const videoKeepAudio = useAtomValue(videoKeepAudioAtom);
+  const videoIntermediateFormat = useAtomValue(videoIntermediateFormatAtom);
+  const videoUseHwEncode = useAtomValue(videoUseHwEncodeAtom);
+  const videoDeduplicateFrames = useAtomValue(videoDeduplicateFramesAtom);
   const logData = useAtomValue(logAtom);
   const [scale] = useAtom(scaleAtom);
   const setDontShowCloudModal = useSetAtom(dontShowCloudModalAtom);
@@ -355,6 +361,9 @@ const Sidebar = ({
       videoContainer,
       videoQuality,
       keepAudio: videoKeepAudio,
+      intermediateFormat: videoIntermediateFormat,
+      useHardwareEncoding: videoUseHwEncode,
+      deduplicateFrames: videoDeduplicateFrames,
     });
 
     setUserStats((prev) => ({

@@ -47,6 +47,16 @@ export type DoubleUpscaylPayload = {
 export type VideoCodec = "h264" | "h265" | "vp9";
 export type VideoContainerFormat = "mp4" | "mkv" | "webm";
 export type VideoQualityPreset = "high" | "balanced" | "compact";
+export type VideoIntermediateFormat = "jpg" | "png";
+export type HardwareVideoEncoder =
+  | "h264_nvenc"
+  | "hevc_nvenc"
+  | "h264_amf"
+  | "hevc_amf"
+  | "h264_qsv"
+  | "hevc_qsv"
+  | "h264_videotoolbox"
+  | "hevc_videotoolbox";
 
 export type VideoUpscaylPayload = {
   videoPath: string;
@@ -68,6 +78,9 @@ export type VideoUpscaylPayload = {
   videoContainer?: VideoContainerFormat;
   videoQuality?: VideoQualityPreset;
   keepAudio?: boolean;
+  intermediateFormat?: VideoIntermediateFormat;
+  useHardwareEncoding?: boolean;
+  deduplicateFrames?: boolean;
 };
 
 export type FfmpegStatus = {
@@ -77,6 +90,7 @@ export type FfmpegStatus = {
   ffmpegPath: string | null;
   ffprobePath: string | null;
   version: string | null;
+  hwEncoders: HardwareVideoEncoder[];
 };
 
 export type VideoMediaInfo = {
@@ -121,6 +135,8 @@ export type VideoDoneInfo = {
   scaleLabel: string;
   codec: VideoCodec;
   container: VideoContainerFormat;
+  usedEncoder: string;
+  skippedDuplicateFrames: number;
 };
 
 export type MultiModelUpscaylPayload = {

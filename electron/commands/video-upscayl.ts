@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import crypto from "crypto";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -20,6 +21,7 @@ import { modelsPath } from "../utils/get-resource-paths";
 import { ELECTRON_COMMANDS } from "../../common/electron-commands";
 import {
   VideoDoneInfo,
+  VideoIntermediateFormat,
   VideoProgressInfo,
   VideoProgressStage,
   VideoUpscaylPayload,
@@ -27,7 +29,6 @@ import {
 import showNotification from "../utils/show-notification";
 import { MODELS } from "../../common/models-list";
 import decodePath from "../../common/decode-path";
-import getThreadCount from "../../common/thread-count";
 import countOccurrences from "../../common/count-occurrences";
 import {
   getFallbackTileSize,
@@ -35,18 +36,24 @@ import {
   VULKAN_MEMORY_ERROR_MESSAGE,
 } from "../../common/vulkan-memory";
 import {
-  DEFAULT_VIDEO_CHUNK_SIZE,
+  ChunkDeduplicationPlan,
+  FrameFingerprint,
   buildVideoEncodeArgs,
   buildVideoExtractArgs,
   buildVideoOutputFilename,
   calculateVideoOverallProgress,
   computeChunkRanges,
+  computeOptimalChunkSize,
+  getVideoThreadCount,
+  planDeduplicatedChunk,
+  resolveHardwareEncoder,
   resolveVideoEncodingProfile,
 } from "../../common/video-upscayl-helpers";
 import { checkFfmpegStatus, probeVideoMediaInfo } from "./video-info";
 
 const MAX_MEMORY_RETRIES = 6;
 const STDERR_TAIL_LIMIT = 800;
+const HASH_CONCURRENCY = 16;
 
 const timeToSeconds = (timeText: string): number => {
   const [hours, minutes, seconds] = timeText.split(":").map(Number);
@@ -100,6 +107,24 @@ const writeBufferToStream = (
       stream.once("drain", onDrain);
     }
   });
+
+const hashFrameBatch = async (
+  dir: string,
+  frameNames: readonly string[],
+): Promise<FrameFingerprint[]> => {
+  const results: FrameFingerprint[] = new Array(frameNames.length);
+  for (let i = 0; i < frameNames.length; i += HASH_CONCURRENCY) {
+    const slice = frameNames.slice(i, i + HASH_CONCURRENCY);
+    await Promise.all(
+      slice.map(async (name, offset) => {
+        const data = await fs.promises.readFile(path.join(dir, name));
+        const hash = crypto.createHash("sha1").update(data).digest("hex");
+        results[i + offset] = { name, hash };
+      }),
+    );
+  }
+  return results;
+};
 
 const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
   const mainWindow = getMainWindow();
@@ -174,17 +199,26 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
   const scale = payload.scale;
   const useCustomWidth = payload.useCustomWidth;
   const customWidth = useCustomWidth ? payload.customWidth : "";
-  const compression = payload.compression;
   const initialTileSize = payload.tileSize;
   const ttaMode = payload.ttaMode;
   const gpuId = payload.gpuId;
   const keepAudio = payload.keepAudio !== false;
+  const intermediateFormat: VideoIntermediateFormat =
+    payload.intermediateFormat === "png" ? "png" : "jpg";
+  const frameExt = intermediateFormat === "png" ? ".png" : ".jpg";
+  const useHardwareEncoding = payload.useHardwareEncoding !== false;
+  const deduplicateFrames = payload.deduplicateFrames !== false;
 
   const encodingProfile = resolveVideoEncodingProfile({
     codec: payload.videoCodec ?? "h264",
     container: payload.videoContainer ?? "mp4",
     quality: payload.videoQuality ?? "balanced",
   });
+
+  const selectedHwEncoder = useHardwareEncoding
+    ? resolveHardwareEncoder(encodingProfile.codec, ffmpegStatus.hwEncoders)
+    : null;
+  const usedEncoderLabel = selectedHwEncoder ?? encodingProfile.videoEncoder;
 
   const isDefaultModel = model in MODELS;
   const modelsDir = isDefaultModel
@@ -243,13 +277,11 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
     const overallFraction = calculateVideoOverallProgress(stage, stageFraction);
     const percent = Math.round(overallFraction * 100);
     const stageIndex =
-      stage === "preparing"
+      stage === "preparing" || stage === "extracting"
         ? 1
-        : stage === "extracting"
-          ? 1
-          : stage === "upscaling"
-            ? 2
-            : 3;
+        : stage === "upscaling"
+          ? 2
+          : 3;
 
     const info: VideoProgressInfo = {
       stage,
@@ -278,11 +310,15 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
 
   let activeTileSize = initialTileSize;
   let memoryRetries = 0;
+  let vramConstrained = false;
+  const cpuCount = os.cpus().length;
 
-  const extractFrames = (): Promise<string[]> =>
+  const runExtractPass = (useHwDecode: boolean): Promise<string[]> =>
     new Promise((resolve, reject) => {
       logit(
-        `🎞 Extracting video frames at CFR ${mediaInfo.fpsRational} (${mediaInfo.fps.toFixed(2)} fps)...`,
+        `🎞 Extracting video frames (${intermediateFormat.toUpperCase()}, ${
+          useHwDecode ? "hwaccel auto" : "software decode"
+        }) at CFR ${mediaInfo.fpsRational} (${mediaInfo.fps.toFixed(2)} fps)...`,
       );
       emitProgress("extracting", 0, {
         message: "Extracting frames... 0%",
@@ -290,8 +326,10 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
 
       const extractArgs = buildVideoExtractArgs({
         inputVideo,
-        outputPattern: path.join(inputFramesDir, "frame_%08d.png"),
+        outputPattern: path.join(inputFramesDir, `frame_%08d${frameExt}`),
         fpsRational: mediaInfo.fpsRational,
+        intermediateFormat,
+        useHwDecode,
       });
 
       const child = spawn(ffmpegBin, extractArgs, { windowsHide: true });
@@ -341,7 +379,7 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
 
         const frames = fs
           .readdirSync(inputFramesDir)
-          .filter((file) => file.toLowerCase().endsWith(".png"))
+          .filter((file) => file.toLowerCase().endsWith(frameExt))
           .sort();
 
         if (frames.length === 0) {
@@ -361,31 +399,54 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       });
     });
 
+  const extractFrames = async (): Promise<string[]> => {
+    try {
+      return await runExtractPass(true);
+    } catch (err: any) {
+      if (stopped || err?.message === "__STOPPED__") throw err;
+      logit(
+        "⚠️ Hardware-accelerated frame decode failed; falling back to software decode: ",
+        err?.message ?? err,
+      );
+      fs.rmSync(inputFramesDir, { recursive: true, force: true });
+      fs.mkdirSync(inputFramesDir, { recursive: true });
+      return await runExtractPass(false);
+    }
+  };
+
   const upscaleChunkDirectory = (
     chunkInputDir: string,
     chunkOutputDir: string,
-    chunkFrameCount: number,
+    uniqueFrameCount: number,
+    chunkTotalFrames: number,
     baseCompletedFrames: number,
     totalFrames: number,
     chunkIndex: number,
     totalChunks: number,
-    threads: string,
   ): Promise<void> =>
     new Promise((resolve, reject) => {
+      if (uniqueFrameCount === 0) {
+        resolve();
+        return;
+      }
+
       const attempt = (currentTileSize: number, isRetry: boolean) => {
         if (stopped) {
           reject(new Error("__STOPPED__"));
           return;
         }
 
-        // Clean any partial output from a failed retry attempt
         if (isRetry) {
           fs.rmSync(chunkOutputDir, { recursive: true, force: true });
           fs.mkdirSync(chunkOutputDir, { recursive: true });
         }
 
+        const threads =
+          payload.threads?.trim() ||
+          getVideoThreadCount({ cpuCount, vramConstrained });
+
         logit(
-          `🚀 Upscaling chunk ${chunkIndex}/${totalChunks} (${chunkFrameCount} frames)` +
+          `🚀 Upscaling chunk ${chunkIndex}/${totalChunks} (${uniqueFrameCount} unique / ${chunkTotalFrames} frames, -j ${threads}, ${intermediateFormat.toUpperCase()})` +
             (isRetry ? ` [retry tile ${currentTileSize}px]` : ""),
         );
 
@@ -396,10 +457,11 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
             modelsPath: modelsDir,
             model,
             gpuId,
-            saveImageAs: "png",
+            saveImageAs: intermediateFormat,
             scale,
             customWidth,
-            compression,
+            // Compression 0 = quality 100 (JPG) or fastest compression (PNG)
+            compression: "0",
             tileSize: currentTileSize,
             ttaMode,
             threads,
@@ -410,7 +472,7 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
         const tracked: TrackedChildProcess = upscayl;
         childProcesses.push(tracked);
 
-        let chunkCompleted = 0;
+        let uniqueDone = 0;
         let retrying = false;
         let settled = false;
         let stderrTail = "";
@@ -425,6 +487,7 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
 
           memoryRetries += 1;
           activeTileSize = fallbackTileSize;
+          vramConstrained = true;
           retrying = true;
           removeChildProcess(tracked);
           upscayl.kill();
@@ -452,12 +515,12 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
 
           const successCount = countOccurrences(text, "Successful");
           if (successCount > 0) {
-            chunkCompleted = Math.min(
-              chunkCompleted + successCount,
-              chunkFrameCount,
+            uniqueDone = Math.min(uniqueDone + successCount, uniqueFrameCount);
+            const proportionalChunkFrames = Math.round(
+              (uniqueDone / uniqueFrameCount) * chunkTotalFrames,
             );
             const totalDone = Math.min(
-              baseCompletedFrames + chunkCompleted,
+              baseCompletedFrames + proportionalChunkFrames,
               totalFrames,
             );
             emitProgress("upscaling", totalDone / totalFrames, {
@@ -534,16 +597,10 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
     }
 
     const totalFrames = frames.length;
-    const chunks = computeChunkRanges(totalFrames, DEFAULT_VIDEO_CHUNK_SIZE);
-    const threads =
-      payload.threads?.trim() ||
-      getThreadCount({
-        totalImages: Math.min(totalFrames, DEFAULT_VIDEO_CHUNK_SIZE),
-        cpuCount: os.cpus().length,
-      });
+    const chunkSize = computeOptimalChunkSize(totalFrames, intermediateFormat);
+    const chunks = computeChunkRanges(totalFrames, chunkSize);
 
-    // Start single streaming FFmpeg encoder for Stage 2 + 3 so peak disk usage
-    // stays bounded to a single chunk of upscaled frames.
+    // Start single streaming FFmpeg encoder (GPU HW accelerated when available)
     const encodeArgs = buildVideoEncodeArgs({
       fpsRational: mediaInfo.fpsRational,
       inputVideo,
@@ -554,9 +611,14 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       keepAudio,
       hasAudio: mediaInfo.hasAudio,
       usePipe: true,
+      intermediateFormat,
+      hardwareEncoder: selectedHwEncoder,
     });
 
-    logit("🎬 Starting streaming FFmpeg encoder: ", JSON.stringify(encodeArgs));
+    logit(
+      `🎬 Starting streaming FFmpeg encoder (${usedEncoderLabel}, pipe=${intermediateFormat}): `,
+      JSON.stringify(encodeArgs),
+    );
     const spawnedEncoder = spawn(ffmpegBin, encodeArgs, { windowsHide: true });
     encoderProcess = spawnedEncoder;
     const trackedEncoder: TrackedChildProcess = {
@@ -570,20 +632,20 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
     let encoderFailed: Error | null = null;
 
     const encoderClosePromise = new Promise<void>((resolve, reject) => {
-      encoderProcess!.stderr.on("data", (chunk) => {
+      spawnedEncoder.stderr.on("data", (chunk) => {
         const text = chunk.toString();
         encoderStderrTail = (encoderStderrTail + text).slice(-STDERR_TAIL_LIMIT);
       });
 
-      encoderProcess!.on("error", (err) => {
-        encoderFailed = new Error(`Failed to run FFmpeg encoder: ${err.message}`);
+      spawnedEncoder.on("error", (err) => {
+        encoderFailed = new Error(
+          `Failed to run FFmpeg encoder: ${err.message}`,
+        );
         reject(encoderFailed);
       });
 
-      encoderProcess!.on("close", (code) => {
-        if (encoderTracked) {
-          removeChildProcess(encoderTracked);
-        }
+      spawnedEncoder.on("close", (code) => {
+        removeChildProcess(trackedEncoder);
         if (stopped) {
           resolve();
           return;
@@ -600,8 +662,6 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       });
     });
 
-    // Attach catch handler early so an unexpected early encoder exit does not
-    // cause an unhandled rejection while chunk upscaling is awaiting.
     encoderClosePromise.catch(() => {});
 
     emitProgress("upscaling", 0, {
@@ -612,12 +672,90 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       totalChunks: chunks.length,
     });
 
-    // Stage 2: Upscale chunk-by-chunk and stream upscaled PNGs into FFmpeg
+    // Stage 2: Double-buffered chunked upscaling + async FFmpeg piping.
+    // While chunk N is piped asynchronously to FFmpeg in the background,
+    // chunk N+1 immediately begins GPU upscaling, keeping GPU utilization high.
     let processedFrames = 0;
+    let totalSkippedDuplicates = 0;
+    let previousChunkLastHash: string | null = null;
+    let lastPipedUpscaledBuffer: Buffer | null = null;
+    let pendingPipePromise: Promise<void> = Promise.resolve();
+    let pipeError: Error | null = null;
+
+    const pipeChunkToEncoder = async (
+      chunkOutDir: string,
+      plan: ChunkDeduplicationPlan,
+      chunkTotalFrames: number,
+      chunkIndex: number,
+      totalChunks: number,
+      afterChunkCompletedFrames: number,
+    ) => {
+      try {
+        const uniqueCache = new Map<string, Buffer>();
+
+        for (const entry of plan.emitOrder) {
+          if (stopped) break;
+          if (encoderFailed) throw encoderFailed;
+
+          let bufferToWrite: Buffer;
+
+          if (entry.reusePreviousChunk) {
+            if (!lastPipedUpscaledBuffer) {
+              throw new Error(
+                `Missing previous upscaled frame while reusing duplicate ${entry.name}`,
+              );
+            }
+            bufferToWrite = lastPipedUpscaledBuffer;
+          } else {
+            const sourceName = entry.sourceFrame!;
+            let cached = uniqueCache.get(sourceName);
+            if (!cached) {
+              const upscaledFramePath = path.join(chunkOutDir, sourceName);
+              if (!fs.existsSync(upscaledFramePath)) {
+                throw new Error(
+                  `Expected upscaled frame was not produced: ${sourceName}`,
+                );
+              }
+              cached = await fs.promises.readFile(upscaledFramePath);
+              uniqueCache.set(sourceName, cached);
+              // Delete frame on disk immediately once loaded into buffer
+              await fs.promises.unlink(upscaledFramePath).catch(() => {});
+            }
+            bufferToWrite = cached;
+            lastPipedUpscaledBuffer = cached;
+          }
+
+          await writeBufferToStream(spawnedEncoder.stdin, bufferToWrite);
+        }
+
+        // Release per-chunk memory buffers and remove chunk output directory
+        uniqueCache.clear();
+        await fs.promises
+          .rm(chunkOutDir, { recursive: true, force: true })
+          .catch(() => {});
+
+        if (!stopped) {
+          emitProgress("upscaling", afterChunkCompletedFrames / totalFrames, {
+            message: `Upscaling frames... ${afterChunkCompletedFrames}/${totalFrames}`,
+            completedFrames: afterChunkCompletedFrames,
+            totalFrames,
+            chunk: chunkIndex,
+            totalChunks,
+          });
+        }
+      } catch (err: any) {
+        await fs.promises
+          .rm(chunkOutDir, { recursive: true, force: true })
+          .catch(() => {});
+        pipeError = err instanceof Error ? err : new Error(String(err));
+        throw pipeError;
+      }
+    };
 
     for (const range of chunks) {
       if (stopped) break;
       if (encoderFailed) throw encoderFailed;
+      if (pipeError) throw pipeError;
 
       const chunkFrames = frames.slice(range.start, range.end);
       const chunkInDir = path.join(tempRoot, `chunk_in_${range.chunkIndex}`);
@@ -625,66 +763,88 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       fs.mkdirSync(chunkInDir, { recursive: true });
       fs.mkdirSync(chunkOutDir, { recursive: true });
 
+      let plan: ChunkDeduplicationPlan;
+      if (deduplicateFrames) {
+        const fingerprints = await hashFrameBatch(inputFramesDir, chunkFrames);
+        plan = planDeduplicatedChunk(fingerprints, previousChunkLastHash);
+        previousChunkLastHash = plan.lastHash;
+        totalSkippedDuplicates += plan.skippedCount;
+      } else {
+        plan = {
+          uniqueFrames: [...chunkFrames],
+          emitOrder: chunkFrames.map((name) => ({
+            name,
+            sourceFrame: name,
+            reusePreviousChunk: false,
+          })),
+          skippedCount: 0,
+          lastHash: null,
+        };
+      }
+
+      const uniqueSet = new Set(plan.uniqueFrames);
       for (const frameName of chunkFrames) {
-        fs.renameSync(
-          path.join(inputFramesDir, frameName),
-          path.join(chunkInDir, frameName),
-        );
+        const src = path.join(inputFramesDir, frameName);
+        if (uniqueSet.has(frameName)) {
+          fs.renameSync(src, path.join(chunkInDir, frameName));
+        } else {
+          // Duplicate frame doesn't need GPU upscaling; delete its input file
+          fs.unlinkSync(src);
+        }
       }
 
       await upscaleChunkDirectory(
         chunkInDir,
         chunkOutDir,
+        plan.uniqueFrames.length,
         chunkFrames.length,
         processedFrames,
         totalFrames,
         range.chunkIndex,
         range.totalChunks,
-        threads,
       );
 
-      // Immediately discard input frames for this chunk to minimize disk usage
-      fs.rmSync(chunkInDir, { recursive: true, force: true });
+      // Discard input frames for this chunk immediately
+      await fs.promises
+        .rm(chunkInDir, { recursive: true, force: true })
+        .catch(() => {});
 
       if (stopped) {
-        fs.rmSync(chunkOutDir, { recursive: true, force: true });
+        await fs.promises
+          .rm(chunkOutDir, { recursive: true, force: true })
+          .catch(() => {});
         break;
       }
 
-      // Stream upscaled PNGs into FFmpeg in strict frame order and delete each
-      // frame immediately after piping it.
-      for (const frameName of chunkFrames) {
-        if (stopped) break;
-        if (encoderFailed) throw encoderFailed;
-
-        const upscaledFramePath = path.join(chunkOutDir, frameName);
-        if (!fs.existsSync(upscaledFramePath)) {
-          throw new Error(
-            `Expected upscaled frame was not produced: ${frameName}`,
-          );
-        }
-
-        const frameBuffer = fs.readFileSync(upscaledFramePath);
-        await writeBufferToStream(encoderProcess.stdin, frameBuffer);
-        fs.unlinkSync(upscaledFramePath);
-      }
-
-      fs.rmSync(chunkOutDir, { recursive: true, force: true });
       processedFrames += chunkFrames.length;
+      const completedAfterChunk = processedFrames;
 
-      emitProgress("upscaling", processedFrames / totalFrames, {
-        message: `Upscaling frames... ${processedFrames}/${totalFrames}`,
-        completedFrames: processedFrames,
-        totalFrames,
-        chunk: range.chunkIndex,
-        totalChunks: range.totalChunks,
-      });
+      // Wait ONLY for the previous chunk's pipe to finish before starting this
+      // chunk's pipe, guaranteeing strict sequential frame order while
+      // overlapping GPU inference of chunk N+1 with piping of chunk N.
+      await pendingPipePromise;
+      if (pipeError) throw pipeError;
+      if (encoderFailed) throw encoderFailed;
+
+      pendingPipePromise = pipeChunkToEncoder(
+        chunkOutDir,
+        plan,
+        chunkFrames.length,
+        range.chunkIndex,
+        range.totalChunks,
+        completedAfterChunk,
+      );
+      pendingPipePromise.catch(() => {});
     }
+
+    // Wait for the final chunk to finish piping into FFmpeg
+    await pendingPipePromise;
+    if (pipeError) throw pipeError;
 
     if (stopped) {
       try {
-        encoderProcess.stdin.destroy();
-        encoderProcess.kill();
+        spawnedEncoder.stdin.destroy();
+        spawnedEncoder.kill();
       } catch {}
       cleanup(true);
       mainWindow.setProgressBar(-1);
@@ -700,7 +860,7 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       totalChunks: chunks.length,
     });
 
-    encoderProcess.stdin.end();
+    spawnedEncoder.stdin.end();
     await encoderClosePromise;
 
     if (stopped) {
@@ -743,6 +903,8 @@ const videoUpscayl = async (_event, payload: VideoUpscaylPayload) => {
       scaleLabel,
       codec: encodingProfile.codec,
       container: encodingProfile.container,
+      usedEncoder: usedEncoderLabel,
+      skippedDuplicateFrames: totalSkippedDuplicates,
     };
 
     mainWindow.webContents.send(ELECTRON_COMMANDS.UPSCAYL_VIDEO_DONE, doneInfo);

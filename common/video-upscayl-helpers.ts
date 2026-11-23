@@ -1,11 +1,14 @@
 import {
+  HardwareVideoEncoder,
   VideoCodec,
   VideoContainerFormat,
+  VideoIntermediateFormat,
   VideoProgressStage,
   VideoQualityPreset,
 } from "./types/types";
 
 export const DEFAULT_VIDEO_CHUNK_SIZE = 60;
+export const FAST_JPG_CHUNK_SIZE = 150;
 const MAX_SENSIBLE_FPS = 240;
 const MIN_SENSIBLE_FPS = 1;
 
@@ -102,6 +105,69 @@ export function parseFrameRate({
 }
 
 /**
+ * Pick a GPU-friendly "load:proc:save" thread split specifically for video frame
+ * batches.
+ *
+ * Keeping `proc` at 2 (or 1 after a VRAM fallback) saturates a single Vulkan
+ * GPU without multiplying per-thread tile VRAM buffers, while scaling `load`
+ * and `save` CPU threads prevents disk/codec I/O from starving the GPU.
+ */
+export function getVideoThreadCount({
+  cpuCount,
+  vramConstrained = false,
+}: {
+  cpuCount: number;
+  vramConstrained?: boolean;
+}): string {
+  const cores = Math.max(1, Math.floor(cpuCount) || 1);
+  const load = Math.max(1, Math.min(4, Math.floor(cores / 2) || 1));
+  const proc = vramConstrained ? 1 : Math.min(2, cores);
+  const save = Math.max(2, Math.min(6, Math.ceil(cores / 2)));
+  return `${load}:${proc}:${save}`;
+}
+
+/**
+ * Choose chunk size based on intermediate frame format.
+ *
+ * Near-lossless JPEG frames are ~8-10x smaller than PNG, so larger chunks
+ * reduce Vulkan/model startup reloads without risking temp-drive exhaustion.
+ */
+export function computeOptimalChunkSize(
+  totalFrames: number,
+  intermediateFormat: VideoIntermediateFormat = "jpg",
+): number {
+  const base =
+    intermediateFormat === "jpg"
+      ? FAST_JPG_CHUNK_SIZE
+      : DEFAULT_VIDEO_CHUNK_SIZE;
+  if (totalFrames <= 0) return base;
+  return Math.min(totalFrames, base);
+}
+
+const HW_ENCODER_PRIORITY: Record<VideoCodec, HardwareVideoEncoder[]> = {
+  h264: ["h264_nvenc", "h264_amf", "h264_qsv", "h264_videotoolbox"],
+  h265: ["hevc_nvenc", "hevc_amf", "hevc_qsv", "hevc_videotoolbox"],
+  vp9: [],
+};
+
+/**
+ * Pick the fastest working hardware encoder for the requested codec, or null
+ * to use optimized CPU software encoding.
+ */
+export function resolveHardwareEncoder(
+  codec: VideoCodec,
+  availableHwEncoders: readonly HardwareVideoEncoder[],
+): HardwareVideoEncoder | null {
+  const candidates = HW_ENCODER_PRIORITY[codec] ?? [];
+  for (const candidate of candidates) {
+    if (availableHwEncoders.includes(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+/**
  * Normalize container/codec pairings so FFmpeg never receives an incompatible
  * combination (e.g. VP9 inside MP4 or H.265 inside WebM).
  */
@@ -183,36 +249,137 @@ export function resolveVideoEncodingProfile({
 }
 
 /**
- * Build FFmpeg arguments to extract CFR PNG frames matching the target
- * rational framerate so VFR inputs remain synchronized with their audio track.
+ * Build FFmpeg arguments to extract CFR frames matching the target rational
+ * framerate so VFR inputs remain synchronized with their audio track.
+ *
+ * Uses multi-threaded decoding (`-threads 0`), optional hardware decoding
+ * (`-hwaccel auto`), and fast intermediate compression (`-q:v 1` for JPEG or
+ * `-compression_level 1` for PNG).
  */
 export function buildVideoExtractArgs({
   inputVideo,
   outputPattern,
   fpsRational,
+  intermediateFormat = "jpg",
+  useHwDecode = true,
 }: {
   inputVideo: string;
   outputPattern: string;
   fpsRational: string;
+  intermediateFormat?: VideoIntermediateFormat;
+  useHwDecode?: boolean;
 }): string[] {
-  return [
-    "-y",
-    "-i",
-    inputVideo,
-    "-vf",
-    `fps=${fpsRational}`,
-    "-start_number",
-    "1",
-    outputPattern,
-  ];
+  const args: string[] = ["-y", "-threads", "0"];
+
+  if (useHwDecode) {
+    args.push("-hwaccel", "auto");
+  }
+
+  args.push("-i", inputVideo, "-vf", `fps=${fpsRational}`, "-start_number", "1");
+
+  if (intermediateFormat === "jpg") {
+    // Near-lossless JPEG: ~5-10x faster than PNG with ~8x smaller temp files
+    args.push("-q:v", "1", "-qmin", "1");
+  } else {
+    // Fast zlib level 1 for lossless PNG (~3-4x faster than default level 6)
+    args.push("-compression_level", "1");
+  }
+
+  args.push(outputPattern);
+  return args;
 }
 
+const getHardwareEncoderArgs = (
+  hwEncoder: HardwareVideoEncoder,
+  quality: VideoQualityPreset,
+): string[] => {
+  if (hwEncoder === "h264_nvenc" || hwEncoder === "hevc_nvenc") {
+    const cqMap: Record<VideoQualityPreset, string> =
+      hwEncoder === "hevc_nvenc"
+        ? { high: "18", balanced: "22", compact: "27" }
+        : { high: "16", balanced: "19", compact: "24" };
+    const args = [
+      "-c:v",
+      hwEncoder,
+      "-preset",
+      "p4",
+      "-rc",
+      "vbr",
+      "-cq",
+      cqMap[quality] ?? "19",
+      "-b:v",
+      "0",
+    ];
+    if (hwEncoder === "hevc_nvenc") {
+      args.push("-tag:v", "hvc1");
+    }
+    return args;
+  }
+
+  if (hwEncoder === "h264_amf" || hwEncoder === "hevc_amf") {
+    const qpMap: Record<VideoQualityPreset, string> =
+      hwEncoder === "hevc_amf"
+        ? { high: "18", balanced: "22", compact: "27" }
+        : { high: "16", balanced: "19", compact: "24" };
+    const qp = qpMap[quality] ?? "19";
+    const args = [
+      "-c:v",
+      hwEncoder,
+      "-quality",
+      "balanced",
+      "-rc",
+      "cqp",
+      "-qp_i",
+      qp,
+      "-qp_p",
+      qp,
+    ];
+    if (hwEncoder === "hevc_amf") {
+      args.push("-tag:v", "hvc1");
+    }
+    return args;
+  }
+
+  if (hwEncoder === "h264_qsv" || hwEncoder === "hevc_qsv") {
+    const qMap: Record<VideoQualityPreset, string> =
+      hwEncoder === "hevc_qsv"
+        ? { high: "19", balanced: "23", compact: "28" }
+        : { high: "17", balanced: "20", compact: "25" };
+    const args = [
+      "-c:v",
+      hwEncoder,
+      "-preset",
+      "faster",
+      "-global_quality",
+      qMap[quality] ?? "20",
+    ];
+    if (hwEncoder === "hevc_qsv") {
+      args.push("-tag:v", "hvc1");
+    }
+    return args;
+  }
+
+  // macOS VideoToolbox
+  const qMap: Record<VideoQualityPreset, string> = {
+    high: "75",
+    balanced: "65",
+    compact: "50",
+  };
+  const args = ["-c:v", hwEncoder, "-q:v", qMap[quality] ?? "65"];
+  if (hwEncoder === "hevc_videotoolbox") {
+    args.push("-tag:v", "hvc1");
+  }
+  return args;
+};
+
 /**
- * Build FFmpeg arguments to encode upscaled PNG frames (either from stdin
+ * Build FFmpeg arguments to encode upscaled frames (either from stdin
  * `image2pipe` or from a filename pattern) into the final video file.
  *
- * Pads odd dimensions to even values (`pad=ceil(iw/2)*2:ceil(ih/2)*2`) so
- * `yuv420p` encoders never fail on odd-sized frames or custom widths.
+ * - Supports GPU hardware encoding (NVENC / AMF / QSV / VideoToolbox) when
+ *   available, falling back to fast multi-threaded software presets.
+ * - Pads odd dimensions (`pad=ceil(iw/2)*2:ceil(ih/2)*2`) so `yuv420p`
+ *   encoders never fail on odd-sized frames or custom widths.
  */
 export function buildVideoEncodeArgs({
   fpsRational,
@@ -225,6 +392,8 @@ export function buildVideoEncodeArgs({
   hasAudio = true,
   usePipe = true,
   framesPattern,
+  intermediateFormat = "jpg",
+  hardwareEncoder = null,
 }: {
   fpsRational: string;
   inputVideo: string;
@@ -236,23 +405,32 @@ export function buildVideoEncodeArgs({
   hasAudio?: boolean;
   usePipe?: boolean;
   framesPattern?: string;
+  intermediateFormat?: VideoIntermediateFormat;
+  hardwareEncoder?: HardwareVideoEncoder | null;
 }): string[] {
   const profile = resolveVideoEncodingProfile({ codec, container, quality });
-  const args: string[] = ["-y"];
+  const pipeCodec = intermediateFormat === "jpg" ? "mjpeg" : "png";
+  const args: string[] = ["-y", "-threads", "0"];
 
   if (usePipe) {
     args.push(
       "-f",
       "image2pipe",
       "-vcodec",
-      "png",
+      pipeCodec,
       "-framerate",
       fpsRational,
       "-i",
       "pipe:0",
     );
   } else {
-    args.push("-framerate", fpsRational, "-i", framesPattern ?? "frame_%08d.png");
+    args.push(
+      "-framerate",
+      fpsRational,
+      "-i",
+      framesPattern ??
+        (intermediateFormat === "jpg" ? "frame_%08d.jpg" : "frame_%08d.png"),
+    );
   }
 
   const shouldIncludeAudio = keepAudio && hasAudio;
@@ -262,17 +440,34 @@ export function buildVideoEncodeArgs({
     args.push("-map", "0:v:0", "-an");
   }
 
-  args.push(
-    "-vf",
-    "pad=ceil(iw/2)*2:ceil(ih/2)*2",
-    "-c:v",
-    profile.videoEncoder,
-  );
+  args.push("-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2");
 
-  if (profile.codec === "vp9") {
-    args.push("-b:v", "0", "-crf", profile.crf, "-deadline", "good", "-cpu-used", "2");
+  if (hardwareEncoder && profile.codec !== "vp9") {
+    args.push(...getHardwareEncoderArgs(hardwareEncoder, profile.quality));
+  } else if (profile.codec === "vp9") {
+    args.push(
+      "-c:v",
+      profile.videoEncoder,
+      "-b:v",
+      "0",
+      "-crf",
+      profile.crf,
+      "-deadline",
+      "good",
+      "-cpu-used",
+      "4",
+      "-row-mt",
+      "1",
+    );
   } else {
-    args.push("-preset", "medium", "-crf", profile.crf);
+    args.push(
+      "-c:v",
+      profile.videoEncoder,
+      "-preset",
+      "fast",
+      "-crf",
+      profile.crf,
+    );
     if (profile.codec === "h265") {
       args.push("-tag:v", "hvc1");
     }
@@ -290,6 +485,70 @@ export function buildVideoEncodeArgs({
 
   args.push(outputFile);
   return args;
+}
+
+export type FrameFingerprint = {
+  name: string;
+  hash: string;
+};
+
+export type ChunkDeduplicationPlan = {
+  /** Frame names that must actually be sent to the GPU upscaler. */
+  uniqueFrames: string[];
+  /**
+   * Ordered emission entries for piping to FFmpeg. Each entry either points to
+   * a unique frame upscaled in this chunk (`sourceFrame`) or reuses the last
+   * upscaled frame carried over from the previous chunk (`reusePreviousChunk`).
+   */
+  emitOrder: Array<{
+    name: string;
+    sourceFrame: string | null;
+    reusePreviousChunk: boolean;
+  }>;
+  skippedCount: number;
+  lastHash: string | null;
+};
+
+/**
+ * Identify byte-identical consecutive frames within a chunk (including across
+ * chunk boundaries) so the GPU upscaler only processes unique frames.
+ */
+export function planDeduplicatedChunk(
+  frames: readonly FrameFingerprint[],
+  previousChunkLastHash: string | null = null,
+): ChunkDeduplicationPlan {
+  const uniqueFrames: string[] = [];
+  const emitOrder: ChunkDeduplicationPlan["emitOrder"] = [];
+  let skippedCount = 0;
+  let lastHash: string | null = previousChunkLastHash;
+  let lastUniqueInChunk: string | null = null;
+
+  for (const frame of frames) {
+    if (lastHash !== null && frame.hash === lastHash) {
+      skippedCount += 1;
+      emitOrder.push({
+        name: frame.name,
+        sourceFrame: lastUniqueInChunk,
+        reusePreviousChunk: lastUniqueInChunk === null,
+      });
+    } else {
+      uniqueFrames.push(frame.name);
+      lastUniqueInChunk = frame.name;
+      lastHash = frame.hash;
+      emitOrder.push({
+        name: frame.name,
+        sourceFrame: frame.name,
+        reusePreviousChunk: false,
+      });
+    }
+  }
+
+  return {
+    uniqueFrames,
+    emitOrder,
+    skippedCount,
+    lastHash,
+  };
 }
 
 export type ChunkRange = {

@@ -396,7 +396,16 @@
     "SYNC_RESTART": "先頭から再生",
     "SHOW_IN_FOLDER": "フォルダで表示",
     "RESET_VIDEO": "別の動画を選ぶ",
-    "STOPPED_NOTICE": "動画のアップスケールを停止しました。"
+    "STOPPED_NOTICE": "動画のアップスケールを停止しました。",
+    "INTERMEDIATE_LABEL": "中間フレーム形式",
+    "INTERMEDIATE_JPG": "高速（高画質JPEG・推奨）",
+    "INTERMEDIATE_PNG": "ロスレス（PNG・低速）",
+    "HW_ENCODE_LABEL": "GPUハードウェアエンコード",
+    "HW_ENCODE_DETECTED": "GPUエンコード: {encoder}",
+    "HW_ENCODE_CPU_ONLY": "CPU高速プリセット",
+    "DEDUP_LABEL": "同一フレームをスキップ",
+    "TTA_WARNING": "設定でTTAモードが有効です。動画アップスケールが約8倍遅くなります。",
+    "SKIPPED_FRAMES": "重複 {count} フレームをスキップ"
   },
   "MULTI_MODEL": {
     "TOGGLE_TITLE": "複数モデル比較",
