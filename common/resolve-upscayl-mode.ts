@@ -1,4 +1,9 @@
-export type UpscaylMode = "batch" | "double" | "single" | "invalid";
+export type UpscaylMode =
+  | "batch"
+  | "multi-model"
+  | "double"
+  | "single"
+  | "invalid";
 
 /**
  * Decide which upscaling pipeline should run.
@@ -12,11 +17,15 @@ export function resolveUpscaylMode({
   doubleUpscayl,
   imagePath,
   batchFolderPath,
+  multiModelMode = false,
+  multiModelCount = 0,
 }: {
   batchMode: boolean;
   doubleUpscayl: boolean;
   imagePath: string;
   batchFolderPath: string;
+  multiModelMode?: boolean;
+  multiModelCount?: number;
 }): UpscaylMode {
   if (batchMode) {
     return batchFolderPath.length > 0 ? "batch" : "invalid";
@@ -24,6 +33,10 @@ export function resolveUpscaylMode({
 
   if (imagePath.length === 0) {
     return "invalid";
+  }
+
+  if (multiModelMode) {
+    return multiModelCount >= 2 ? "multi-model" : "invalid";
   }
 
   return doubleUpscayl ? "double" : "single";

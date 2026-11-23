@@ -4,19 +4,28 @@ import { useState, useMemo, useEffect } from "react";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import { useAtom, useAtomValue } from "jotai";
 import {
+  activeTabAtom,
   batchModeAtom,
-  lensSizeAtom,
   savedOutputPathAtom,
   progressAtom,
   viewTypeAtom,
   rememberOutputFolderAtom,
   upscaylPassAtom,
   batchProgressAtom,
+  multiModelProgressAtom,
+  videoProgressAtom,
 } from "../../atoms/user-settings-atom";
 import { useToast } from "@/components/ui/use-toast";
 import { sanitizePath } from "@common/sanitize-path";
 import getDirectoryFromPath from "@common/get-directory-from-path";
 import { FEATURE_FLAGS } from "@common/feature-flags";
+import { isVideoPath } from "@common/video-formats";
+import {
+  FfmpegStatus,
+  MultiModelResult,
+  VideoDoneInfo,
+  VideoMediaInfo,
+} from "@common/types/types";
 import { ImageFormat, VALID_IMAGE_FORMATS } from "@/lib/valid-formats";
 import ProgressBar from "./progress-bar";
 import InstructionsCard from "./instructions-card";
@@ -27,6 +36,8 @@ import LensViewer from "./lens-view";
 import ImageViewer from "./image-viewer";
 import useTranslation from "../hooks/use-translation";
 import SliderView from "./slider-view";
+import MultiModelCompareView from "./multi-model-compare-view";
+import VideoWorkspace from "./video-workspace";
 
 type MainContentProps = {
   imagePath: string;
@@ -37,6 +48,8 @@ type MainContentProps = {
   selectFolderHandler: () => void;
   selectImageHandler: () => void;
   upscaledImagePath: string;
+  multiModelResults: MultiModelResult[];
+  multiModelStopped: boolean;
   batchFolderPath: string;
   setDimensions: React.Dispatch<
     React.SetStateAction<{
@@ -44,6 +57,13 @@ type MainContentProps = {
       height: number;
     }>
   >;
+  videoPath: string;
+  videoInfo: VideoMediaInfo | null;
+  videoDoneInfo: VideoDoneInfo | null;
+  ffmpegStatus: FfmpegStatus | null;
+  selectVideoHandler: () => Promise<void>;
+  loadVideoPath: (path: string) => Promise<void>;
+  resetVideoHandler: () => void;
 };
 
 const MainContent = ({
@@ -55,24 +75,43 @@ const MainContent = ({
   selectFolderHandler,
   selectImageHandler,
   upscaledImagePath,
+  multiModelResults,
+  multiModelStopped,
   batchFolderPath,
   setDimensions,
+  videoPath,
+  videoInfo,
+  videoDoneInfo,
+  ffmpegStatus,
+  selectVideoHandler,
+  loadVideoPath,
+  resetVideoHandler,
 }: MainContentProps) => {
   const t = useTranslation();
   const logit = useLogger();
   const { toast } = useToast();
   const version = useUpscaylVersion();
 
+  const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   const [outputPath, setOutputPath] = useAtom(savedOutputPathAtom);
   const progress = useAtomValue(progressAtom);
   const batchMode = useAtomValue(batchModeAtom);
   const upscaylPass = useAtomValue(upscaylPassAtom);
   const batchProgress = useAtomValue(batchProgressAtom);
+  const multiModelProgress = useAtomValue(multiModelProgressAtom);
+  const videoProgress = useAtomValue(videoProgressAtom);
 
   const viewType = useAtomValue(viewTypeAtom);
-  const lensSize = useAtomValue(lensSizeAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
   const [zoomAmount, setZoomAmount] = useState("100");
+
+  const isVideoTab = activeTab === 1;
+  const hasMultiModelResults =
+    !batchMode &&
+    imagePath.length > 0 &&
+    multiModelResults.some(
+      (item) => item.status === "done" && item.outputPath.length > 0,
+    );
 
   const sanitizedUpscaledImagePath = useMemo(
     () => sanitizePath(upscaledImagePath),
@@ -80,17 +119,24 @@ const MainContent = ({
   );
 
   const showInformationCard = useMemo(() => {
+    if (isVideoTab) return false;
     if (!batchMode) {
-      return imagePath.length === 0 && upscaledImagePath.length === 0;
+      return (
+        imagePath.length === 0 &&
+        upscaledImagePath.length === 0 &&
+        !hasMultiModelResults
+      );
     } else {
       return (
         batchFolderPath.length === 0 && upscaledBatchFolderPath.length === 0
       );
     }
   }, [
+    isVideoTab,
     batchMode,
     imagePath,
     upscaledImagePath,
+    hasMultiModelResults,
     batchFolderPath,
     upscaledBatchFolderPath,
   ]);
@@ -98,19 +144,15 @@ const MainContent = ({
   // DRAG AND DROP HANDLERS
   const handleDragEnter = (e) => {
     e.preventDefault();
-    console.log("drag enter");
   };
   const handleDragLeave = (e) => {
     e.preventDefault();
-    console.log("drag leave");
   };
   const handleDragOver = (e) => {
     e.preventDefault();
-    console.log("drag over");
   };
 
-  const openFolderHandler = (e) => {
-    const logit = useLogger();
+  const openFolderHandler = () => {
     logit("📂 OPEN_FOLDER: ", upscaledBatchFolderPath);
     window.electron.send(
       ELECTRON_COMMANDS.OPEN_FOLDER,
@@ -125,7 +167,6 @@ const MainContent = ({
 
   const handleDrop = (e) => {
     e.preventDefault();
-    resetImagePaths();
     if (
       e.dataTransfer.items.length === 0 ||
       e.dataTransfer.files.length === 0
@@ -137,13 +178,31 @@ const MainContent = ({
       });
       return;
     }
-    const type = e.dataTransfer.items[0].type;
+
+    const type = e.dataTransfer.items[0].type ?? "";
     const filePath = e.dataTransfer.files[0].path;
-    const extension = e.dataTransfer.files[0].name.split(".").at(-1);
+    const extension = e.dataTransfer.files[0].name.split(".").at(-1) ?? "";
     logit("⤵️ Dropped file: ", JSON.stringify({ type, filePath, extension }));
+
+    if (type.includes("video") || isVideoPath(filePath)) {
+      logit("🎬 Dropped video file: ", filePath);
+      setActiveTab(1);
+      loadVideoPath(filePath);
+      return;
+    }
+
+    if (isVideoTab) {
+      toast({
+        title: t("VIDEO_UPSCAYL.DROP_TITLE"),
+        description: t("VIDEO_UPSCAYL.DROP_DESCRIPTION"),
+      });
+      return;
+    }
+
+    resetImagePaths();
     if (
       !type.includes("image") ||
-      !VALID_IMAGE_FORMATS.includes(extension.toLowerCase())
+      !VALID_IMAGE_FORMATS.includes(extension.toLowerCase() as ImageFormat)
     ) {
       logit("🚫 Invalid file dropped");
       toast({
@@ -165,6 +224,7 @@ const MainContent = ({
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    if (isVideoTab) return;
     e.preventDefault();
     if (outputPath) {
       resetImagePaths();
@@ -241,7 +301,6 @@ const MainContent = ({
   };
 
   useEffect(() => {
-    // Events
     const handlePasteEvent = (e) => handlePaste(e);
     const handlePasteImageSaveSuccess = (_: any, imageFilePath: string) => {
       setImagePath(imageFilePath);
@@ -265,7 +324,15 @@ const MainContent = ({
     return () => {
       window.removeEventListener("paste", handlePasteEvent);
     };
-  }, [t, outputPath]);
+  }, [t, outputPath, isVideoTab]);
+
+  const showProgressOverlay =
+    progress.length > 0 &&
+    (isVideoTab
+      ? !videoDoneInfo
+      : upscaledImagePath.length === 0 &&
+        upscaledBatchFolderPath.length === 0 &&
+        !hasMultiModelResults);
 
   return (
     <div
@@ -274,39 +341,76 @@ const MainContent = ({
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
-      onDoubleClick={batchMode ? selectFolderHandler : selectImageHandler}
+      onDoubleClick={
+        isVideoTab
+          ? selectVideoHandler
+          : batchMode
+            ? selectFolderHandler
+            : selectImageHandler
+      }
     >
       <MacTitlebarDragRegion />
 
-      {progress.length > 0 &&
-        upscaledImagePath.length === 0 &&
-        upscaledBatchFolderPath.length === 0 && (
-          <ProgressBar
-            batchMode={batchMode}
-            progress={progress}
-            upscaylPass={upscaylPass}
-            batchProgress={batchProgress}
-          />
-        )}
+      {showProgressOverlay && (
+        <ProgressBar
+          batchMode={batchMode}
+          progress={progress}
+          upscaylPass={upscaylPass}
+          batchProgress={batchProgress}
+          multiModelProgress={multiModelProgress}
+          videoProgress={videoProgress}
+        />
+      )}
+
+      {/* VIDEO WORKSPACE */}
+      {isVideoTab && (
+        <VideoWorkspace
+          version={version}
+          videoPath={videoPath}
+          videoInfo={videoInfo}
+          videoDoneInfo={videoDoneInfo}
+          ffmpegStatus={ffmpegStatus}
+          selectVideoHandler={selectVideoHandler}
+          resetVideoHandler={resetVideoHandler}
+        />
+      )}
 
       {/* DEFAULT PANE INFO */}
       {showInformationCard && (
         <InstructionsCard version={version} batchMode={batchMode} />
       )}
 
-      <MoreOptionsDrawer
-        zoomAmount={zoomAmount}
-        setZoomAmount={setZoomAmount}
-        resetImagePaths={resetImagePaths}
-      />
+      {!isVideoTab && (
+        <MoreOptionsDrawer
+          zoomAmount={zoomAmount}
+          setZoomAmount={setZoomAmount}
+          resetImagePaths={resetImagePaths}
+        />
+      )}
 
       {/* SHOW SELECTED IMAGE */}
-      {!batchMode && upscaledImagePath.length === 0 && imagePath.length > 0 && (
-        <ImageViewer imagePath={imagePath} setDimensions={setDimensions} />
+      {!isVideoTab &&
+        !batchMode &&
+        upscaledImagePath.length === 0 &&
+        !hasMultiModelResults &&
+        imagePath.length > 0 && (
+          <ImageViewer imagePath={imagePath} setDimensions={setDimensions} />
+        )}
+
+      {/* MULTI-MODEL COMPARISON VIEW */}
+      {!isVideoTab && hasMultiModelResults && (
+        <MultiModelCompareView
+          imagePath={imagePath}
+          outputPath={outputPath}
+          results={multiModelResults}
+          wasStopped={multiModelStopped}
+          zoomAmount={zoomAmount}
+        />
       )}
 
       {/* BATCH UPSCALE SHOW SELECTED FOLDER */}
-      {batchMode &&
+      {!isVideoTab &&
+        batchMode &&
         upscaledBatchFolderPath.length === 0 &&
         batchFolderPath.length > 0 && (
           <p className="select-none text-base-content">
@@ -316,9 +420,9 @@ const MainContent = ({
             {batchFolderPath}
           </p>
         )}
-      {/* BATCH UPSCALE DONE INFO */}
 
-      {batchMode && upscaledBatchFolderPath.length > 0 && (
+      {/* BATCH UPSCALE DONE INFO */}
+      {!isVideoTab && batchMode && upscaledBatchFolderPath.length > 0 && (
         <div className="z-50 flex flex-col items-center">
           <p className="select-none py-4 font-bold text-base-content">
             {t("APP.PROGRESS.BATCH.DONE_TITLE")}
@@ -332,15 +436,22 @@ const MainContent = ({
         </div>
       )}
 
-      {!batchMode && viewType === "lens" && upscaledImagePath && imagePath && (
-        <LensViewer
-          sanitizedImagePath={sanitizedImagePath}
-          sanitizedUpscaledImagePath={sanitizedUpscaledImagePath}
-        />
-      )}
+      {!isVideoTab &&
+        !batchMode &&
+        !hasMultiModelResults &&
+        viewType === "lens" &&
+        upscaledImagePath &&
+        imagePath && (
+          <LensViewer
+            sanitizedImagePath={sanitizedImagePath}
+            sanitizedUpscaledImagePath={sanitizedUpscaledImagePath}
+          />
+        )}
 
       {/* COMPARISON SLIDER */}
-      {!batchMode &&
+      {!isVideoTab &&
+        !batchMode &&
+        !hasMultiModelResults &&
         viewType === "slider" &&
         imagePath.length > 0 &&
         upscaledImagePath.length > 0 && (

@@ -10,6 +10,8 @@ import {
   scaleAtom,
   customWidthAtom,
   useCustomWidthAtom,
+  multiModelModeAtom,
+  selectedCompareModelsAtom,
 } from "../../../atoms/user-settings-atom";
 import { FEATURE_FLAGS } from "@common/feature-flags";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
@@ -50,6 +52,8 @@ function UpscaylSteps({
   const [scale, setScale] = useAtom(scaleAtom);
   const [outputPath, setOutputPath] = useAtom(savedOutputPathAtom);
   const [progress, setProgress] = useAtom(progressAtom);
+  const [multiModelMode, setMultiModelMode] = useAtom(multiModelModeAtom);
+  const selectedCompareModels = useAtomValue(selectedCompareModelsAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
   const customWidth = useAtomValue(customWidthAtom);
   const useCustomWidth = useAtomValue(useCustomWidthAtom);
@@ -108,31 +112,82 @@ function UpscaylSteps({
     return newDimensions;
   }, [dimensions.width, dimensions.height, doubleUpscayl, scale]);
 
+  const handleStartClick = () => {
+    if (progress.length > 0) {
+      toast({
+        description: t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE"),
+      });
+      return;
+    }
+    if (!outputPath) {
+      toast({
+        description: t("APP.SCALE_SELECTION.NO_OUTPUT_FOLDER_ALERT"),
+      });
+      return;
+    }
+    if (!batchMode && multiModelMode && selectedCompareModels.length < 2) {
+      toast({
+        description: t("MULTI_MODEL.NEED_TWO_MODELS"),
+      });
+      return;
+    }
+    upscaylHandler();
+  };
+
   return (
     <div
-      className={`animate-step-in animate flex h-screen flex-col gap-7 overflow-y-auto overflow-x-hidden p-5`}
+      className={`animate-step-in animate flex h-screen flex-col gap-6 overflow-y-auto overflow-x-hidden p-5`}
     >
-      {/* BATCH OPTION */}
-      <div className="flex flex-row items-center gap-2">
-        <input
-          type="checkbox"
-          className="toggle"
-          checked={batchMode}
-          onChange={() => {
-            if (!rememberOutputFolder) {
-              setOutputPath("");
-            }
-            setProgress("");
-            setBatchMode((oldValue) => !oldValue);
-          }}
-        ></input>
-        <p
-          className="mr-1 inline-block cursor-help text-sm"
-          data-tooltip-id="tooltip"
-          data-tooltip-content={t("APP.BATCH_MODE.DESCRIPTION")}
-        >
-          {t("APP.BATCH_MODE.TITLE")}
-        </p>
+      {/* MODE TOGGLES */}
+      <div className="flex flex-col gap-2.5">
+        <div className="flex flex-row items-center gap-2">
+          <input
+            type="checkbox"
+            className="toggle toggle-sm"
+            checked={batchMode}
+            onChange={() => {
+              if (!rememberOutputFolder) {
+                setOutputPath("");
+              }
+              setProgress("");
+              setBatchMode((oldValue) => {
+                const next = !oldValue;
+                if (next) setMultiModelMode(false);
+                return next;
+              });
+            }}
+          />
+          <p
+            className="mr-1 inline-block cursor-help text-sm"
+            data-tooltip-id="tooltip"
+            data-tooltip-content={t("APP.BATCH_MODE.DESCRIPTION")}
+          >
+            {t("APP.BATCH_MODE.TITLE")}
+          </p>
+        </div>
+
+        <div className="flex flex-row items-center gap-2">
+          <input
+            type="checkbox"
+            className="toggle toggle-primary toggle-sm"
+            checked={multiModelMode && !batchMode}
+            onChange={() => {
+              setProgress("");
+              setMultiModelMode((oldValue) => {
+                const next = !oldValue;
+                if (next) setBatchMode(false);
+                return next;
+              });
+            }}
+          />
+          <p
+            className="mr-1 inline-block cursor-help text-sm"
+            data-tooltip-id="tooltip"
+            data-tooltip-content={t("MULTI_MODEL.TOGGLE_DESCRIPTION")}
+          >
+            {t("MULTI_MODEL.TOGGLE_TITLE")}
+          </p>
+        </div>
       </div>
 
       {/* STEP 1 */}
@@ -154,9 +209,13 @@ function UpscaylSteps({
       <div className="animate-step-in group flex flex-col gap-4">
         <div>
           <p className="step-heading">{t("APP.MODEL_SELECTION.TITLE")}</p>
-          <p className="mb-2 text-sm">{t("APP.MODEL_SELECTION.DESCRIPTION")}</p>
+          <p className="mb-2 text-sm">
+            {multiModelMode && !batchMode
+              ? t("MULTI_MODEL.DIALOG_TITLE")
+              : t("APP.MODEL_SELECTION.DESCRIPTION")}
+          </p>
 
-          <SelectModelDialog />
+          <SelectModelDialog multiSelect={multiModelMode && !batchMode} />
         </div>
 
         <div className="flex items-center gap-1">
@@ -252,22 +311,14 @@ function UpscaylSteps({
             </span>
           </p>
         )}
-        <button
-          className="btn btn-secondary"
-          onClick={
-            progress.length > 0 || !outputPath
-              ? () =>
-                  toast({
-                    description: t(
-                      "APP.SCALE_SELECTION.NO_OUTPUT_FOLDER_ALERT",
-                    ),
-                  })
-              : upscaylHandler
-          }
-        >
+        <button className="btn btn-secondary" onClick={handleStartClick}>
           {progress.length > 0
             ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
-            : t("APP.SCALE_SELECTION.START_BUTTON_TITLE")}
+            : multiModelMode && !batchMode
+              ? t("MULTI_MODEL.START_BUTTON", {
+                  count: String(selectedCompareModels.length),
+                })
+              : t("APP.SCALE_SELECTION.START_BUTTON_TITLE")}
         </button>
       </div>
     </div>

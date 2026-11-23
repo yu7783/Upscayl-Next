@@ -2,10 +2,13 @@
 import { useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
+  activeTabAtom,
   batchModeAtom,
   batchProgressAtom,
   compressionAtom,
   dontShowCloudModalAtom,
+  multiModelModeAtom,
+  multiModelProgressAtom,
   noImageProcessingAtom,
   savedOutputPathAtom,
   overwriteAtom,
@@ -15,6 +18,7 @@ import {
   useCustomWidthAtom,
   tileSizeAtom,
   showSidebarAtom,
+  selectedCompareModelsAtom,
   selectedModelIdAtom,
   doubleUpscaylAtom,
   gpuIdAtom,
@@ -24,12 +28,22 @@ import {
   ttaModeAtom,
   copyMetadataAtom,
   threadsAtom,
+  videoCodecAtom,
+  videoContainerAtom,
+  videoKeepAudioAtom,
+  videoProgressAtom,
+  videoQualityAtom,
 } from "../../atoms/user-settings-atom";
 import useLogger from "../hooks/use-logger";
 import {
   BatchUpscaylPayload,
   DoubleUpscaylPayload,
+  FfmpegStatus,
   ImageUpscaylPayload,
+  MultiModelResult,
+  MultiModelUpscaylPayload,
+  VideoDoneInfo,
+  VideoMediaInfo,
   VideoUpscaylPayload,
 } from "@common/types/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -51,6 +65,8 @@ import SidebarToggleButton from "./sidebar-button";
 
 const Sidebar = ({
   setUpscaledImagePath,
+  setMultiModelResults,
+  setMultiModelStopped,
   batchFolderPath,
   setUpscaledBatchFolderPath,
   dimensions,
@@ -58,9 +74,14 @@ const Sidebar = ({
   selectImageHandler,
   selectFolderHandler,
   videoPath,
+  videoInfo,
+  ffmpegStatus,
+  setVideoDoneInfo,
   selectVideoHandler,
 }: {
   setUpscaledImagePath: React.Dispatch<React.SetStateAction<string>>;
+  setMultiModelResults: React.Dispatch<React.SetStateAction<MultiModelResult[]>>;
+  setMultiModelStopped: React.Dispatch<React.SetStateAction<boolean>>;
   batchFolderPath: string;
   setUpscaledBatchFolderPath: React.Dispatch<React.SetStateAction<string>>;
   dimensions: {
@@ -71,6 +92,9 @@ const Sidebar = ({
   selectImageHandler: () => Promise<void>;
   selectFolderHandler: () => Promise<void>;
   videoPath: string;
+  videoInfo: VideoMediaInfo | null;
+  ffmpegStatus: FfmpegStatus | null;
+  setVideoDoneInfo: React.Dispatch<React.SetStateAction<VideoDoneInfo | null>>;
   selectVideoHandler: () => Promise<void>;
 }) => {
   const t = useTranslation();
@@ -79,13 +103,12 @@ const Sidebar = ({
   const version = useUpscaylVersion();
 
   // LOCAL STATES
-  // TODO: Add electron handler for os
-  const [selectedModelId, setSelectedModelId] = useAtom(selectedModelIdAtom);
+  const [selectedModelId] = useAtom(selectedModelIdAtom);
   const [doubleUpscayl, setDoubleUpscayl] = useAtom(doubleUpscaylAtom);
   const [gpuId, setGpuId] = useAtom(gpuIdAtom);
   const [saveImageAs, setSaveImageAs] = useAtom(saveImageAsAtom);
 
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedTab, setSelectedTab] = useAtom(activeTabAtom);
   const [showCloudModal, setShowCloudModal] = useState(false);
 
   // ATOMIC STATES
@@ -94,6 +117,14 @@ const Sidebar = ({
   const [compression, setCompression] = useAtom(compressionAtom);
   const setProgress = useSetAtom(progressAtom);
   const [batchMode, setBatchMode] = useAtom(batchModeAtom);
+  const multiModelMode = useAtomValue(multiModelModeAtom);
+  const selectedCompareModels = useAtomValue(selectedCompareModelsAtom);
+  const setMultiModelProgress = useSetAtom(multiModelProgressAtom);
+  const setVideoProgress = useSetAtom(videoProgressAtom);
+  const videoCodec = useAtomValue(videoCodecAtom);
+  const videoContainer = useAtomValue(videoContainerAtom);
+  const videoQuality = useAtomValue(videoQualityAtom);
+  const videoKeepAudio = useAtomValue(videoKeepAudioAtom);
   const logData = useAtomValue(logAtom);
   const [scale] = useAtom(scaleAtom);
   const setDontShowCloudModal = useSetAtom(dontShowCloudModalAtom);
@@ -113,6 +144,10 @@ const Sidebar = ({
     logit("🔄 Resetting Upscaled Image Path");
     setUpscaledImagePath("");
     setUpscaledBatchFolderPath("");
+    setMultiModelResults([]);
+    setMultiModelStopped(false);
+    setMultiModelProgress(null);
+    setVideoProgress(null);
     setUpscaylPass({ pass: 0, totalPasses: 0 });
     setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
 
@@ -121,9 +156,18 @@ const Sidebar = ({
       doubleUpscayl,
       imagePath,
       batchFolderPath,
+      multiModelMode,
+      multiModelCount: selectedCompareModels.length,
     });
 
     if (mode === "invalid") {
+      if (!batchMode && multiModelMode && imagePath.length > 0 && selectedCompareModels.length < 2) {
+        toast({
+          description: t("MULTI_MODEL.NEED_TWO_MODELS"),
+        });
+        logit("🚫 Multi-model compare requires at least 2 models");
+        return;
+      }
       toast({
         title: t("ERRORS.NO_IMAGE_ERROR.TITLE"),
         description: t("ERRORS.NO_IMAGE_ERROR.DESCRIPTION"),
@@ -165,6 +209,38 @@ const Sidebar = ({
         batchUpscayls: prev.batchUpscayls + 1,
       }));
       logit("🏁 FOLDER_UPSCAYL", doubleUpscayl ? "(DOUBLE)" : "");
+      return;
+    }
+
+    if (mode === "multi-model") {
+      window.electron.send<MultiModelUpscaylPayload>(
+        ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL,
+        {
+          imagePath,
+          outputPath,
+          models: selectedCompareModels,
+          gpuId: gpuId.length === 0 ? null : gpuId,
+          saveImageAs,
+          scale,
+          overwrite,
+          noImageProcessing,
+          compression: compression.toString(),
+          customWidth: customWidth > 0 ? customWidth.toString() : null,
+          useCustomWidth,
+          tileSize,
+          ttaMode,
+          copyMetadata,
+          doubleUpscale: doubleUpscayl,
+          threads: threads ?? undefined,
+        },
+      );
+      setUserStats((prev) => ({
+        ...prev,
+        totalUpscayls: prev.totalUpscayls + 1,
+        lastUsedAt: new Date().getTime(),
+        imageUpscayls: prev.imageUpscayls + 1,
+      }));
+      logit("🏁 MULTI_MODEL_UPSCAYL", selectedCompareModels.join(", "));
       return;
     }
 
@@ -246,6 +322,20 @@ const Sidebar = ({
 
     setUpscaledImagePath("");
     setUpscaledBatchFolderPath("");
+    setMultiModelResults([]);
+    setMultiModelProgress(null);
+    setVideoDoneInfo(null);
+    setVideoProgress({
+      stage: "preparing",
+      stageIndex: 1,
+      totalStages: 3,
+      percent: 0,
+      completedFrames: 0,
+      totalFrames: videoInfo?.estimatedFrames ?? 0,
+      chunk: 0,
+      totalChunks: 0,
+      message: t("APP.PROGRESS.WAIT_TITLE"),
+    });
     setProgress(t("APP.PROGRESS.WAIT_TITLE"));
 
     window.electron.send<VideoUpscaylPayload>(ELECTRON_COMMANDS.UPSCAYL_VIDEO, {
@@ -261,6 +351,10 @@ const Sidebar = ({
       tileSize,
       ttaMode,
       threads: threads ?? undefined,
+      videoCodec,
+      videoContainer,
+      videoQuality,
+      keepAudio: videoKeepAudio,
     });
 
     setUserStats((prev) => ({
@@ -320,6 +414,8 @@ const Sidebar = ({
         {selectedTab === 1 && (
           <VideoTab
             videoPath={videoPath}
+            videoInfo={videoInfo}
+            ffmpegStatus={ffmpegStatus}
             selectVideoHandler={selectVideoHandler}
             upscaylVideoHandler={upscaylVideoHandler}
           />

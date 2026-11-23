@@ -1,7 +1,7 @@
 {
   "name": "upscayl-next",
   "private": true,
-  "version": "1.2.6",
+  "version": "1.3.0",
   "productName": "Upscayl-Next",
   "author": {
     "name": "Nayam Amarshe",
@@ -41,7 +41,7 @@
     "dev": "tsc && electron .",
     "build": "tsc && npm run validate-schema && next build renderer",
     "tsc": "tsc",
-    "test": "tsc && node --test tests",
+    "test": "tsc && node --test \"tests/*.test.cjs\"",
     "native:setup": "powershell -NoProfile -ExecutionPolicy Bypass -File native/setup.ps1",
     "native:setup:unix": "bash native/setup.sh",
     "installer-assets": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-installer-assets.ps1",
@@ -267,7 +267,7 @@
     "@radix-ui/react-popover": "^1.1.4",
     "@radix-ui/react-scroll-area": "^1.2.2",
     "@radix-ui/react-slot": "^1.1.1",
-    "@radix-ui/react-toast": "^1.2.6",
+    "@radix-ui/react-toast": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",

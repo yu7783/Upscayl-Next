@@ -15,10 +15,20 @@ const ELECTRON_COMMANDS = {
   FOLDER_UPSCAYL_PROGRESS_INFO:
     "Send Structured Folder Upscaling Progress from Main to Renderer",
   UPSCAYL_PASS_INFO: "Send Upscayl Pass Info from Main to Renderer",
+  MULTI_MODEL_UPSCAYL: "Upscale Image with Multiple Models",
+  MULTI_MODEL_UPSCAYL_PROGRESS:
+    "Send Multi-Model Upscaling Progress from Main to Renderer",
+  MULTI_MODEL_UPSCAYL_RESULT: "Send Single Model Result in Multi-Model Run",
+  MULTI_MODEL_UPSCAYL_DONE: "Multi-Model Upscaling Done",
   OPEN_FOLDER: "Open Folder",
+  OPEN_FILE_LOCATION: "Open File Location",
   UPSCAYL_VIDEO: "Upscale the Video",
   UPSCAYL_VIDEO_DONE: "Video Upscaling Done",
   UPSCAYL_VIDEO_PROGRESS: "Send Video Upscale Progress from Main to Renderer",
+  UPSCAYL_VIDEO_PROGRESS_INFO:
+    "Send Structured Video Upscale Progress from Main to Renderer",
+  GET_VIDEO_INFO: "Get Video Metadata",
+  CHECK_FFMPEG: "Check FFmpeg Availability",
   FFMPEG_VIDEO_DONE: "Ran FFMpeg successfully",
   FFMPEG_VIDEO_PROGRESS: "Running FFMpeg for frame extraction",
   SELECT_CUSTOM_MODEL_FOLDER: "Select a Custom Model Folder",
@@ -26,6 +36,7 @@ const ELECTRON_COMMANDS = {
   CUSTOM_MODEL_FILES_LIST: "Send custom model files list to renderer",
   LOG: "Log",
   STOP: "Stop the current operation",
+  STOPPED: "Operation stopped",
   OS: "Get OS",
   SCALING_AND_CONVERTING: "Adding some finishing touches",
   UPSCAYL_WARNING: "Upscaling Warning",

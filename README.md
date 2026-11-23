@@ -8,7 +8,7 @@
 [![Downloads](https://img.shields.io/github/downloads/yu7783/Upscayl-Next/total.svg?style=for-the-badge)](https://github.com/yu7783/Upscayl-Next/releases)
 
 [Download the latest release](https://github.com/yu7783/Upscayl-Next/releases/latest) ·
-[Release notes](RELEASE_NOTES_v1.2.6.md) ·
+[Release notes](RELEASE_NOTES_v1.3.0.md) ·
 [Report an issue](https://github.com/yu7783/Upscayl-Next/issues)
 
 </div>
@@ -24,17 +24,19 @@ without losing quality.
 # ✨ What's changed from upstream?
 
 Upscayl-Next is based on upstream **Upscayl 2.15.0**. The fork uses its own
-versioning and starts at **1.0.0** (current release: **1.2.6**).
+versioning and starts at **1.0.0** (current release: **1.3.0**).
 
 Compared with the upstream tree, this release contains **more than 200 changed
-files**, including a complete Windows installer overhaul with animated pages,
-optional AI backend setup and packaged license notices.
+files**, including Multi-Model Sequential Comparison, production Video
+Upscaling, a complete Windows installer overhaul with animated pages, optional
+AI backend setup and packaged license notices.
 
 ## Added
 
 | Area | Change | Main files |
 | --- | --- | --- |
-| Video upscaling | Extract frames with FFmpeg, upscale each frame, re-encode to MP4 with audio | `electron/commands/video-upscayl.ts`, `select-video.ts`, `common/video-formats.ts` |
+| Multi-model compare | Upscale a single image with multiple models in succession and compare outputs via Slider (A/B), synchronized-zoom Grid (All), or Lens (A/B) | `electron/commands/multi-model-upscayl.ts`, `common/multi-model-helpers.ts`, `main-content/multi-model-compare-view.tsx` |
+| Official video upscaling | Production CFR extraction, chunked upscaling piped to FFmpeg (`image2pipe`), odd-dimension padding, H.264/H.265/VP9 + quality/audio options, metadata probe, and synced before/after video comparison player | `electron/commands/video-upscayl.ts`, `video-info.ts`, `common/video-upscayl-helpers.ts`, `main-content/video-workspace.tsx` |
 | VRAM recovery | Detect `vkAllocateMemory failed` / `vk Allocated memory failed` and retry at `512→256→128→64→32` tile sizes | `common/vulkan-memory.ts`, all upscale commands |
 | Batch + double | Process a whole folder twice; batch takes priority over double (fixes #1405) | `common/resolve-upscayl-mode.ts`, `batch-upscayl.ts` |
 | Model profiles | Recommended scale, tile size, TTA, compression and threads per bundled model | `common/model-profiles.ts`, `auto-optimize-toggle.tsx` |
@@ -42,11 +44,11 @@ optional AI backend setup and packaged license notices.
 | Model compatibility | Detect NCNN `.param/.bin` plus ONNX / PyTorch extensions and label them in the UI | `common/model-compatibility.ts`, `get-models.ts` |
 | Model guidance | Model picker explains bundled vs custom models, shows engine badges, optional AI backend requirements, supported formats and an empty-state guide | `select-model-dialog.tsx`, `select-custom-models-folder.tsx`, locales |
 | Native HAT / DAT / SUPIR | Run transformer and diffusion upscalers in a bundled Python backend (spandrel, ONNX Runtime, official SUPIR), routed automatically by model name/extension | `native/`, `common/model-runtime.ts`, `electron/utils/spawn-upscayl.ts` |
-| Structured progress | Pass number, total passes, completed and total counts for batch jobs | `electron-commands.ts`, `batch-upscayl.ts`, `progress-bar.tsx` |
-| Video tab | Dedicated video workflow: video, model, output, scale, start/stop | `sidebar/video-tab/index.tsx`, `tabs.tsx` |
+| Structured progress | Pass number, total passes, completed and total counts for batch, multi-model, and video jobs | `electron-commands.ts`, `batch-upscayl.ts`, `video-upscayl.ts`, `progress-bar.tsx` |
+| Video tab & workspace | Dedicated video workflow with FFmpeg status check, metadata preview, encoding controls, drag-and-drop, and before/after video player | `sidebar/video-tab/index.tsx`, `main-content/video-workspace.tsx`, `tabs.tsx` |
 | Custom modern installer | Electron downloader with animated dark UI, step rail, download progress ring with speed/ETA, SHA-256 verification, per-user install, shortcuts, uninstaller and optional AI backend | `installer/`, `package.json` |
 | Legacy NSIS installer | Dark animated NSIS wizard (welcome, credits, options and finish pages) kept for auto-update and fallback | `build/installer.nsh`, `build/anim/`, `scripts/generate-installer-assets.ps1`, `native/setup-launcher.ps1` |
-| Release manifest | Asset list, SHA-256 checksums and v1.2.6 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.2.6.md` |
+| Release manifest | Asset list, SHA-256 checksums and v1.3.0 release notes | `RELEASE_FILES.md`, `RELEASE_NOTES_v1.3.0.md` |
 
 ## Improved and fixed
 
@@ -57,7 +59,8 @@ optional AI backend setup and packaged license notices.
 - **Batch metadata copy** runs in chunks of 8 to avoid opening thousands of handles.
 - **Double upscale progress** now reports the overall two-pass progress instead of restarting at 100%.
 - **Image input validation** checks the input file, output folder and Windows path length.
-- **Video error handling** cleans up temporary frames after failures and reports each stage.
+- **Video pipeline reliability** normalizes VFR inputs to CFR, chunks frames to cap temp disk usage, pads odd dimensions for `yuv420p`, verifies exit codes, and cleans up temp folders on stop/failure/exit.
+- **Stop handling** cleanly terminates child processes and resets UI progress immediately across all pipelines.
 - **Auto-update** now opens fork release notes under `yu7783/Upscayl-Next`.
 - **Custom model folder** accepts NCNN, ONNX and PyTorch checkpoint extensions.
 
@@ -65,8 +68,9 @@ optional AI backend setup and packaged license notices.
 
 - Rebranded the UI from Upscayl to Upscayl-Next (header, footer, logo, version badge and locales).
 - Header and footer links point to the fork repository.
-- Added a video tab alongside image and batch modes.
-- Reworked the progress overlay with batch/pass progress, elapsed time and ETA.
+- Added Multi-Model Compare mode with Slider (A/B), synchronized-zoom Grid (All), and Lens (A/B) comparison views.
+- Promoted Video Upscaling to a full official workspace with preview, metadata cards, encoding controls, and synced before/after playback.
+- Reworked the progress overlay with batch/pass/model/video-stage progress, elapsed time and ETA.
 - Added Auto-optimize settings and thread-split controls.
 - Replaced `lucide-react` icons with a bundled icon set.
 - Replaced upstream model-comparison images with `original-placeholder.svg`.
@@ -79,11 +83,11 @@ optional AI backend setup and packaged license notices.
 - `appId`: `org.upscayl.Upscayl` → `org.upscaylnext.UpscaylNext`
 - `publisherName`: `Upscayl Team` → `Upscayl-Next Team`
 - Versioning starts at `1.0.0` instead of upstream `2.15.0`.
-- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.2.6`).
+- Artifacts are named `Upscayl-Next-Setup-<version>.exe` / `.zip` (currently `1.3.0`).
 - GitHub publish target is `yu7783/Upscayl-Next`.
 - Installer shortcuts, run-after-finish, custom sidebar/header and animated welcome page.
 - macOS config uses PNG icons instead of `.icns`.
-- Added `npm test` (`tsc && node --test tests`).
+- Added `npm test` (`tsc && node --test "tests/*.test.cjs"`).
 
 ## Removed
 
@@ -187,14 +191,14 @@ troubleshooting.
 The recommended download is the custom **modern downloader**:
 
 1. Open the [latest release](https://github.com/yu7783/Upscayl-Next/releases/latest).
-2. Download **`Upscayl-Next-Installer-1.2.6.exe`**.
+2. Download **`Upscayl-Next-Installer-1.3.0.exe`**.
 3. Run it. The animated downloader checks GitHub for the latest portable
    package, verifies its SHA-256 checksum and installs it per-user.
 4. Choose the installation folder and shortcuts. You can optionally install the
    HAT/DAT/SUPIR AI backend during setup.
 5. Finish and launch **Upscayl-Next** from the Start Menu or desktop shortcut.
 
-The older NSIS installer (`Upscayl-Next-Setup-1.2.6.exe`) is still published for
+The older NSIS installer (`Upscayl-Next-Setup-1.3.0.exe`) is still published for
 auto-update and as a fallback, but new users should use the custom downloader.
 
 > [!NOTE]
@@ -204,7 +208,7 @@ auto-update and as a fallback, but new users should use the custom downloader.
 
 ## Portable ZIP
 
-1. Download **`Upscayl-Next-Setup-1.2.6.zip`** from the same release.
+1. Download **`Upscayl-Next-Setup-1.3.0.zip`** from the same release.
 2. Extract the archive to a folder of your choice.
 3. Run `Upscayl-Next.exe`.
 
@@ -222,11 +226,19 @@ upscale** to process it again.
 3. Select the output folder and scale.
 4. Click **Upscayl-Next 🚀**.
 
+### Multi-model comparison
+
+1. Enable **Compare Multiple Models** at the top of the Image tab.
+2. Select an input image and choose 2 or more models (bundled or custom) in Step 2.
+3. Click **Compare N Models 🚀** to generate each model's result sequentially.
+4. Inspect results using **Slider (A/B)**, **Grid (All)** with synchronized zoom, or **Lens (A/B)**.
+
 ### Video upscaling
 
-1. Install FFmpeg and make sure both `ffmpeg` and `ffprobe` are available in `PATH`.
-2. Select a video, output folder, model and scale.
-3. Start the upscale. Frames are extracted, upscaled and encoded to MP4 (H.264/AAC).
+1. Install FFmpeg and make sure both `ffmpeg` and `ffprobe` are available in `PATH` (or set `UPSCAYL_FFMPEG_PATH` / `UPSCAYL_FFPROBE_PATH`).
+2. Switch to the **Video** tab (or drag and drop a video file directly into the window).
+3. Choose the model, scale, output folder, format/codec (`MP4 H.264`, `MP4 H.265`, `MKV`, or `WebM VP9`), quality preset, and audio option.
+4. Start the upscale. Frames are extracted at constant frame rate, upscaled in bounded chunks, and streamed directly to FFmpeg, then opened in the synchronized before/after comparison player.
 
 # 🩺 Troubleshooting
 
@@ -244,8 +256,8 @@ upscale** to process it again.
 - [Before/after comparisons](COMPARISONS.MD)
 - [Additional custom models](https://github.com/upscayl/custom-models)
 - [Upstream troubleshooting guide](https://github.com/upscayl/upscayl/wiki/Troubleshooting)
-- [Release manifest for v1.2.6](RELEASE_FILES.md)
-- [Release notes for v1.2.6](RELEASE_NOTES_v1.2.6.md)
+- [Release manifest for v1.3.0](RELEASE_FILES.md)
+- [Release notes for v1.3.0](RELEASE_NOTES_v1.3.0.md)
 
 # 🛠 Development
 
@@ -293,9 +305,9 @@ npm run installer-assets
 
 Outputs:
 
-- `dist/Upscayl-Next-Setup-1.2.6.exe` (legacy NSIS installer / auto-update)
-- `dist/Upscayl-Next-Setup-1.2.6.exe.blockmap`
-- `dist/Upscayl-Next-Setup-1.2.6.zip` (portable app package used by the downloader)
+- `dist/Upscayl-Next-Setup-1.3.0.exe` (legacy NSIS installer / auto-update)
+- `dist/Upscayl-Next-Setup-1.3.0.exe.blockmap`
+- `dist/Upscayl-Next-Setup-1.3.0.zip` (portable app package used by the downloader)
 - `dist/latest.yml`
 
 Build the custom modern downloader (Electron app in `installer/`):
@@ -306,7 +318,7 @@ npm run installer-app
 
 Output:
 
-- `installer/dist/Upscayl-Next-Installer-1.2.6.exe`
+- `installer/dist/Upscayl-Next-Installer-1.3.0.exe`
 
 The custom installer downloads the portable ZIP from the latest GitHub release,
 verifies `SHA256SUMS.txt`, extracts the app, creates shortcuts, registers an
@@ -315,8 +327,8 @@ uninstaller and optionally runs `resources/native/setup.ps1`.
 Generate or verify checksums with:
 
 ```powershell
-Get-FileHash dist\Upscayl-Next-Setup-1.2.6.exe -Algorithm SHA256
-Get-FileHash installer\dist\Upscayl-Next-Installer-1.2.6.exe -Algorithm SHA256
+Get-FileHash dist\Upscayl-Next-Setup-1.3.0.exe -Algorithm SHA256
+Get-FileHash installer\dist\Upscayl-Next-Installer-1.3.0.exe -Algorithm SHA256
 ```
 
 ## Installer artwork and pages

@@ -3,9 +3,13 @@ import React, { useMemo, useRef, useState } from "react";
 const LensViewer = ({
   sanitizedImagePath,
   sanitizedUpscaledImagePath,
+  leftLabel = "Original",
+  rightLabel = "Upscayl-Next AI",
 }: {
   sanitizedImagePath: string;
   sanitizedUpscaledImagePath: string;
+  leftLabel?: string;
+  rightLabel?: string;
 }) => {
   const originalImageContainerRef = useRef<HTMLDivElement>(null);
   const originalImageRef = useRef<HTMLImageElement>(null);
@@ -42,7 +46,7 @@ const LensViewer = ({
       originalImageRef.current.naturalHeight;
     viewportImageHeight = viewportImageWidth / originalImageAspectRatio;
     // Divide by 2 because image is centered
-    imageTop = (containerHeight - viewportImageHeight) / 2;
+    imageTop = containerTop + (containerHeight - viewportImageHeight) / 2;
 
     // Find relative mouse position within the image
     const relativeMouseX = mouseX - containerLeft;
@@ -84,7 +88,7 @@ const LensViewer = ({
       relativeMouseXPercent,
       relativeMouseYPercent,
       relativeMouseX,
-      mouseY,
+      mouseY: mouseY - containerTop,
       originalImageMouseX: bgPosX,
       originalImageMouseY: bgPosY,
     });
@@ -100,16 +104,15 @@ const LensViewer = ({
   );
 
   return (
-    <div className="group relative flex h-full flex-col items-center">
+    <div className="group relative flex h-full w-full flex-col items-center">
       {/* Main image container */}
       <div
         className="relative h-full w-full cursor-crosshair"
         ref={originalImageContainerRef}
       >
-        ORIGINAL IMAGE
         <img
           src={originalImage}
-          alt="Original"
+          alt={leftLabel}
           className="h-full w-full object-contain"
           onMouseMove={handleMouseMove}
           ref={originalImageRef}
@@ -127,39 +130,39 @@ const LensViewer = ({
         />
       </div>
 
-      {/* Enlarged views for original and upscaled images */}
+      {/* Enlarged views for left and right images */}
       <div
-        className="pointer-events-none absolute hidden group-hover:flex"
+        className="pointer-events-none absolute z-20 hidden group-hover:flex"
         style={{
           left: `${hoverPosition.relativeMouseX}px`,
           top: `${hoverPosition.mouseY + 25}px`,
           transform: "translate(-50%, 0)",
         }}
       >
-        {/* ORIGINAL IMAGE */}
+        {/* LEFT IMAGE */}
         <div
           className="relative h-48 w-48 border border-gray-300 bg-cover bg-no-repeat"
           style={{
             backgroundImage: `url(${originalImage})`,
             backgroundPosition: `-${hoverPosition.originalImageMouseX * zoomLevel - 96}px -${hoverPosition.originalImageMouseY * zoomLevel - 96}px`,
-            backgroundSize: `${originalImageRef.current?.naturalWidth * zoomLevel}px ${originalImageRef.current?.naturalHeight * zoomLevel}px`,
+            backgroundSize: `${(originalImageRef.current?.naturalWidth ?? 0) * zoomLevel}px ${(originalImageRef.current?.naturalHeight ?? 0) * zoomLevel}px`,
           }}
         >
-          <span className="absolute bottom-0 w-full bg-black bg-opacity-60 px-2 py-1 text-center text-xs text-white">
-            Original
+          <span className="absolute bottom-0 w-full truncate bg-black bg-opacity-70 px-2 py-1 text-center text-xs text-white">
+            {leftLabel}
           </span>
         </div>
-        {/* UPSCALED IMAGE */}
+        {/* RIGHT IMAGE */}
         <div
           className="relative h-48 w-48 border border-gray-300 bg-cover bg-no-repeat"
           style={{
             backgroundImage: `url(${upscaledImage})`,
             backgroundPosition: `-${hoverPosition.originalImageMouseX * zoomLevel - 96}px -${hoverPosition.originalImageMouseY * zoomLevel - 96}px`,
-            backgroundSize: `${originalImageRef.current?.naturalWidth * zoomLevel}px ${originalImageRef.current?.naturalHeight * zoomLevel}px`,
+            backgroundSize: `${(originalImageRef.current?.naturalWidth ?? 0) * zoomLevel}px ${(originalImageRef.current?.naturalHeight ?? 0) * zoomLevel}px`,
           }}
         >
-          <span className="absolute bottom-0 w-full bg-black bg-opacity-60 px-2 py-1 text-center text-xs text-white">
-            Upscayl-Next AI
+          <span className="absolute bottom-0 w-full truncate bg-black bg-opacity-70 px-2 py-1 text-center text-xs text-white">
+            {rightLabel}
           </span>
         </div>
       </div>

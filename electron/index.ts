@@ -4,12 +4,14 @@ import log from "electron-log";
 import { app, ipcMain, protocol } from "electron";
 import { ELECTRON_COMMANDS } from "../common/electron-commands";
 import logit from "./utils/logit";
-import openFolder from "./commands/open-folder";
+import openFolder, { openFileLocation } from "./commands/open-folder";
 import stop from "./commands/stop";
 import selectFolder from "./commands/select-folder";
 import selectFile from "./commands/select-file";
 import selectVideo from "./commands/select-video";
 import videoUpscayl from "./commands/video-upscayl";
+import { handleCheckFfmpeg, handleGetVideoInfo } from "./commands/video-info";
+import multiModelUpscayl from "./commands/multi-model-upscayl";
 import getModelsList from "./commands/get-models-list";
 import customModelsSelect from "./commands/custom-models-select";
 import imageUpscayl from "./commands/image-upscayl";
@@ -22,6 +24,7 @@ import autoUpdate from "./commands/auto-update";
 import { FEATURE_FLAGS } from "../common/feature-flags";
 import settings from "electron-settings";
 import pasteImage from "./commands/paste-image";
+import { cleanupAllTempDirs } from "./utils/config-variables";
 import path from "path";
 
 // INITIALIZATION
@@ -77,6 +80,10 @@ app.on("window-all-closed", () => {
   app.quit();
 });
 
+app.on("before-quit", () => {
+  cleanupAllTempDirs();
+});
+
 // ! ENABLE THIS FOR MACOS APP STORE BUILD
 if (FEATURE_FLAGS.APP_STORE_BUILD) {
   logit("🚀 APP STORE BUILD ENABLED");
@@ -87,11 +94,17 @@ ipcMain.on(ELECTRON_COMMANDS.STOP, stop);
 
 ipcMain.on(ELECTRON_COMMANDS.OPEN_FOLDER, openFolder);
 
+ipcMain.on(ELECTRON_COMMANDS.OPEN_FILE_LOCATION, openFileLocation);
+
 ipcMain.handle(ELECTRON_COMMANDS.SELECT_FOLDER, selectFolder);
 
 ipcMain.handle(ELECTRON_COMMANDS.SELECT_FILE, selectFile);
 
 ipcMain.handle(ELECTRON_COMMANDS.SELECT_VIDEO, selectVideo);
+
+ipcMain.handle(ELECTRON_COMMANDS.CHECK_FFMPEG, handleCheckFfmpeg);
+
+ipcMain.handle(ELECTRON_COMMANDS.GET_VIDEO_INFO, handleGetVideoInfo);
 
 ipcMain.on(ELECTRON_COMMANDS.GET_MODELS_LIST, getModelsList);
 
@@ -105,6 +118,8 @@ ipcMain.on(ELECTRON_COMMANDS.UPSCAYL, imageUpscayl);
 ipcMain.on(ELECTRON_COMMANDS.FOLDER_UPSCAYL, batchUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.DOUBLE_UPSCAYL, doubleUpscayl);
+
+ipcMain.on(ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL, multiModelUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.UPSCAYL_VIDEO, videoUpscayl);
 

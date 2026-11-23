@@ -2,6 +2,14 @@ name: Build for Windows
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach assets to (defaults to latest release)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
 
 jobs:
   windows:
@@ -9,45 +17,57 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3.5.0
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
 
-      - name: Install Modules and Build
+      - name: Install, Test, and Build Windows Packages
+        shell: pwsh
         run: |
-          npm install
+          npm ci
+          npm test
           npm run dist:win
+          npm run installer-app
 
-      # Get the latest release
-      - name: Get Latest Release
-        id: get_latest_release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const latestRelease = await github.rest.repos.getLatestRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
-            core.setOutput('release_id', latestRelease.data.id);
+      - name: Generate SHA256SUMS.txt
+        shell: pwsh
+        run: |
+          $files = @()
+          $files += Get-ChildItem -Path "installer/dist" -Filter "*.exe" -ErrorAction SilentlyContinue
+          $files += Get-ChildItem -Path "dist" -Include "*.exe","*.blockmap","*.zip","latest.yml" -File -Recurse -Depth 0 -ErrorAction SilentlyContinue
+          $lines = foreach ($f in $files) {
+            $hash = (Get-FileHash -Path $f.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$hash  $($f.Name)"
+          }
+          $lines | Set-Content -Path "dist/SHA256SUMS.txt" -Encoding ascii
+          Get-Content "dist/SHA256SUMS.txt"
 
-      - name: Upload Assets to Release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: |
-            dist/*.blockmap
-            dist/*.zip
-            dist/*.exe
-            dist/*.yml
+      - name: Upload Assets to GitHub Release
+        shell: pwsh
+        run: |
+          $tag = "${{ inputs.tag }}"
+          if (-not $tag) {
+            $tag = gh release view --json tagName --jq .tagName
+          }
+          $assets = @()
+          $assets += (Get-ChildItem -Path "installer/dist/*.exe").FullName
+          $assets += (Get-ChildItem -Path "dist/*.exe").FullName
+          $assets += (Get-ChildItem -Path "dist/*.blockmap").FullName
+          $assets += (Get-ChildItem -Path "dist/*.zip").FullName
+          $assets += (Get-ChildItem -Path "dist/latest.yml").FullName
+          $assets += (Get-ChildItem -Path "dist/SHA256SUMS.txt").FullName
+          gh release upload $tag @assets --clobber
 
-      - name: Upload Windows Build
-        uses: actions/upload-artifact@v3
+      - name: Upload Windows Build Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: windows-build
           path: |
             dist/*.blockmap
             dist/*.zip
             dist/*.exe
-            dist/*.yml
+            dist/latest.yml
+            dist/SHA256SUMS.txt
+            installer/dist/*.exe

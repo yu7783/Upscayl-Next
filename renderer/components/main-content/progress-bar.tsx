@@ -5,6 +5,12 @@ import { translationAtom } from "@/atoms/translations-atom";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import useLogger from "../hooks/use-logger";
 
+import {
+  MultiModelProgressInfo,
+  VideoProgressInfo,
+} from "@common/types/types";
+import { ModelId, MODELS } from "@common/models-list";
+
 const clampPercent = (value: number) => Math.min(Math.max(value, 0), 100);
 
 const formatDuration = (totalSeconds: number) => {
@@ -24,6 +30,8 @@ function ProgressBar({
   batchMode,
   upscaylPass,
   batchProgress,
+  multiModelProgress,
+  videoProgress,
 }: {
   progress: string;
   batchMode: boolean;
@@ -34,6 +42,8 @@ function ProgressBar({
     completed: number;
     total: number;
   };
+  multiModelProgress?: MultiModelProgressInfo | null;
+  videoProgress?: VideoProgressInfo | null;
 }) {
   const t = useAtomValue(translationAtom);
   const logit = useLogger();
@@ -71,21 +81,29 @@ function ProgressBar({
       : batchProgress.totalPasses;
 
   const overallFraction = useMemo(() => {
+    if (videoProgress) {
+      return clampPercent(videoProgress.percent) / 100;
+    }
+    if (multiModelProgress) {
+      return clampPercent(multiModelProgress.overallPercent) / 100;
+    }
     if (showBatchProgress) {
       const completed = Math.min(batchProgress.completed, batchProgress.total);
       return (
-        ((batchProgress.pass - 1) + completed / batchProgress.total) /
+        (batchProgress.pass - 1 + completed / batchProgress.total) /
         Math.max(batchProgress.totalPasses, 1)
       );
     }
     if (loggedPercent !== null) {
       return (
-        ((Math.max(activePass, 1) - 1) + loggedPercent / 100) /
+        (Math.max(activePass, 1) - 1 + loggedPercent / 100) /
         Math.max(activeTotalPasses, 1)
       );
     }
     return null;
   }, [
+    videoProgress,
+    multiModelProgress,
     showBatchProgress,
     batchProgress,
     loggedPercent,
@@ -243,12 +261,43 @@ function ProgressBar({
         })
       : "";
 
+  const multiModelLabel = multiModelProgress
+    ? t("MULTI_MODEL.PROGRESS_TITLE", {
+        current: String(multiModelProgress.modelIndex + 1),
+        total: String(multiModelProgress.totalModels),
+        model:
+          multiModelProgress.modelId in MODELS
+            ? t(
+                `APP.MODEL_SELECTION.MODELS.${MODELS[multiModelProgress.modelId as ModelId].id}.NAME` as any,
+              )
+            : multiModelProgress.modelId,
+      })
+    : "";
+
+  const videoStageLabel = videoProgress
+    ? videoProgress.stage === "extracting" || videoProgress.stage === "preparing"
+      ? t("VIDEO_UPSCAYL.STAGE_EXTRACTING")
+      : videoProgress.stage === "upscaling"
+        ? t("VIDEO_UPSCAYL.STAGE_UPSCALING")
+        : t("VIDEO_UPSCAYL.STAGE_ENCODING")
+    : "";
+
   return (
     <div className="absolute z-50 flex h-full w-full flex-col items-center justify-center bg-base-300/50 backdrop-blur-lg">
-      <div className="flex w-80 flex-col items-center gap-2 rounded-btn bg-base-100/50 p-4 backdrop-blur-lg">
+      <div className="flex w-96 max-w-[90vw] flex-col items-center gap-2 rounded-btn bg-base-100/70 p-5 shadow-xl backdrop-blur-lg">
         <UpscaylSVGLogo className="spinner h-12 w-12" />
 
-        {passLabel && (
+        {multiModelLabel && (
+          <p className="badge badge-primary badge-sm max-w-full truncate">
+            {multiModelLabel}
+          </p>
+        )}
+
+        {videoStageLabel && (
+          <p className="badge badge-primary badge-sm">{videoStageLabel}</p>
+        )}
+
+        {passLabel && !multiModelLabel && !videoStageLabel && (
           <p className="badge badge-primary badge-sm">{passLabel}</p>
         )}
 
@@ -274,6 +323,14 @@ function ProgressBar({
                   total: String(batchProgress.total),
                   percent: String(overallPercent ?? 0),
                 })}
+              </span>
+            )}
+            {videoProgress && videoProgress.totalFrames > 0 && (
+              <span className="text-right">
+                {videoProgress.completedFrames}/{videoProgress.totalFrames} frames
+                {videoProgress.totalChunks > 1 && videoProgress.chunk > 0
+                  ? ` (chunk ${videoProgress.chunk}/${videoProgress.totalChunks})`
+                  : ""}
               </span>
             )}
           </div>
@@ -310,7 +367,7 @@ function ProgressBar({
 
         <div className="flex flex-col items-center gap-1">
           <p className="max-h-24 max-w-80 overflow-y-auto whitespace-pre-wrap text-center text-sm font-bold">
-            {progress}
+            {videoProgress?.message || progress}
           </p>
 
           <p className="animate-pulse rounded-full px-2 pb-3 text-xs font-medium text-neutral-content/50">

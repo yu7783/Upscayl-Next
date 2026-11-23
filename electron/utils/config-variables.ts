@@ -3,6 +3,7 @@
  * Our goal is to send as many variables as possible from the renderer process to the main process to avoid using local storage variables.
  */
 
+import fs from "fs";
 import { ChildProcessWithoutNullStreams } from "child_process";
 import { getMainWindow } from "../main-window";
 import logit from "./logit";
@@ -44,10 +45,38 @@ export let stopped = false;
 /**
  * The child processes array to store the spawned upscayl processes.
  */
-export let childProcesses: {
+export type TrackedChildProcess = {
   process: ChildProcessWithoutNullStreams;
   kill: () => boolean;
-}[] = [];
+};
+
+export let childProcesses: TrackedChildProcess[] = [];
+
+/**
+ * Temporary working directories created by active pipelines (e.g. video frames)
+ * so they can be cleaned up automatically if the app quits mid-run.
+ */
+const activeTempDirs = new Set<string>();
+
+export function registerTempDir(dirPath: string): void {
+  activeTempDirs.add(dirPath);
+}
+
+export function unregisterTempDir(dirPath: string): void {
+  activeTempDirs.delete(dirPath);
+}
+
+export function cleanupAllTempDirs(): void {
+  for (const dirPath of Array.from(activeTempDirs)) {
+    try {
+      fs.rmSync(dirPath, { recursive: true, force: true });
+      activeTempDirs.delete(dirPath);
+      logit("🧹 Cleaned up temp dir on exit: ", dirPath);
+    } catch (error) {
+      logit("⚠️ Failed to clean up temp dir on exit: ", dirPath, error);
+    }
+  }
+}
 
 /**
  * The turn off notifications variable, so that we can load this value on startup.
@@ -64,18 +93,26 @@ export function setStopped(value: boolean): void {
   logit("🛑 Updating Stopped: ", stopped);
 }
 
-export function setChildProcesses(value: {
-  process: ChildProcessWithoutNullStreams;
-  kill: () => boolean;
-}): void {
+export function setChildProcesses(value: TrackedChildProcess): void {
   childProcesses.push(value);
   logit(
     "👶 Updating Child Processes: ",
     JSON.stringify({
-      binary: childProcesses[0].process.spawnfile,
-      args: childProcesses[0].process.spawnargs,
+      binary: value.process.spawnfile,
+      args: value.process.spawnargs,
     }),
   );
+}
+
+export function removeChildProcess(value: TrackedChildProcess): void {
+  const idx = childProcesses.indexOf(value);
+  if (idx >= 0) {
+    childProcesses.splice(idx, 1);
+  }
+}
+
+export function clearChildProcesses(): void {
+  childProcesses.length = 0;
 }
 
 // LOCAL STORAGE

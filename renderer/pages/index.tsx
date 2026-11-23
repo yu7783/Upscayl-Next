@@ -1,9 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import { useAtomValue, useSetAtom } from "jotai";
 import { customModelIdsAtom } from "../atoms/models-list-atom";
 import {
+  activeTabAtom,
   batchModeAtom,
   savedOutputPathAtom,
   progressAtom,
@@ -11,6 +12,8 @@ import {
   userStatsAtom,
   upscaylPassAtom,
   batchProgressAtom,
+  multiModelProgressAtom,
+  videoProgressAtom,
 } from "../atoms/user-settings-atom";
 import useLogger from "../components/hooks/use-logger";
 import { useToast } from "@/components/ui/use-toast";
@@ -21,6 +24,15 @@ import Sidebar from "@/components/sidebar";
 import MainContent from "@/components/main-content";
 import getDirectoryFromPath from "@common/get-directory-from-path";
 import { FEATURE_FLAGS } from "@common/feature-flags";
+import {
+  FfmpegStatus,
+  MultiModelDonePayload,
+  MultiModelProgressInfo,
+  MultiModelResult,
+  VideoDoneInfo,
+  VideoMediaInfo,
+  VideoProgressInfo,
+} from "@common/types/types";
 import { ImageFormat, VALID_IMAGE_FORMATS } from "@/lib/valid-formats";
 import { initCustomModels } from "@/components/hooks/use-custom-models";
 import { OnboardingDialog } from "@/components/main-content/onboarding-dialog";
@@ -37,11 +49,21 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [imagePath, setImagePath] = useState("");
   const [videoPath, setVideoPath] = useState("");
+  const [videoInfo, setVideoInfo] = useState<VideoMediaInfo | null>(null);
+  const [videoDoneInfo, setVideoDoneInfo] = useState<VideoDoneInfo | null>(
+    null,
+  );
+  const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegStatus | null>(null);
   const [upscaledImagePath, setUpscaledImagePath] = useState("");
+  const [multiModelResults, setMultiModelResults] = useState<
+    MultiModelResult[]
+  >([]);
+  const [multiModelStopped, setMultiModelStopped] = useState(false);
   const [dimensions, setDimensions] = useState({
     width: null,
     height: null,
   });
+  const activeTab = useAtomValue(activeTabAtom);
   const setOutputPath = useSetAtom(savedOutputPathAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
   const batchMode = useAtomValue(batchModeAtom);
@@ -50,8 +72,55 @@ const Home = () => {
   const setProgress = useSetAtom(progressAtom);
   const setUpscaylPass = useSetAtom(upscaylPassAtom);
   const setBatchProgress = useSetAtom(batchProgressAtom);
+  const setMultiModelProgress = useSetAtom(multiModelProgressAtom);
+  const setVideoProgress = useSetAtom(videoProgressAtom);
   const setModelIds = useSetAtom(customModelIdsAtom);
   const setUserStats = useSetAtom(userStatsAtom);
+
+  // Check FFmpeg / FFprobe readiness when opening the Video tab
+  useEffect(() => {
+    if (activeTab !== 1) return;
+    let cancelled = false;
+    window.electron
+      .invoke(ELECTRON_COMMANDS.CHECK_FFMPEG)
+      .then((status: FfmpegStatus) => {
+        if (!cancelled) setFfmpegStatus(status);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
+  const loadVideoPath = useCallback(
+    async (path: string) => {
+      if (!path) return;
+      logit("🎬 Selected Video Path: ", path);
+      setVideoPath(path);
+      setVideoDoneInfo(null);
+      setVideoInfo(null);
+      const dirname = getDirectoryFromPath(path);
+      logit("📁 Selected Video Directory: ", dirname);
+      if (!FEATURE_FLAGS.APP_STORE_BUILD) {
+        if (!rememberOutputFolder) {
+          setOutputPath(dirname);
+        }
+      }
+      try {
+        const info: VideoMediaInfo | null = await window.electron.invoke(
+          ELECTRON_COMMANDS.GET_VIDEO_INFO,
+          path,
+        );
+        setVideoInfo(info);
+        if (info) {
+          logit("🎞 Video Metadata: ", JSON.stringify(info));
+        }
+      } catch (err) {
+        logit("⚠️ Could not probe video metadata: ", err);
+      }
+    },
+    [logit, rememberOutputFolder, setOutputPath],
+  );
 
   const selectImageHandler = async () => {
     resetImagePaths();
@@ -72,15 +141,15 @@ const Home = () => {
   const selectVideoHandler = async () => {
     const path = await window.electron.invoke(ELECTRON_COMMANDS.SELECT_VIDEO);
     if (path === null) return;
-    logit("🎬 Selected Video Path: ", path);
-    setVideoPath(path);
-    const dirname = getDirectoryFromPath(path);
-    logit("📁 Selected Video Directory: ", dirname);
-    if (!FEATURE_FLAGS.APP_STORE_BUILD) {
-      if (!rememberOutputFolder) {
-        setOutputPath(dirname);
-      }
-    }
+    await loadVideoPath(path);
+  };
+
+  const resetVideoHandler = () => {
+    setVideoPath("");
+    setVideoInfo(null);
+    setVideoDoneInfo(null);
+    setVideoProgress(null);
+    setProgress("");
   };
 
   const selectFolderHandler = async () => {
@@ -144,7 +213,12 @@ const Home = () => {
           ),
         });
         resetImagePaths();
-      } else if (data.includes("write") || data.includes("read")) {
+      } else if (
+        /\b(read|write)\b/i.test(data) &&
+        (data.toLowerCase().includes("error") ||
+          data.toLowerCase().includes("failed") ||
+          data.toLowerCase().includes("cannot"))
+      ) {
         if (batchMode) return;
         toast({
           title: t("ERRORS.READ_WRITE_ERROR.TITLE"),
@@ -213,7 +287,20 @@ const Home = () => {
         title: t("ERRORS.GENERIC_ERROR.TITLE"),
         description: data,
       });
-      resetImagePaths();
+      setProgress("");
+      setVideoProgress(null);
+      setMultiModelProgress(null);
+      setUpscaylPass({ pass: 0, totalPasses: 0 });
+      setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
+    });
+    // STOPPED
+    window.electron.on(ELECTRON_COMMANDS.STOPPED, () => {
+      setProgress("");
+      setVideoProgress(null);
+      setMultiModelProgress(null);
+      setUpscaylPass({ pass: 0, totalPasses: 0 });
+      setBatchProgress({ pass: 0, totalPasses: 0, completed: 0, total: 0 });
+      logit("🛑 Operation stopped");
     });
     // UPSCAYL PROGRESS
     window.electron.on(
@@ -230,28 +317,48 @@ const Home = () => {
         logit(`🚧 UPSCAYL_PROGRESS: `, data);
       },
     );
-    // VIDEO UPSCAYL PROGRESS
+    // MULTI-MODEL PROGRESS
     window.electron.on(
-      ELECTRON_COMMANDS.UPSCAYL_VIDEO_PROGRESS,
-      (_, data: string) => {
-        if (data.length > 0 && data.length < 10) {
-          setProgress(data);
-        } else {
-          setProgress(data);
-        }
-        handleErrors(data);
-        logit(`🎬 UPSCAYL_VIDEO_PROGRESS: `, data);
+      ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL_PROGRESS,
+      (_, data: MultiModelProgressInfo) => {
+        setMultiModelProgress(data);
+        setProgress(`${data.overallPercent}%`);
+        logit(`🔀 MULTI_MODEL_PROGRESS: `, JSON.stringify(data));
       },
     );
-    // VIDEO UPSCAYL DONE
+    // MULTI-MODEL SINGLE RESULT (incremental)
     window.electron.on(
-      ELECTRON_COMMANDS.UPSCAYL_VIDEO_DONE,
-      (_, data: string) => {
-        setProgress("");
-        toast({
-          title: t("VIDEO_UPSCAYL.SUCCESS_TITLE"),
-          description: data,
+      ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL_RESULT,
+      (_, result: MultiModelResult) => {
+        setMultiModelResults((prev) => {
+          const exists = prev.some((r) => r.modelId === result.modelId);
+          return exists
+            ? prev.map((r) => (r.modelId === result.modelId ? result : r))
+            : [...prev, result];
         });
+        logit(`🧩 MULTI_MODEL_RESULT: `, JSON.stringify(result));
+      },
+    );
+    // MULTI-MODEL DONE
+    window.electron.on(
+      ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL_DONE,
+      (_, payload: MultiModelDonePayload) => {
+        setProgress("");
+        setMultiModelProgress(null);
+        setUpscaylPass({ pass: 0, totalPasses: 0 });
+        setMultiModelResults(payload.results ?? []);
+        setMultiModelStopped(Boolean(payload.stopped));
+        const succeeded = (payload.results ?? []).filter(
+          (r) => r.status === "done",
+        ).length;
+        if (succeeded > 0) {
+          toast({
+            title: t("MULTI_MODEL.COMPLETED_SUMMARY", {
+              succeeded: String(succeeded),
+              total: String(payload.results.length),
+            }),
+          });
+        }
         setUserStats((prev) => ({
           ...prev,
           lastUpscaylDuration: new Date().getTime() - prev.lastUsedAt,
@@ -260,7 +367,51 @@ const Home = () => {
               (new Date().getTime() - prev.lastUsedAt)) /
             (prev.totalUpscayls + 1),
         }));
-        logit(`💯 UPSCAYL_VIDEO_DONE: `, data);
+        logit(`💯 MULTI_MODEL_UPSCAYL_DONE: `, JSON.stringify(payload));
+      },
+    );
+    // VIDEO UPSCAYL PROGRESS (legacy text + structured)
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_VIDEO_PROGRESS,
+      (_, data: string) => {
+        setProgress(data);
+        logit(`🎬 UPSCAYL_VIDEO_PROGRESS: `, data);
+      },
+    );
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_VIDEO_PROGRESS_INFO,
+      (_, data: VideoProgressInfo) => {
+        setVideoProgress(data);
+        setProgress(data.message);
+      },
+    );
+    // VIDEO UPSCAYL DONE
+    window.electron.on(
+      ELECTRON_COMMANDS.UPSCAYL_VIDEO_DONE,
+      (_, data: VideoDoneInfo | string) => {
+        setProgress("");
+        setVideoProgress(null);
+        if (typeof data === "string") {
+          toast({
+            title: t("VIDEO_UPSCAYL.SUCCESS_TITLE"),
+            description: data,
+          });
+        } else {
+          setVideoDoneInfo(data);
+          toast({
+            title: t("VIDEO_UPSCAYL.SUCCESS_TITLE"),
+            description: data.outputPath,
+          });
+        }
+        setUserStats((prev) => ({
+          ...prev,
+          lastUpscaylDuration: new Date().getTime() - prev.lastUsedAt,
+          averageUpscaylTime:
+            (prev.averageUpscaylTime * prev.totalUpscayls +
+              (new Date().getTime() - prev.lastUsedAt)) /
+            (prev.totalUpscayls + 1),
+        }));
+        logit(`💯 UPSCAYL_VIDEO_DONE: `, JSON.stringify(data));
       },
     );
     // FOLDER UPSCAYL PROGRESS
@@ -400,6 +551,9 @@ const Home = () => {
       height: null,
     });
     setProgress("");
+    setMultiModelProgress(null);
+    setMultiModelResults([]);
+    setMultiModelStopped(false);
     setImagePath("");
     setUpscaledImagePath("");
     setBatchFolderPath("");
@@ -421,11 +575,16 @@ const Home = () => {
         imagePath={imagePath}
         dimensions={dimensions}
         setUpscaledImagePath={setUpscaledImagePath}
+        setMultiModelResults={setMultiModelResults}
+        setMultiModelStopped={setMultiModelStopped}
         batchFolderPath={batchFolderPath}
         setUpscaledBatchFolderPath={setUpscaledBatchFolderPath}
         selectImageHandler={selectImageHandler}
         selectFolderHandler={selectFolderHandler}
         videoPath={videoPath}
+        videoInfo={videoInfo}
+        ffmpegStatus={ffmpegStatus}
+        setVideoDoneInfo={setVideoDoneInfo}
         selectVideoHandler={selectVideoHandler}
       />
       <MainContent
@@ -438,7 +597,16 @@ const Home = () => {
         selectImageHandler={selectImageHandler}
         batchFolderPath={batchFolderPath}
         upscaledImagePath={upscaledImagePath}
+        multiModelResults={multiModelResults}
+        multiModelStopped={multiModelStopped}
         setDimensions={setDimensions}
+        videoPath={videoPath}
+        videoInfo={videoInfo}
+        videoDoneInfo={videoDoneInfo}
+        ffmpegStatus={ffmpegStatus}
+        selectVideoHandler={selectVideoHandler}
+        loadVideoPath={loadVideoPath}
+        resetVideoHandler={resetVideoHandler}
       />
       <OnboardingDialog />
     </div>

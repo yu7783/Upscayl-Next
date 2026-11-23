@@ -1,5 +1,10 @@
+import { ELECTRON_COMMANDS } from "../../common/electron-commands";
 import { getMainWindow } from "../main-window";
-import { childProcesses, setStopped } from "../utils/config-variables";
+import {
+  childProcesses,
+  clearChildProcesses,
+  setStopped,
+} from "../utils/config-variables";
 import logit from "../utils/logit";
 
 const stop = async (event, payload) => {
@@ -7,10 +12,17 @@ const stop = async (event, payload) => {
 
   setStopped(true);
   mainWindow && mainWindow.setProgressBar(-1);
-  childProcesses.forEach((child) => {
-    logit("🛑 Stopping Upscaling Process", child.process.pid);
-    child.kill();
+  const active = [...childProcesses];
+  clearChildProcesses();
+  active.forEach((child) => {
+    try {
+      logit("🛑 Stopping Upscaling Process", child.process.pid);
+      child.kill();
+    } catch (error) {
+      logit("⚠️ Failed to stop process: ", error);
+    }
   });
+  mainWindow?.webContents.send(ELECTRON_COMMANDS.STOPPED);
 };
 
 export default stop;

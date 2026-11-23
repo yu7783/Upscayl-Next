@@ -1,6 +1,13 @@
 import { ImageFormat } from "@/lib/valid-formats";
 import { ModelId } from "@common/models-list";
-import { atom } from "jotai";
+import {
+  MultiModelProgressInfo,
+  VideoCodec,
+  VideoContainerFormat,
+  VideoProgressInfo,
+  VideoQualityPreset,
+} from "@common/types/types";
+import { PrimitiveAtom, atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 export const customModelsPathAtom = atomWithStorage<string | null>(
@@ -22,6 +29,22 @@ export const saveImageAsAtom = atomWithStorage<ImageFormat>(
 export const scaleAtom = atomWithStorage<string>("scale", "4");
 
 export const batchModeAtom = atom<boolean>(false);
+
+/**
+ * Multi-Model Compare mode: run an image through multiple models in succession
+ * and inspect the results side-by-side / via slider / via lens.
+ */
+export const multiModelModeAtom = atom<boolean>(false);
+
+export const selectedCompareModelsAtom = atomWithStorage<string[]>(
+  "selectedCompareModels",
+  ["upscayl-standard-4x", "high-fidelity-4x"],
+);
+
+/**
+ * Active sidebar tab: 0 = Image, 1 = Video, 2 = Settings.
+ */
+export const activeTabAtom = atom<number>(0);
 
 /**
  * The path to the last folder the user saved an image to.
@@ -59,6 +82,31 @@ export const batchProgressAtom = atom<{
   completed: 0,
   total: 0,
 });
+
+export const multiModelProgressAtom = atom(
+  null as MultiModelProgressInfo | null,
+) as PrimitiveAtom<MultiModelProgressInfo | null>;
+
+export const videoProgressAtom = atom(
+  null as VideoProgressInfo | null,
+) as PrimitiveAtom<VideoProgressInfo | null>;
+
+export const videoCodecAtom = atomWithStorage<VideoCodec>("videoCodec", "h264");
+
+export const videoContainerAtom = atomWithStorage<VideoContainerFormat>(
+  "videoContainer",
+  "mp4",
+);
+
+export const videoQualityAtom = atomWithStorage<VideoQualityPreset>(
+  "videoQuality",
+  "balanced",
+);
+
+export const videoKeepAudioAtom = atomWithStorage<boolean>(
+  "videoKeepAudio",
+  true,
+);
 
 export const rememberOutputFolderAtom = atomWithStorage<boolean>(
   "rememberOutputFolder",

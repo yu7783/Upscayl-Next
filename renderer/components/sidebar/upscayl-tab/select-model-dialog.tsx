@@ -18,6 +18,7 @@ import {
   compressionAtom,
   doubleUpscaylAtom,
   scaleAtom,
+  selectedCompareModelsAtom,
   selectedModelIdAtom,
   threadsAtom,
   tileSizeAtom,
@@ -47,9 +48,16 @@ const engineBadgeClass = (engine: string) => {
   }
 };
 
-const SelectModelDialog = () => {
+type SelectModelDialogProps = {
+  multiSelect?: boolean;
+};
+
+const SelectModelDialog = ({ multiSelect = false }: SelectModelDialogProps) => {
   const t = useTranslation();
   const [selectedModelId, setSelectedModelId] = useAtom(selectedModelIdAtom);
+  const [selectedCompareModels, setSelectedCompareModels] = useAtom(
+    selectedCompareModelsAtom,
+  );
   const autoOptimize = useAtomValue(autoOptimizeAtom);
 
   // Profile settings are only written when auto-optimization is enabled. Custom
@@ -73,7 +81,26 @@ const SelectModelDialog = () => {
   const [open, setOpen] = useState(false);
   const [zoomedModel, setZoomedModel] = useState<ModelId | null>(null);
 
+  const getModelDisplayName = (modelId: string) =>
+    modelId in MODELS
+      ? t(`APP.MODEL_SELECTION.MODELS.${MODELS[modelId as ModelId]?.id}.NAME` as any)
+      : modelId;
+
+  const toggleCompareModel = (model: string) => {
+    setSelectedCompareModels((prev) => {
+      if (prev.includes(model)) {
+        return prev.filter((item) => item !== model);
+      }
+      return [...prev, model];
+    });
+  };
+
   const handleModelSelect = (model: ModelId | string) => {
+    if (multiSelect) {
+      toggleCompareModel(model);
+      return;
+    }
+
     setSelectedModelId(model);
 
     const next = resolveModelSettings(model, autoOptimize, {
@@ -101,22 +128,65 @@ const SelectModelDialog = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <button className="btn btn-primary justify-start border-border">
-            <SwatchBookIcon className="mr-2 h-5 w-5" />
-            {selectedModelId in MODELS
-              ? t(
-                  `APP.MODEL_SELECTION.MODELS.${MODELS[selectedModelId]?.id}.NAME` as any,
-                )
-              : selectedModelId}
+            <SwatchBookIcon className="mr-2 h-5 w-5 shrink-0" />
+            <span className="truncate">
+              {multiSelect
+                ? selectedCompareModels.length > 0
+                  ? t("MULTI_MODEL.SELECT_MODELS_BUTTON", {
+                      count: String(selectedCompareModels.length),
+                    })
+                  : t("MULTI_MODEL.SELECT_MODELS_EMPTY")
+                : getModelDisplayName(selectedModelId)}
+            </span>
           </button>
         </DialogTrigger>
         <DialogContent className="z-50 sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{t("APP.MODEL_SELECTION.DESCRIPTION")}</DialogTitle>
+            <DialogTitle>
+              {multiSelect
+                ? t("MULTI_MODEL.DIALOG_TITLE")
+                : t("APP.MODEL_SELECTION.DESCRIPTION")}
+            </DialogTitle>
           </DialogHeader>
+
+          {multiSelect && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-box border border-primary/20 bg-primary/10 px-3 py-2 text-xs">
+              <span className="font-semibold text-primary">
+                {t("MULTI_MODEL.SELECTED_COUNT", {
+                  count: String(selectedCompareModels.length),
+                })}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-xs"
+                  onClick={() =>
+                    setSelectedCompareModels(Object.keys(MODELS))
+                  }
+                >
+                  {t("MULTI_MODEL.SELECT_ALL_BUNDLED")}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-xs"
+                  onClick={() => setSelectedCompareModels([])}
+                >
+                  {t("MULTI_MODEL.CLEAR_SELECTION")}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-xs"
+                  onClick={() => setOpen(false)}
+                >
+                  {t("MULTI_MODEL.DONE_BUTTON")}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-box border border-base-content/10 bg-base-200/70 p-3 text-xs leading-relaxed">
             <p className="mb-2 text-sm font-semibold">
@@ -148,24 +218,49 @@ const SelectModelDialog = () => {
             </div>
           </div>
 
-          <ScrollArea className="max-h-[520px] pr-4">
+          <ScrollArea className="max-h-[480px] pr-4">
             <div className="flex flex-col gap-4">
               {Object.entries(MODELS).map((modelData) => {
                 const modelId = modelData[0] as ModelId;
                 const compatibility = getModelCompatibility(modelId);
+                const selectedIndex = multiSelect
+                  ? selectedCompareModels.indexOf(modelId)
+                  : -1;
+                const isSelected = multiSelect
+                  ? selectedIndex >= 0
+                  : selectedModelId === modelId;
+
                 return (
                   <button
                     key={modelId}
-                    className="btn !h-auto !w-full !flex-col !items-start !rounded-sm !p-4"
+                    type="button"
+                    className={`btn !h-auto !w-full !flex-col !items-start !rounded-sm !p-4 ${
+                      isSelected ? "ring-2 ring-primary ring-offset-1 ring-offset-base-100" : ""
+                    }`}
                     onClick={() => handleModelSelect(modelId)}
                   >
                     <div className="flex w-full flex-wrap items-center justify-between gap-2">
-                      <p className="font-semibold">
-                        {t(`APP.MODEL_SELECTION.MODELS.${modelId}.NAME`)}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {multiSelect && (
+                          <input
+                            type="checkbox"
+                            readOnly
+                            checked={isSelected}
+                            className="checkbox checkbox-primary checkbox-sm pointer-events-none"
+                          />
+                        )}
+                        <p className="font-semibold">
+                          {t(`APP.MODEL_SELECTION.MODELS.${modelId}.NAME`)}
+                        </p>
+                      </div>
                       <div className="flex flex-wrap items-center gap-1">
+                        {multiSelect && selectedIndex >= 0 && (
+                          <span className="badge badge-primary badge-sm font-bold">
+                            #{selectedIndex + 1}
+                          </span>
+                        )}
                         {modelId === "upscayl-standard-4x" && (
-                          <span className="badge badge-sm badge-primary">
+                          <span className="badge badge-primary badge-sm">
                             {t("APP.MODEL_SELECTION.RECOMMENDED")}
                           </span>
                         )}
@@ -249,19 +344,48 @@ const SelectModelDialog = () => {
 
                 {customModelIds.map((customModel) => {
                   const compatibility = getModelCompatibility(customModel);
+                  const selectedIndex = multiSelect
+                    ? selectedCompareModels.indexOf(customModel)
+                    : -1;
+                  const isSelected = multiSelect
+                    ? selectedIndex >= 0
+                    : selectedModelId === customModel;
+
                   return (
                     <button
                       key={customModel}
-                      className="btn h-auto w-full flex-col items-start gap-1 p-4"
+                      type="button"
+                      className={`btn h-auto w-full flex-col items-start gap-1 p-4 ${
+                        isSelected ? "ring-2 ring-primary ring-offset-1 ring-offset-base-100" : ""
+                      }`}
                       onClick={() => handleModelSelect(customModel)}
                       title={customModel}
                     >
                       <span className="flex w-full items-center justify-between gap-2">
-                        <span className="truncate text-left">{customModel}</span>
-                        <span
-                          className={`badge badge-sm ${engineBadgeClass(compatibility.engine)}`}
-                        >
-                          {compatibility.label}
+                        <span className="flex min-w-0 items-center gap-2">
+                          {multiSelect && (
+                            <input
+                              type="checkbox"
+                              readOnly
+                              checked={isSelected}
+                              className="checkbox checkbox-primary checkbox-sm pointer-events-none"
+                            />
+                          )}
+                          <span className="truncate text-left">
+                            {customModel}
+                          </span>
+                        </span>
+                        <span className="flex shrink-0 items-center gap-1">
+                          {multiSelect && selectedIndex >= 0 && (
+                            <span className="badge badge-primary badge-sm font-bold">
+                              #{selectedIndex + 1}
+                            </span>
+                          )}
+                          <span
+                            className={`badge badge-sm ${engineBadgeClass(compatibility.engine)}`}
+                          >
+                            {compatibility.label}
+                          </span>
                         </span>
                       </span>
                       <span className="text-xs text-base-content/60">
@@ -278,6 +402,31 @@ const SelectModelDialog = () => {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {multiSelect && selectedCompareModels.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selectedCompareModels.map((modelId, idx) => (
+            <span
+              key={modelId}
+              className="badge badge-neutral gap-1.5 py-2.5 text-xs"
+              title={modelId}
+            >
+              <span className="font-bold text-primary">#{idx + 1}</span>
+              <span className="max-w-[170px] truncate">
+                {getModelDisplayName(modelId)}
+              </span>
+              <button
+                type="button"
+                aria-label={`Remove ${modelId}`}
+                className="ml-0.5 opacity-70 hover:opacity-100"
+                onClick={() => toggleCompareModel(modelId)}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       <Dialog
         open={!!zoomedModel}
