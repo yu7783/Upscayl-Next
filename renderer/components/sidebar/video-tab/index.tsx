@@ -46,6 +46,7 @@ import {
 import useLogger from "../../hooks/use-logger";
 import SelectModelDialog from "../upscayl-tab/select-model-dialog";
 import { SelectImageScale } from "../settings-tab/select-image-scale";
+import RecipeBar from "../recipe-bar";
 
 type VideoTabProps = {
   videoPath: string;
@@ -226,6 +227,8 @@ const VideoTab = ({
 
   return (
     <div className="animate-step-in flex h-screen flex-col gap-5 overflow-y-auto overflow-x-hidden p-5">
+      <RecipeBar />
+
       {/* FFmpeg Status */}
       {ffmpegStatus && (
         <div

@@ -41,6 +41,9 @@ import {
   videoTrimStartAtom,
   videoUseHwEncodeAtom,
   videoBatchPathsAtom,
+  faceRestoreAtom,
+  faceRestoreStrengthAtom,
+  roiRectAtom,
 } from "../../atoms/user-settings-atom";
 import useLogger from "../hooks/use-logger";
 import {
@@ -52,6 +55,8 @@ import {
   ImageUpscaylPayload,
   MultiModelResult,
   MultiModelUpscaylPayload,
+  RoiUpscaylDonePayload,
+  RoiUpscaylPayload,
   VideoDoneInfo,
   VideoMediaInfo,
   VideoSessionManifest,
@@ -79,6 +84,7 @@ const Sidebar = ({
   setUpscaledImagePath,
   setMultiModelResults,
   setMultiModelStopped,
+  setRoiPreview,
   batchFolderPath,
   setUpscaledBatchFolderPath,
   dimensions,
@@ -95,10 +101,14 @@ const Sidebar = ({
   selectMultipleVideosHandler,
   resumeVideoSessionHandler,
   discardVideoSessionHandler,
+  registerImageActions,
 }: {
   setUpscaledImagePath: React.Dispatch<React.SetStateAction<string>>;
   setMultiModelResults: React.Dispatch<React.SetStateAction<MultiModelResult[]>>;
   setMultiModelStopped: React.Dispatch<React.SetStateAction<boolean>>;
+  setRoiPreview: React.Dispatch<
+    React.SetStateAction<RoiUpscaylDonePayload | null>
+  >;
   batchFolderPath: string;
   setUpscaledBatchFolderPath: React.Dispatch<React.SetStateAction<string>>;
   dimensions: {
@@ -120,6 +130,10 @@ const Sidebar = ({
   selectMultipleVideosHandler: () => Promise<void>;
   resumeVideoSessionHandler: (sessionId: string) => void;
   discardVideoSessionHandler: (sessionId: string) => Promise<void>;
+  registerImageActions?: (actions: {
+    runFullUpscale: () => Promise<void>;
+    runRoiUpscale: () => Promise<void>;
+  }) => void;
 }) => {
   const t = useTranslation();
   const logit = useLogger();
@@ -157,6 +171,9 @@ const Sidebar = ({
   const videoTrimStart = useAtomValue(videoTrimStartAtom);
   const videoTrimEnd = useAtomValue(videoTrimEndAtom);
   const videoBatchPaths = useAtomValue(videoBatchPathsAtom);
+  const faceRestore = useAtomValue(faceRestoreAtom);
+  const faceRestoreStrength = useAtomValue(faceRestoreStrengthAtom);
+  const roiRect = useAtomValue(roiRectAtom);
   const logData = useAtomValue(logAtom);
   const [scale] = useAtom(scaleAtom);
   const setDontShowCloudModal = useSetAtom(dontShowCloudModalAtom);
@@ -178,6 +195,7 @@ const Sidebar = ({
     setUpscaledBatchFolderPath("");
     setMultiModelResults([]);
     setMultiModelStopped(false);
+    setRoiPreview(null);
     setMultiModelProgress(null);
     setVideoProgress(null);
     setUpscaylPass({ pass: 0, totalPasses: 0 });
@@ -211,9 +229,6 @@ const Sidebar = ({
     setProgress(t("APP.PROGRESS.WAIT_TITLE"));
 
     if (mode === "batch") {
-      // Batch Upscayl. Batch takes priority so a persisted Double Upscayl
-      // flag can no longer send an empty imagePath to the double pipeline
-      // (GitHub issue #1405). Double is forwarded as a second pass instead.
       window.electron.send<BatchUpscaylPayload>(
         ELECTRON_COMMANDS.FOLDER_UPSCAYL,
         {
@@ -232,6 +247,8 @@ const Sidebar = ({
           copyMetadata,
           doubleUpscale: doubleUpscayl,
           threads: threads ?? undefined,
+          faceRestore,
+          faceRestoreStrength,
         },
       );
       setUserStats((prev) => ({
@@ -264,6 +281,8 @@ const Sidebar = ({
           copyMetadata,
           doubleUpscale: doubleUpscayl,
           threads: threads ?? undefined,
+          faceRestore,
+          faceRestoreStrength,
         },
       );
       setUserStats((prev) => ({
@@ -295,6 +314,8 @@ const Sidebar = ({
           ttaMode,
           copyMetadata,
           threads: threads ?? undefined,
+          faceRestore,
+          faceRestoreStrength,
         },
       );
       setUserStats((prev) => ({
@@ -325,6 +346,8 @@ const Sidebar = ({
       ttaMode,
       copyMetadata,
       threads: threads ?? undefined,
+      faceRestore,
+      faceRestoreStrength,
     });
     setUserStats((prev) => ({
       ...prev,
@@ -334,6 +357,56 @@ const Sidebar = ({
     }));
     logit("🏁 UPSCAYL");
   };
+
+  const roiUpscaleHandler = async () => {
+    if (!imagePath) {
+      toast({
+        title: t("ERRORS.NO_IMAGE_ERROR.TITLE"),
+        description: t("ERRORS.NO_IMAGE_ERROR.DESCRIPTION"),
+      });
+      return;
+    }
+    if (!roiRect) {
+      toast({ description: t("ROI.NO_REGION_ERROR") });
+      return;
+    }
+    const targetModels =
+      multiModelMode && selectedCompareModels.length > 0
+        ? selectedCompareModels
+        : [String(selectedModelId)];
+
+    setUpscaledImagePath("");
+    setMultiModelResults([]);
+    setRoiPreview(null);
+    setProgress(t("APP.PROGRESS.WAIT_TITLE"));
+
+    window.electron.send<RoiUpscaylPayload>(ELECTRON_COMMANDS.ROI_UPSCAYL, {
+      imagePath,
+      outputPath: outputPath || "",
+      roi: roiRect,
+      models: targetModels,
+      scale,
+      gpuId: gpuId.length === 0 ? null : gpuId,
+      saveImageAs,
+      compression: compression.toString(),
+      customWidth: customWidth > 0 ? customWidth.toString() : null,
+      useCustomWidth,
+      tileSize,
+      ttaMode,
+      doubleUpscale: doubleUpscayl,
+      threads: threads ?? undefined,
+      faceRestore,
+      faceRestoreStrength,
+    });
+    logit("✂️ ROI_UPSCAYL", JSON.stringify({ roiRect, targetModels }));
+  };
+
+  if (registerImageActions) {
+    registerImageActions({
+      runFullUpscale: upscaylHandler,
+      runRoiUpscale: roiUpscaleHandler,
+    });
+  }
 
   const upscaylVideoHandler = async (overrides?: {
     trimStartSeconds?: number | null;
@@ -528,6 +601,7 @@ const Sidebar = ({
             selectImageHandler={selectImageHandler}
             selectFolderHandler={selectFolderHandler}
             upscaylHandler={upscaylHandler}
+            roiUpscaleHandler={roiUpscaleHandler}
             batchMode={batchMode}
             setBatchMode={setBatchMode}
             imagePath={imagePath}

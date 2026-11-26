@@ -8,12 +8,20 @@ import {
   resolveDefaultComparePair,
 } from "@common/multi-model-helpers";
 import { sanitizePath } from "@common/sanitize-path";
-import { MultiModelResult } from "@common/types/types";
+import {
+  MultiModelResult,
+  MultiModelTrashPayload,
+  MultiModelTrashResult,
+  RoiRectPayload,
+} from "@common/types/types";
+import getFilenameFromPath from "@common/get-file-name";
+import { useToast } from "@/components/ui/use-toast";
 import useTranslation from "../hooks/use-translation";
 import LensViewer from "./lens-view";
 import SliderView from "./slider-view";
+import BlendPanel from "./blend-panel";
 
-type CompareMode = "slider" | "grid" | "lens";
+type CompareMode = "slider" | "grid" | "lens" | "blend";
 
 type MultiModelCompareViewProps = {
   imagePath: string;
@@ -21,6 +29,13 @@ type MultiModelCompareViewProps = {
   results: MultiModelResult[];
   wasStopped: boolean;
   zoomAmount: string;
+  onUpdateResults?: React.Dispatch<React.SetStateAction<MultiModelResult[]>>;
+  roiPreview?: {
+    cropInputPath: string;
+    roi: RoiRectPayload;
+  } | null;
+  onExitRoiPreview?: () => void;
+  onUpscaleFullFromRoi?: () => void;
 };
 
 const formatMs = (ms: number): string => {
@@ -35,8 +50,15 @@ const MultiModelCompareView = ({
   results,
   wasStopped,
   zoomAmount,
+  onUpdateResults,
+  roiPreview,
+  onExitRoiPreview,
+  onUpscaleFullFromRoi,
 }: MultiModelCompareViewProps) => {
   const t = useTranslation();
+  const { toast } = useToast();
+
+  const effectiveSourcePath = roiPreview?.cropInputPath || imagePath;
 
   const succeededResults = useMemo(
     () => results.filter((r) => r.status === "done" && r.outputPath.length > 0),
@@ -58,6 +80,7 @@ const MultiModelCompareView = ({
   const [showOriginalInGrid, setShowOriginalInGrid] = useState<boolean>(true);
   const [gridZoom, setGridZoom] = useState<number>(100);
   const [gridOrigin, setGridOrigin] = useState<string>("50% 50%");
+  const [isTrashing, setIsTrashing] = useState<boolean>(false);
 
   useEffect(() => {
     setLeftId(defaultPair.leftId);
@@ -85,7 +108,7 @@ const MultiModelCompareView = ({
       {
         id: ORIGINAL_COMPARE_ID,
         label: t("MULTI_MODEL.ORIGINAL_OPTION"),
-        path: imagePath,
+        path: effectiveSourcePath,
         durationMs: 0,
       },
     ];
@@ -101,7 +124,7 @@ const MultiModelCompareView = ({
     }
 
     return list;
-  }, [imagePath, succeededResults, t]);
+  }, [effectiveSourcePath, succeededResults, t]);
 
   const leftOption =
     options.find((opt) => opt.id === leftId) ?? options[0];
@@ -109,6 +132,54 @@ const MultiModelCompareView = ({
     options.find((opt) => opt.id === rightId) ??
     options[options.length - 1] ??
     options[0];
+
+  const discardModels = async (modelIdsToTrash: string[]) => {
+    if (isTrashing || modelIdsToTrash.length === 0) return;
+    const toTrashSet = new Set(modelIdsToTrash);
+    const filePaths = results
+      .filter((r) => toTrashSet.has(r.modelId) && r.outputPath)
+      .map((r) => r.outputPath);
+
+    setIsTrashing(true);
+    try {
+      const payload: MultiModelTrashPayload = {
+        filePaths,
+        protectedPaths: [imagePath, effectiveSourcePath],
+      };
+      const res: MultiModelTrashResult = await window.electron.invoke(
+        ELECTRON_COMMANDS.MULTI_MODEL_TRASH_FILES,
+        payload,
+      );
+      if (onUpdateResults) {
+        onUpdateResults((prev) =>
+          prev.filter((r) => !toTrashSet.has(r.modelId)),
+        );
+      }
+      const remaining = results.filter(
+        (r) => !toTrashSet.has(r.modelId) && r.status === "done",
+      );
+      toast({
+        description:
+          remaining.length === 0
+            ? t("MULTI_MODEL.ALL_DISCARDED")
+            : t("MULTI_MODEL.TRASHED_SUMMARY", {
+                count: String(res.trashed.length),
+              }),
+      });
+    } catch (err: any) {
+      toast({ description: err?.message ?? String(err) });
+    } finally {
+      setIsTrashing(false);
+    }
+  };
+
+  const keepOnlyModel = async (winnerModelId: string) => {
+    const others = succeededResults
+      .filter((r) => r.modelId !== winnerModelId)
+      .map((r) => r.modelId);
+    if (others.length === 0) return;
+    await discardModels(others);
+  };
 
   // Keyboard shortcuts: 1..9 switch Right (B), Left/Right arrow cycle Right (B)
   useEffect(() => {
@@ -174,11 +245,50 @@ const MultiModelCompareView = ({
         ? "grid-cols-2"
         : "grid-cols-2 xl:grid-cols-3";
 
+  const baseNameForBlend = useMemo(() => {
+    const fn = getFilenameFromPath(imagePath);
+    const dot = fn.lastIndexOf(".");
+    return dot > 0 ? fn.slice(0, dot) : fn || "upscayl";
+  }, [imagePath]);
+
   return (
     <div
       className="flex h-screen w-full flex-col overflow-hidden bg-base-300"
       onDoubleClick={(e) => e.stopPropagation()}
     >
+      {/* ROI Preview Banner */}
+      {roiPreview && (
+        <div className="z-30 flex flex-wrap items-center justify-between gap-2 border-b border-primary/30 bg-primary/15 px-4 py-1.5 text-xs">
+          <span className="font-semibold text-primary">
+            ✂️{" "}
+            {t("ROI.PREVIEW_BANNER", {
+              width: String(roiPreview.roi.width),
+              height: String(roiPreview.roi.height),
+            })}
+          </span>
+          <div className="flex items-center gap-2">
+            {onUpscaleFullFromRoi && (
+              <button
+                type="button"
+                className="btn btn-primary btn-xs"
+                onClick={onUpscaleFullFromRoi}
+              >
+                🚀 {t("ROI.UPSCALE_FULL_BUTTON")}
+              </button>
+            )}
+            {onExitRoiPreview && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-xs"
+                onClick={onExitRoiPreview}
+              >
+                {t("ROI.EXIT_PREVIEW")}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top Toolbar */}
       <div className="z-20 flex flex-col gap-2 border-b border-base-content/10 bg-base-100/95 px-4 py-2.5 backdrop-blur-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -210,6 +320,15 @@ const MultiModelCompareView = ({
               onClick={() => setCompareMode("lens")}
             >
               {t("MULTI_MODEL.VIEW_LENS")}
+            </button>
+            <button
+              type="button"
+              className={`btn join-item btn-xs ${
+                compareMode === "blend" ? "btn-primary" : "btn-ghost"
+              }`}
+              onClick={() => setCompareMode("blend")}
+            >
+              🎨 {t("MULTI_MODEL.VIEW_BLEND")}
             </button>
           </div>
 
@@ -288,17 +407,31 @@ const MultiModelCompareView = ({
             </div>
           )}
 
-          {outputPath && (
-            <button
-              type="button"
-              className="btn btn-outline btn-xs"
-              onClick={() =>
-                window.electron.send(ELECTRON_COMMANDS.OPEN_FOLDER, outputPath)
-              }
-            >
-              {t("MULTI_MODEL.OPEN_FOLDER")}
-            </button>
-          )}
+          <div className="flex items-center gap-1.5">
+            {!roiPreview &&
+              succeededResults.length > 1 &&
+              rightOption.id !== ORIGINAL_COMPARE_ID && (
+                <button
+                  type="button"
+                  className="btn btn-success btn-xs"
+                  disabled={isTrashing}
+                  onClick={() => keepOnlyModel(rightOption.id)}
+                >
+                  ✅ {t("MULTI_MODEL.KEEP_WINNER")}
+                </button>
+              )}
+            {outputPath && (
+              <button
+                type="button"
+                className="btn btn-outline btn-xs"
+                onClick={() =>
+                  window.electron.send(ELECTRON_COMMANDS.OPEN_FOLDER, outputPath)
+                }
+              >
+                {t("MULTI_MODEL.OPEN_FOLDER")}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Quick Model Strip */}
@@ -419,6 +552,18 @@ const MultiModelCompareView = ({
           />
         )}
 
+        {compareMode === "blend" && (
+          <BlendPanel
+            imageAPath={leftOption.path}
+            imageBPath={rightOption.path}
+            labelA={leftOption.label}
+            labelB={rightOption.label}
+            outputDir={outputPath || ""}
+            baseName={baseNameForBlend}
+            sourceMetadataPath={imagePath}
+          />
+        )}
+
         {compareMode === "grid" && (
           <div className={`grid h-full w-full gap-3 overflow-y-auto p-3 ${gridColsClass}`}>
             {gridItems.map((item) => (
@@ -466,20 +611,42 @@ const MultiModelCompareView = ({
                     >
                       {t("MULTI_MODEL.SET_AS_B")}
                     </button>
-                    {item.id !== ORIGINAL_COMPARE_ID && (
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-xs"
-                        onClick={() =>
-                          window.electron.send(
-                            ELECTRON_COMMANDS.OPEN_FILE_LOCATION,
-                            item.path,
-                          )
-                        }
-                        title={t("MULTI_MODEL.SHOW_IN_FOLDER")}
-                      >
-                        📂
-                      </button>
+                    {!roiPreview && item.id !== ORIGINAL_COMPARE_ID && (
+                      <>
+                        {succeededResults.length > 1 && (
+                          <button
+                            type="button"
+                            className="btn btn-success btn-xs"
+                            disabled={isTrashing}
+                            title={t("MULTI_MODEL.KEEP_THIS_WINNER")}
+                            onClick={() => keepOnlyModel(item.id)}
+                          >
+                            ★
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-error btn-ghost btn-xs"
+                          disabled={isTrashing}
+                          title={t("MULTI_MODEL.DISCARD_THIS")}
+                          onClick={() => discardModels([item.id])}
+                        >
+                          🗑️
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs"
+                          onClick={() =>
+                            window.electron.send(
+                              ELECTRON_COMMANDS.OPEN_FILE_LOCATION,
+                              item.path,
+                            )
+                          }
+                          title={t("MULTI_MODEL.SHOW_IN_FOLDER")}
+                        >
+                          📂
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

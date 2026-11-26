@@ -460,6 +460,57 @@
     "PARTIAL_STOPPED": "Stopped early — comparing {count} completed model(s).",
     "SOME_FAILED": "{count} model(s) failed during generation.",
     "SHORTCUT_HINT": "Keys 1–9 switch Right (B) · ←/→ cycle models",
-    "COMPLETED_SUMMARY": "Compared {succeeded} of {total} models"
+    "COMPLETED_SUMMARY": "Compared {succeeded} of {total} models",
+    "VIEW_BLEND": "Blend (A+B)",
+    "KEEP_WINNER": "Keep B · Trash Others",
+    "KEEP_THIS_WINNER": "Keep Only This",
+    "DISCARD_THIS": "Discard",
+    "TRASHED_SUMMARY": "Moved {count} rejected output(s) to Trash.",
+    "ALL_DISCARDED": "All generated outputs were discarded."
+  },
+  "ROI": {
+    "TOGGLE_TITLE": "ROI Crop Preview",
+    "TOGGLE_DESCRIPTION": "Drag on the image to select a small area and test upscale speed/quality in seconds.",
+    "DRAW_HINT": "Drag on the image to select a test crop region",
+    "SELECTED_SIZE": "Crop: {width}×{height} px",
+    "CLEAR_BUTTON": "Clear Crop",
+    "RUN_BUTTON": "Test Crop ({width}×{height})",
+    "PREVIEW_BANNER": "ROI Crop Preview ({width}×{height} px)",
+    "UPSCALE_FULL_BUTTON": "Upscale Full Image",
+    "EXIT_PREVIEW": "Back to Full Image",
+    "NO_REGION_ERROR": "Drag on the image to select a crop area first."
+  },
+  "BLEND": {
+    "TITLE": "Model Blend",
+    "BUTTON_OPEN": "Blend",
+    "WEIGHT_LABEL": "Blend Ratio",
+    "SAVE_BUTTON": "Save Blended Image",
+    "SAVING_BUTTON": "Blending...",
+    "SAVED_TOAST": "Saved blended image: {path}",
+    "ERROR_TOAST": "Blend failed: {error}",
+    "SHOW_IN_FOLDER": "Show Blended File"
+  },
+  "RECIPES": {
+    "TITLE": "Recipes / Presets",
+    "SELECT_PLACEHOLDER": "Apply a recipe...",
+    "BUILTIN_GROUP": "Built-in",
+    "CUSTOM_GROUP": "My Recipes",
+    "SAVE_BUTTON": "Save",
+    "DELETE_BUTTON": "Delete",
+    "EXPORT_BUTTON": "Export",
+    "IMPORT_BUTTON": "Import",
+    "NAME_PLACEHOLDER": "Recipe name...",
+    "APPLIED_TOAST": "Applied recipe: {name}",
+    "SAVED_TOAST": "Saved recipe: {name}",
+    "DELETED_TOAST": "Deleted recipe: {name}",
+    "IMPORTED_TOAST": "Imported {count} recipe(s).",
+    "IMPORT_ERROR": "Could not import recipes JSON."
+  },
+  "FACE_RESTORE": {
+    "TOGGLE_TITLE": "Face Restoration (GFPGAN)",
+    "TOGGLE_DESCRIPTION": "Restore facial details after upscaling using GFPGAN in the native Python environment.",
+    "STRENGTH_LABEL": "Strength ({value}%)",
+    "STATUS_READY": "GFPGAN Ready",
+    "STATUS_MISSING": "Requires pip install gfpgan"
   }
 }

@@ -52,6 +52,11 @@ const ELECTRON_COMMANDS = {
   PASTE_IMAGE: "Paste Image from clipboard",
   PASTE_IMAGE_SAVE_SUCCESS: "Clipboard Image saved successfully",
   PASTE_IMAGE_SAVE_ERROR: "Clipboard Image save failed",
+  MULTI_MODEL_TRASH_FILES: "Trash Rejected Multi-Model Files",
+  ROI_UPSCAYL: "Upscale ROI Region",
+  ROI_UPSCAYL_DONE: "ROI Upscaling Done",
+  BLEND_IMAGES: "Blend Two Images",
+  CHECK_FACE_RESTORE: "Check Face Restore Availability",
 } as const;
 
 export { ELECTRON_COMMANDS };

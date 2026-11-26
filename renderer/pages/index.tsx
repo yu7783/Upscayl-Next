@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import { useAtomValue, useSetAtom } from "jotai";
 import { customModelIdsAtom } from "../atoms/models-list-atom";
@@ -16,6 +16,7 @@ import {
   videoProgressAtom,
   videoBatchModeAtom,
   videoBatchPathsAtom,
+  roiRectAtom,
 } from "../atoms/user-settings-atom";
 import useLogger from "../components/hooks/use-logger";
 import { useToast } from "@/components/ui/use-toast";
@@ -34,6 +35,7 @@ import {
   MultiModelDonePayload,
   MultiModelProgressInfo,
   MultiModelResult,
+  RoiUpscaylDonePayload,
   VideoDoneInfo,
   VideoMediaInfo,
   VideoProgressInfo,
@@ -71,6 +73,17 @@ const Home = () => {
     MultiModelResult[]
   >([]);
   const [multiModelStopped, setMultiModelStopped] = useState(false);
+  const [roiPreview, setRoiPreview] = useState<RoiUpscaylDonePayload | null>(
+    null,
+  );
+  const imageActionsRef = useRef<{
+    runFullUpscale: () => Promise<void>;
+    runRoiUpscale: () => Promise<void>;
+  }>({
+    runFullUpscale: async () => {},
+    runRoiUpscale: async () => {},
+  });
+  const setRoiRect = useSetAtom(roiRectAtom);
   const [dimensions, setDimensions] = useState({
     width: null,
     height: null,
@@ -423,6 +436,7 @@ const Home = () => {
         setProgress("");
         setMultiModelProgress(null);
         setUpscaylPass({ pass: 0, totalPasses: 0 });
+        setRoiPreview(null);
         setMultiModelResults(payload.results ?? []);
         setMultiModelStopped(Boolean(payload.stopped));
         const succeeded = (payload.results ?? []).filter(
@@ -445,6 +459,19 @@ const Home = () => {
             (prev.totalUpscayls + 1),
         }));
         logit(`💯 MULTI_MODEL_UPSCAYL_DONE: `, JSON.stringify(payload));
+      },
+    );
+    // ROI PREVIEW DONE
+    window.electron.on(
+      ELECTRON_COMMANDS.ROI_UPSCAYL_DONE,
+      (_, payload: RoiUpscaylDonePayload) => {
+        setProgress("");
+        setMultiModelProgress(null);
+        setUpscaylPass({ pass: 0, totalPasses: 0 });
+        setRoiPreview(payload);
+        setMultiModelResults(payload.results ?? []);
+        setMultiModelStopped(Boolean(payload.stopped));
+        logit(`✂️ ROI_UPSCAYL_DONE: `, JSON.stringify(payload));
       },
     );
     // VIDEO UPSCAYL PROGRESS (legacy text + structured)
@@ -669,6 +696,8 @@ const Home = () => {
     setMultiModelProgress(null);
     setMultiModelResults([]);
     setMultiModelStopped(false);
+    setRoiPreview(null);
+    setRoiRect(null);
     setImagePath("");
     setUpscaledImagePath("");
     setBatchFolderPath("");
@@ -692,6 +721,7 @@ const Home = () => {
         setUpscaledImagePath={setUpscaledImagePath}
         setMultiModelResults={setMultiModelResults}
         setMultiModelStopped={setMultiModelStopped}
+        setRoiPreview={setRoiPreview}
         batchFolderPath={batchFolderPath}
         setUpscaledBatchFolderPath={setUpscaledBatchFolderPath}
         selectImageHandler={selectImageHandler}
@@ -706,6 +736,9 @@ const Home = () => {
         selectMultipleVideosHandler={selectMultipleVideosHandler}
         resumeVideoSessionHandler={resumeVideoSessionHandler}
         discardVideoSessionHandler={discardVideoSessionHandler}
+        registerImageActions={(actions) => {
+          imageActionsRef.current = actions;
+        }}
       />
       <MainContent
         imagePath={imagePath}
@@ -718,7 +751,20 @@ const Home = () => {
         batchFolderPath={batchFolderPath}
         upscaledImagePath={upscaledImagePath}
         multiModelResults={multiModelResults}
+        setMultiModelResults={setMultiModelResults}
         multiModelStopped={multiModelStopped}
+        roiPreview={roiPreview}
+        onExitRoiPreview={() => {
+          setRoiPreview(null);
+          setMultiModelResults([]);
+        }}
+        onRunRoiUpscale={() => {
+          imageActionsRef.current.runRoiUpscale();
+        }}
+        onUpscaleFullFromRoi={() => {
+          setRoiPreview(null);
+          imageActionsRef.current.runFullUpscale();
+        }}
         setDimensions={setDimensions}
         videoPath={videoPath}
         videoInfo={videoInfo}

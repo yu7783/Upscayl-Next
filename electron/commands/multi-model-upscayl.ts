@@ -42,6 +42,7 @@ import logit from "../utils/logit";
 import showNotification from "../utils/show-notification";
 import slash from "../utils/slash";
 import { spawnUpscayl } from "../utils/spawn-upscayl";
+import { runFaceRestore } from "./face-restore";
 
 const MAX_MEMORY_RETRIES = 6;
 const STDERR_TAIL_LIMIT = 800;
@@ -418,6 +419,16 @@ const multiModelUpscayl = async (_event, payload: MultiModelUpscaylPayload) => {
     const modelStart = Date.now();
     try {
       await runModelWithRetry(i, modelId, outFile, i);
+
+      if (payload.faceRestore && fs.existsSync(outFile)) {
+        const fr = await runFaceRestore(outFile, payload.faceRestoreStrength);
+        if (!fr.applied && fr.warning) {
+          mainWindow.webContents.send(
+            ELECTRON_COMMANDS.UPSCAYL_WARNING,
+            fr.warning,
+          );
+        }
+      }
 
       if (payload.copyMetadata && fs.existsSync(outFile)) {
         try {

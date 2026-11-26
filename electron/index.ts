@@ -17,6 +17,10 @@ import {
 } from "./commands/video-sessions";
 import { handleCheckFfmpeg, handleGetVideoInfo } from "./commands/video-info";
 import multiModelUpscayl from "./commands/multi-model-upscayl";
+import { handleTrashMultiModelFiles } from "./commands/multi-model-manage";
+import { handleBlendImages } from "./commands/blend-images";
+import { handleCheckFaceRestore } from "./commands/face-restore";
+import roiUpscayl from "./commands/roi-upscayl";
 import getModelsList from "./commands/get-models-list";
 import customModelsSelect from "./commands/custom-models-select";
 import imageUpscayl from "./commands/image-upscayl";
@@ -134,6 +138,17 @@ ipcMain.on(ELECTRON_COMMANDS.FOLDER_UPSCAYL, batchUpscayl);
 ipcMain.on(ELECTRON_COMMANDS.DOUBLE_UPSCAYL, doubleUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL, multiModelUpscayl);
+
+ipcMain.handle(
+  ELECTRON_COMMANDS.MULTI_MODEL_TRASH_FILES,
+  handleTrashMultiModelFiles,
+);
+
+ipcMain.on(ELECTRON_COMMANDS.ROI_UPSCAYL, roiUpscayl);
+
+ipcMain.handle(ELECTRON_COMMANDS.BLEND_IMAGES, handleBlendImages);
+
+ipcMain.handle(ELECTRON_COMMANDS.CHECK_FACE_RESTORE, handleCheckFaceRestore);
 
 ipcMain.on(ELECTRON_COMMANDS.UPSCAYL_VIDEO, videoUpscayl);
 

@@ -1,4 +1,5 @@
 import { ImageFormat } from "@electron/types/types";
+export type { ImageFormat };
 
 export type ImageUpscaylPayload = {
   imagePath: string;
@@ -19,6 +20,8 @@ export type ImageUpscaylPayload = {
    * Optional "load:proc:save" thread split. Empty/undefined keeps the default.
    */
   threads?: string;
+  faceRestore?: boolean;
+  faceRestoreStrength?: number;
 };
 
 export type DoubleUpscaylPayload = {
@@ -42,6 +45,8 @@ export type DoubleUpscaylPayload = {
    * Optional "load:proc:save" thread split. Empty/undefined keeps the default.
    */
   threads?: string;
+  faceRestore?: boolean;
+  faceRestoreStrength?: number;
 };
 
 export type VideoCodec = "h264" | "h265" | "vp9";
@@ -235,6 +240,8 @@ export type MultiModelUpscaylPayload = {
   copyMetadata: boolean;
   doubleUpscale?: boolean;
   threads?: string;
+  faceRestore?: boolean;
+  faceRestoreStrength?: number;
 };
 
 export type MultiModelResult = {
@@ -262,6 +269,77 @@ export type MultiModelDonePayload = {
   stopped: boolean;
 };
 
+export type MultiModelTrashPayload = {
+  filePaths: string[];
+  protectedPaths?: string[];
+};
+
+export type MultiModelTrashResult = {
+  trashed: string[];
+  failed: Array<{ path: string; error: string }>;
+};
+
+export type RoiRectPayload = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type RoiUpscaylPayload = {
+  imagePath: string;
+  outputPath: string;
+  roi: RoiRectPayload;
+  models: string[];
+  scale: string;
+  gpuId: string;
+  saveImageAs: ImageFormat;
+  compression: string;
+  customWidth: string;
+  useCustomWidth: boolean;
+  tileSize: number;
+  ttaMode: boolean;
+  doubleUpscale?: boolean;
+  threads?: string;
+  faceRestore?: boolean;
+  faceRestoreStrength?: number;
+};
+
+export type RoiUpscaylDonePayload = {
+  cropInputPath: string;
+  roi: RoiRectPayload;
+  results: MultiModelResult[];
+  stopped: boolean;
+};
+
+export type BlendImagesPayload = {
+  imageAPath: string;
+  imageBPath: string;
+  outputDir: string;
+  baseName: string;
+  labelA: string;
+  labelB: string;
+  alphaPercent: number;
+  saveImageAs: ImageFormat;
+  compression: number;
+  copyMetadata?: boolean;
+  sourceMetadataPath?: string;
+};
+
+export type BlendImagesResult = {
+  outputPath: string;
+  width: number;
+  height: number;
+  alphaPercent: number;
+};
+
+export type FaceRestoreStatus = {
+  available: boolean;
+  engines: string[];
+  pythonPath: string | null;
+  message?: string;
+};
+
 export type BatchUpscaylPayload = {
   batchFolderPath: string;
   outputPath: string;
@@ -286,4 +364,6 @@ export type BatchUpscaylPayload = {
    * calculate a split from the CPU core count.
    */
   threads?: string;
+  faceRestore?: boolean;
+  faceRestoreStrength?: number;
 };

@@ -209,3 +209,27 @@ export const copyMetadataAtom = atomWithStorage<boolean>(
   "copyMetadata",
   false,
 );
+
+// Phase 2: Face Restoration, Model Blending, ROI Crop, Recipes
+export const faceRestoreAtom = atomWithStorage<boolean>("faceRestore", false);
+export const faceRestoreStrengthAtom = atomWithStorage<number>(
+  "faceRestoreStrength",
+  70,
+);
+export const blendAlphaAtom = atomWithStorage<number>("blendAlpha", 50);
+export const blendSecondModelAtom = atomWithStorage<string | null>(
+  "blendSecondModel",
+  null,
+);
+export const roiModeAtom = atom<boolean>(false);
+export const roiRectAtom = atom(
+  null as { x: number; y: number; width: number; height: number } | null,
+) as PrimitiveAtom<{
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} | null>;
+export const customRecipesAtom = atomWithStorage<
+  import("@common/recipe-helpers").UpscaylRecipe[]
+>("customRecipes", []);

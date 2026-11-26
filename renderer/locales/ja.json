@@ -460,6 +460,57 @@
     "PARTIAL_STOPPED": "途中で停止しました — 完了した {count} 個のモデルを比較できます。",
     "SOME_FAILED": "{count} 個のモデルで生成に失敗しました。",
     "SHORTCUT_HINT": "数字キー 1–9 で右(B)を切替 · ←/→ でモデル移動",
-    "COMPLETED_SUMMARY": "{total} モデル中 {succeeded} モデルの比較が完了"
+    "COMPLETED_SUMMARY": "{total} モデル中 {succeeded} モデルの比較が完了",
+    "VIEW_BLEND": "ブレンド (A+B)",
+    "KEEP_WINNER": "Bを採用・他をゴミ箱へ",
+    "KEEP_THIS_WINNER": "これだけ採用",
+    "DISCARD_THIS": "破棄",
+    "TRASHED_SUMMARY": "不採用の {count} 件をゴミ箱へ移動しました。",
+    "ALL_DISCARDED": "すべての生成結果を破棄しました。"
+  },
+  "ROI": {
+    "TOGGLE_TITLE": "ROI 部分テスト拡大",
+    "TOGGLE_DESCRIPTION": "画像上をドラッグして一部分だけ切り出し、数秒で画質やモデルを比較できます。",
+    "DRAW_HINT": "画像上をドラッグしてテストしたい範囲を選択してください",
+    "SELECTED_SIZE": "選択範囲: {width}×{height} px",
+    "CLEAR_BUTTON": "範囲クリア",
+    "RUN_BUTTON": "選択範囲をテスト拡大 ({width}×{height})",
+    "PREVIEW_BANNER": "ROI 部分プレビュー ({width}×{height} px)",
+    "UPSCALE_FULL_BUTTON": "元画像全体をアップスケール",
+    "EXIT_PREVIEW": "全体画像に戻る",
+    "NO_REGION_ERROR": "先に画像上をドラッグして拡大範囲を選択してください。"
+  },
+  "BLEND": {
+    "TITLE": "モデルブレンド",
+    "BUTTON_OPEN": "ブレンド",
+    "WEIGHT_LABEL": "ブレンド比率",
+    "SAVE_BUTTON": "ブレンド画像を保存",
+    "SAVING_BUTTON": "ブレンド中...",
+    "SAVED_TOAST": "ブレンド画像を保存しました: {path}",
+    "ERROR_TOAST": "ブレンドに失敗しました: {error}",
+    "SHOW_IN_FOLDER": "保存先を表示"
+  },
+  "RECIPES": {
+    "TITLE": "レシピ / プリセット",
+    "SELECT_PLACEHOLDER": "レシピを適用...",
+    "BUILTIN_GROUP": "標準レシピ",
+    "CUSTOM_GROUP": "マイレシピ",
+    "SAVE_BUTTON": "保存",
+    "DELETE_BUTTON": "削除",
+    "EXPORT_BUTTON": "出力",
+    "IMPORT_BUTTON": "読込",
+    "NAME_PLACEHOLDER": "レシピ名を入力...",
+    "APPLIED_TOAST": "レシピを適用しました: {name}",
+    "SAVED_TOAST": "レシピを保存しました: {name}",
+    "DELETED_TOAST": "レシピを削除しました: {name}",
+    "IMPORTED_TOAST": "{count}件のレシピを読み込みました。",
+    "IMPORT_ERROR": "レシピJSONの読み込みに失敗しました。"
+  },
+  "FACE_RESTORE": {
+    "TOGGLE_TITLE": "顔修復 (GFPGAN)",
+    "TOGGLE_DESCRIPTION": "アップスケール後にネイティブPython環境のGFPGANで顔のディテールを自然修復します。",
+    "STRENGTH_LABEL": "修復強度 ({value}%)",
+    "STATUS_READY": "GFPGAN 利用可能",
+    "STATUS_MISSING": "pip install gfpgan が必要"
   }
 }

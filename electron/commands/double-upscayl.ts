@@ -29,6 +29,7 @@ import {
   isVulkanMemoryError,
   VULKAN_MEMORY_ERROR_MESSAGE,
 } from "../../common/vulkan-memory";
+import { runFaceRestore } from "./face-restore";
 
 const doubleUpscayl = async (event, payload: DoubleUpscaylPayload) => {
   const mainWindow = getMainWindow();
@@ -227,6 +228,15 @@ const doubleUpscayl = async (event, payload: DoubleUpscaylPayload) => {
         logit("💯 Done upscaling");
 
         mainWindow.setProgressBar(-1);
+        if (payload.faceRestore && fs.existsSync(outFile)) {
+          const fr = await runFaceRestore(outFile, payload.faceRestoreStrength);
+          if (!fr.applied && fr.warning) {
+            mainWindow.webContents.send(
+              ELECTRON_COMMANDS.UPSCAYL_WARNING,
+              fr.warning,
+            );
+          }
+        }
         if (payload.copyMetadata) {
           logit("🏷️ Copying metadata...");
           try {

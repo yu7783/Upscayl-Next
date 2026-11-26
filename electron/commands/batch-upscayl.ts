@@ -27,6 +27,7 @@ import {
   isVulkanMemoryError,
   VULKAN_MEMORY_ERROR_MESSAGE,
 } from "../../common/vulkan-memory";
+import { runFaceRestore } from "./face-restore";
 
 const countImages = (dir: string): number => {
   try {
@@ -373,6 +374,33 @@ const batchUpscayl = async (event, payload: BatchUpscaylPayload) => {
         // Continue with the tile size that actually worked for this pass.
         runPass(currentTileSize);
         return;
+      }
+
+      if (payload.faceRestore) {
+        try {
+          const outFiles = fs
+            .readdirSync(outputFolderPath, { withFileTypes: true })
+            .filter((entry) => entry.isFile())
+            .map((entry) => outputFolderPath + slash + entry.name);
+          let warned = false;
+          for (const outImg of outFiles) {
+            if (stopped) break;
+            const fr = await runFaceRestore(
+              outImg,
+              payload.faceRestoreStrength,
+            );
+            if (!fr.applied && fr.warning && !warned) {
+              warned = true;
+              mainWindow.webContents.send(
+                ELECTRON_COMMANDS.UPSCAYL_WARNING,
+                fr.warning,
+              );
+              break;
+            }
+          }
+        } catch (err) {
+          logit("❌ Error in batch face restoration: ", err);
+        }
       }
 
       await copyBatchMetadata();

@@ -16,16 +16,20 @@ import {
   videoProgressAtom,
   videoBatchModeAtom,
   videoBatchPathsAtom,
+  roiModeAtom,
+  roiRectAtom,
 } from "../../atoms/user-settings-atom";
 import { useToast } from "@/components/ui/use-toast";
 import { sanitizePath } from "@common/sanitize-path";
 import getDirectoryFromPath from "@common/get-directory-from-path";
+import getFilenameFromPath from "@common/get-file-name";
 import { FEATURE_FLAGS } from "@common/feature-flags";
 import { isVideoPath } from "@common/video-formats";
 import {
   BatchVideoItemResult,
   FfmpegStatus,
   MultiModelResult,
+  RoiUpscaylDonePayload,
   VideoDoneInfo,
   VideoMediaInfo,
 } from "@common/types/types";
@@ -40,6 +44,7 @@ import ImageViewer from "./image-viewer";
 import useTranslation from "../hooks/use-translation";
 import SliderView from "./slider-view";
 import MultiModelCompareView from "./multi-model-compare-view";
+import BlendPanel from "./blend-panel";
 import VideoWorkspace from "./video-workspace";
 
 type MainContentProps = {
@@ -52,7 +57,12 @@ type MainContentProps = {
   selectImageHandler: () => void;
   upscaledImagePath: string;
   multiModelResults: MultiModelResult[];
+  setMultiModelResults: React.Dispatch<React.SetStateAction<MultiModelResult[]>>;
   multiModelStopped: boolean;
+  roiPreview: RoiUpscaylDonePayload | null;
+  onExitRoiPreview: () => void;
+  onRunRoiUpscale: () => void;
+  onUpscaleFullFromRoi: () => void;
   batchFolderPath: string;
   setDimensions: React.Dispatch<
     React.SetStateAction<{
@@ -80,7 +90,12 @@ const MainContent = ({
   selectImageHandler,
   upscaledImagePath,
   multiModelResults,
+  setMultiModelResults,
   multiModelStopped,
+  roiPreview,
+  onExitRoiPreview,
+  onRunRoiUpscale,
+  onUpscaleFullFromRoi,
   batchFolderPath,
   setDimensions,
   videoPath,
@@ -107,6 +122,9 @@ const MainContent = ({
   const videoProgress = useAtomValue(videoProgressAtom);
   const setVideoBatchMode = useSetAtom(videoBatchModeAtom);
   const setVideoBatchPaths = useSetAtom(videoBatchPathsAtom);
+  const roiMode = useAtomValue(roiModeAtom);
+  const [roiRect, setRoiRect] = useAtom(roiRectAtom);
+  const [singleBlendOpen, setSingleBlendOpen] = useState(false);
 
   const viewType = useAtomValue(viewTypeAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
@@ -425,10 +443,17 @@ const MainContent = ({
         upscaledImagePath.length === 0 &&
         !hasMultiModelResults &&
         imagePath.length > 0 && (
-          <ImageViewer imagePath={imagePath} setDimensions={setDimensions} />
+          <ImageViewer
+            imagePath={imagePath}
+            setDimensions={setDimensions}
+            roiMode={roiMode}
+            roiRect={roiRect}
+            setRoiRect={setRoiRect}
+            onRunRoi={onRunRoiUpscale}
+          />
         )}
 
-      {/* MULTI-MODEL COMPARISON VIEW */}
+      {/* MULTI-MODEL / ROI COMPARISON VIEW */}
       {!isVideoTab && hasMultiModelResults && (
         <MultiModelCompareView
           imagePath={imagePath}
@@ -436,6 +461,10 @@ const MainContent = ({
           results={multiModelResults}
           wasStopped={multiModelStopped}
           zoomAmount={zoomAmount}
+          onUpdateResults={setMultiModelResults}
+          roiPreview={roiPreview}
+          onExitRoiPreview={onExitRoiPreview}
+          onUpscaleFullFromRoi={onUpscaleFullFromRoi}
         />
       )}
 
@@ -467,9 +496,56 @@ const MainContent = ({
         </div>
       )}
 
+      {/* SINGLE IMAGE BLEND FLOATING TOGGLE */}
       {!isVideoTab &&
         !batchMode &&
         !hasMultiModelResults &&
+        upscaledImagePath.length > 0 &&
+        imagePath.length > 0 && (
+          <button
+            type="button"
+            className={`btn btn-xs absolute right-4 top-4 z-40 shadow-md ${
+              singleBlendOpen ? "btn-primary" : "btn-neutral"
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSingleBlendOpen((v) => !v);
+            }}
+          >
+            🎨 {t("BLEND.BUTTON_OPEN")}
+          </button>
+        )}
+
+      {/* SINGLE IMAGE BLEND PANEL */}
+      {!isVideoTab &&
+        !batchMode &&
+        !hasMultiModelResults &&
+        singleBlendOpen &&
+        upscaledImagePath.length > 0 &&
+        imagePath.length > 0 && (
+          <div
+            className="h-screen w-full"
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
+            <BlendPanel
+              imageAPath={imagePath}
+              imageBPath={upscaledImagePath}
+              labelA={t("MULTI_MODEL.ORIGINAL_OPTION")}
+              labelB="Upscaled"
+              outputDir={outputPath || getDirectoryFromPath(upscaledImagePath)}
+              baseName={
+                getFilenameFromPath(imagePath).replace(/\.[^/.]+$/, "") ||
+                "upscayl"
+              }
+              sourceMetadataPath={imagePath}
+            />
+          </div>
+        )}
+
+      {!isVideoTab &&
+        !batchMode &&
+        !hasMultiModelResults &&
+        !singleBlendOpen &&
         viewType === "lens" &&
         upscaledImagePath &&
         imagePath && (
@@ -483,6 +559,7 @@ const MainContent = ({
       {!isVideoTab &&
         !batchMode &&
         !hasMultiModelResults &&
+        !singleBlendOpen &&
         viewType === "slider" &&
         imagePath.length > 0 &&
         upscaledImagePath.length > 0 && (

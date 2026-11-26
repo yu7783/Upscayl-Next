@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from "jotai";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { themeChange } from "theme-change";
 import useLogger from "../../hooks/use-logger";
@@ -12,19 +12,26 @@ import {
   useCustomWidthAtom,
   multiModelModeAtom,
   selectedCompareModelsAtom,
+  faceRestoreAtom,
+  faceRestoreStrengthAtom,
+  roiModeAtom,
+  roiRectAtom,
 } from "../../../atoms/user-settings-atom";
 import { FEATURE_FLAGS } from "@common/feature-flags";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
+import { FaceRestoreStatus } from "@common/types/types";
 import { useToast } from "@/components/ui/use-toast";
 import { translationAtom } from "@/atoms/translations-atom";
 import { SelectImageScale } from "../settings-tab/select-image-scale";
 import SelectModelDialog from "./select-model-dialog";
+import RecipeBar from "../recipe-bar";
 import { ImageFormat } from "@/lib/valid-formats";
 
 interface IProps {
   selectImageHandler: () => Promise<void>;
   selectFolderHandler: () => Promise<void>;
   upscaylHandler: () => Promise<void>;
+  roiUpscaleHandler?: () => Promise<void>;
   batchMode: boolean;
   setBatchMode: React.Dispatch<React.SetStateAction<boolean>>;
   imagePath: string;
@@ -42,6 +49,7 @@ function UpscaylSteps({
   selectImageHandler,
   selectFolderHandler,
   upscaylHandler,
+  roiUpscaleHandler,
   batchMode,
   setBatchMode,
   imagePath,
@@ -57,10 +65,32 @@ function UpscaylSteps({
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
   const customWidth = useAtomValue(customWidthAtom);
   const useCustomWidth = useAtomValue(useCustomWidthAtom);
+  const [faceRestore, setFaceRestore] = useAtom(faceRestoreAtom);
+  const [faceRestoreStrength, setFaceRestoreStrength] = useAtom(
+    faceRestoreStrengthAtom,
+  );
+  const [roiMode, setRoiMode] = useAtom(roiModeAtom);
+  const roiRect = useAtomValue(roiRectAtom);
+  const [faceRestoreStatus, setFaceRestoreStatus] =
+    useState<FaceRestoreStatus | null>(null);
 
   const logit = useLogger();
   const { toast } = useToast();
   const t = useAtomValue(translationAtom);
+
+  useEffect(() => {
+    if (!faceRestore) return;
+    let cancelled = false;
+    window.electron
+      .invoke(ELECTRON_COMMANDS.CHECK_FACE_RESTORE)
+      .then((status: FaceRestoreStatus) => {
+        if (!cancelled) setFaceRestoreStatus(status);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [faceRestore]);
 
   const outputHandler = async () => {
     const path = await window.electron.invoke(ELECTRON_COMMANDS.SELECT_FOLDER);
@@ -136,8 +166,11 @@ function UpscaylSteps({
 
   return (
     <div
-      className={`animate-step-in animate flex h-screen flex-col gap-6 overflow-y-auto overflow-x-hidden p-5`}
+      className={`animate-step-in animate flex h-screen flex-col gap-5 overflow-y-auto overflow-x-hidden p-5`}
     >
+      {/* RECIPES BAR */}
+      <RecipeBar />
+
       {/* MODE TOGGLES */}
       <div className="flex flex-col gap-2.5">
         <div className="flex flex-row items-center gap-2">
@@ -152,7 +185,10 @@ function UpscaylSteps({
               setProgress("");
               setBatchMode((oldValue) => {
                 const next = !oldValue;
-                if (next) setMultiModelMode(false);
+                if (next) {
+                  setMultiModelMode(false);
+                  setRoiMode(false);
+                }
                 return next;
               });
             }}
@@ -188,6 +224,24 @@ function UpscaylSteps({
             {t("MULTI_MODEL.TOGGLE_TITLE")}
           </p>
         </div>
+
+        {!batchMode && (
+          <div className="flex flex-row items-center gap-2">
+            <input
+              type="checkbox"
+              className="toggle toggle-secondary toggle-sm"
+              checked={roiMode}
+              onChange={(e) => setRoiMode(e.target.checked)}
+            />
+            <p
+              className="mr-1 inline-block cursor-help text-sm"
+              data-tooltip-id="tooltip"
+              data-tooltip-content={t("ROI.TOGGLE_DESCRIPTION")}
+            >
+              ✂️ {t("ROI.TOGGLE_TITLE")}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* STEP 1 */}
@@ -251,6 +305,56 @@ function UpscaylSteps({
         </div>
 
         <SelectImageScale scale={scale} setScale={setScale} hideInfo />
+
+        {/* FACE RESTORATION (GFPGAN) */}
+        <div className="flex flex-col gap-1.5 rounded-btn border border-base-content/10 bg-base-200/60 p-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
+              <input
+                type="checkbox"
+                className="checkbox checkbox-primary checkbox-xs"
+                checked={faceRestore}
+                onChange={(e) => setFaceRestore(e.target.checked)}
+              />
+              <span
+                className="cursor-help"
+                data-tooltip-id="tooltip"
+                data-tooltip-content={t("FACE_RESTORE.TOGGLE_DESCRIPTION")}
+              >
+                🙂 {t("FACE_RESTORE.TOGGLE_TITLE")}
+              </span>
+            </label>
+            {faceRestore && faceRestoreStatus && (
+              <span
+                className={`badge badge-xs ${
+                  faceRestoreStatus.available ? "badge-success" : "badge-warning"
+                }`}
+              >
+                {faceRestoreStatus.available
+                  ? t("FACE_RESTORE.STATUS_READY")
+                  : t("FACE_RESTORE.STATUS_MISSING")}
+              </span>
+            )}
+          </div>
+          {faceRestore && (
+            <div className="flex items-center gap-2 pt-0.5 text-[11px]">
+              <span className="shrink-0 text-base-content/70">
+                {t("FACE_RESTORE.STRENGTH_LABEL", {
+                  value: String(faceRestoreStrength),
+                })}
+              </span>
+              <input
+                type="range"
+                min={10}
+                max={100}
+                step={5}
+                value={faceRestoreStrength}
+                onChange={(e) => setFaceRestoreStrength(Number(e.target.value))}
+                className="range range-primary range-xs flex-1"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* STEP 3 */}
@@ -297,10 +401,10 @@ function UpscaylSteps({
       </div>
 
       {/* STEP 4 */}
-      <div className="animate-step-in">
+      <div className="animate-step-in flex flex-col gap-2">
         <p className="step-heading">{t("APP.SCALE_SELECTION.TITLE")}</p>
         {dimensions.width && dimensions.height && (
-          <p className="mb-2 text-sm">
+          <p className="mb-1 text-sm">
             {t("APP.SCALE_SELECTION.FROM_TITLE")}
             <span className="font-bold">
               {dimensions.width}x{dimensions.height}
@@ -311,15 +415,34 @@ function UpscaylSteps({
             </span>
           </p>
         )}
-        <button className="btn btn-secondary" onClick={handleStartClick}>
-          {progress.length > 0
-            ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
-            : multiModelMode && !batchMode
-              ? t("MULTI_MODEL.START_BUTTON", {
-                  count: String(selectedCompareModels.length),
-                })
-              : t("APP.SCALE_SELECTION.START_BUTTON_TITLE")}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button className="btn btn-secondary" onClick={handleStartClick}>
+            {progress.length > 0
+              ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
+              : multiModelMode && !batchMode
+                ? t("MULTI_MODEL.START_BUTTON", {
+                    count: String(selectedCompareModels.length),
+                  })
+                : t("APP.SCALE_SELECTION.START_BUTTON_TITLE")}
+          </button>
+
+          {roiMode && !batchMode && roiUpscaleHandler && (
+            <button
+              type="button"
+              className="btn btn-outline btn-primary btn-sm"
+              disabled={progress.length > 0}
+              onClick={roiUpscaleHandler}
+            >
+              ✂️{" "}
+              {roiRect
+                ? t("ROI.RUN_BUTTON", {
+                    width: String(roiRect.width),
+                    height: String(roiRect.height),
+                  })
+                : t("ROI.TOGGLE_TITLE")}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
