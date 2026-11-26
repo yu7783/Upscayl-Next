@@ -6,9 +6,18 @@ import { Settings } from "./icons/original-icons";
 type TabsProps = {
   selectedTab: number;
   setSelectedTab: (tab: number) => void;
+  onOpenModelManager?: () => void;
+  onOpenQueue?: () => void;
+  queueActiveCount?: number;
 };
 
-const Tabs = ({ selectedTab, setSelectedTab }: TabsProps) => {
+const Tabs = ({
+  selectedTab,
+  setSelectedTab,
+  onOpenModelManager,
+  onOpenQueue,
+  queueActiveCount = 0,
+}: TabsProps) => {
   const t = useAtomValue(translationAtom);
 
   // The settings view is rendered full-screen, so a text tab is hidden behind
@@ -19,12 +28,12 @@ const Tabs = ({ selectedTab, setSelectedTab }: TabsProps) => {
   }
 
   const tabClass = (tab: number) =>
-    `btn btn-sm flex-1 gap-2 ${
+    `btn btn-sm flex-1 gap-1.5 ${
       selectedTab === tab ? "btn-primary" : "btn-ghost"
     }`;
 
   return (
-    <div className="mx-3 mb-2 flex items-center gap-2 rounded-btn border border-base-content/10 bg-base-200/60 px-3 py-2">
+    <div className="mx-3 mb-2 flex items-center gap-1.5 rounded-btn border border-base-content/10 bg-base-200/60 px-2.5 py-2">
       <div className="flex flex-1 items-center gap-1">
         <button
           type="button"
@@ -45,9 +54,40 @@ const Tabs = ({ selectedTab, setSelectedTab }: TabsProps) => {
           {t("VIDEO_UPSCAYL.TAB_VIDEO")}
         </button>
       </div>
+      {onOpenModelManager && (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm px-2"
+          onClick={onOpenModelManager}
+          title={t("MODEL_MANAGER.BUTTON_LABEL")}
+          aria-label={t("MODEL_MANAGER.BUTTON_LABEL")}
+          data-tooltip-id="tooltip"
+          data-tooltip-content={t("MODEL_MANAGER.BUTTON_LABEL")}
+        >
+          📦
+        </button>
+      )}
+      {onOpenQueue && (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm relative px-2"
+          onClick={onOpenQueue}
+          title={t("JOB_QUEUE.BUTTON_LABEL")}
+          aria-label={t("JOB_QUEUE.BUTTON_LABEL")}
+          data-tooltip-id="tooltip"
+          data-tooltip-content={t("JOB_QUEUE.BUTTON_LABEL")}
+        >
+          📋
+          {queueActiveCount > 0 && (
+            <span className="badge badge-primary badge-xs absolute -right-1 -top-1">
+              {queueActiveCount}
+            </span>
+          )}
+        </button>
+      )}
       <button
         type="button"
-        className="btn btn-ghost btn-sm gap-2"
+        className="btn btn-ghost btn-sm px-2"
         onClick={() => setSelectedTab(2)}
         title={t("SETTINGS.TITLE")}
         aria-label={t("SETTINGS.TITLE")}
@@ -55,7 +95,6 @@ const Tabs = ({ selectedTab, setSelectedTab }: TabsProps) => {
         data-tooltip-content={t("SETTINGS.TITLE")}
       >
         <Settings className="h-4 w-4" />
-        <span className="hidden sm:inline">{t("SETTINGS.TITLE")}</span>
       </button>
     </div>
   );

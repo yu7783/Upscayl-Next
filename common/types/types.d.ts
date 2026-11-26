@@ -367,3 +367,18 @@ export type BatchUpscaylPayload = {
   faceRestore?: boolean;
   faceRestoreStrength?: number;
 };
+
+export type ModelManagerProgressInfo = {
+  modelId: string;
+  fileIndex: number;
+  totalFiles: number;
+  currentFile: string;
+  downloadedBytes: number;
+  totalBytes: number;
+  percent: number;
+};
+
+export type ModelManagerListResponse = {
+  modelsDir: string;
+  entries: import("../model-catalog").CatalogModelStatus[];
+};

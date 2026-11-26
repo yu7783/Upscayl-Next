@@ -512,5 +512,37 @@
     "STRENGTH_LABEL": "Strength ({value}%)",
     "STATUS_READY": "GFPGAN Ready",
     "STATUS_MISSING": "Requires pip install gfpgan"
+  },
+  "MODEL_MANAGER": {
+    "BUTTON_LABEL": "Model Manager",
+    "TITLE": "In-App Model Manager",
+    "DESCRIPTION": "Browse, download, and manage popular open-source AI models directly inside Upscayl-Next.",
+    "SEARCH_PLACEHOLDER": "Search models by name or tag...",
+    "ALL_TAGS": "All",
+    "INSTALLED_BADGE": "Installed",
+    "INSTALL_BUTTON": "Install",
+    "INSTALLING_BUTTON": "Installing {percent}%",
+    "DELETE_BUTTON": "Uninstall",
+    "OPEN_FOLDER": "Open Models Folder",
+    "EMPTY_RESULTS": "No matching models found.",
+    "INSTALL_SUCCESS": "Installed model: {name}",
+    "INSTALL_ERROR": "Failed to install {name}: {error}",
+    "DELETE_SUCCESS": "Removed model: {name}"
+  },
+  "JOB_QUEUE": {
+    "BUTTON_LABEL": "Queue",
+    "TITLE": "Job Queue",
+    "ADD_BUTTON": "+ Queue",
+    "ADDED_TOAST": "Added to job queue: {label}",
+    "START_BUTTON": "Start Queue",
+    "PAUSE_BUTTON": "Pause After Current",
+    "CLEAR_BUTTON": "Clear Finished",
+    "EMPTY_STATE": "No jobs in queue. Use \"+ Queue\" in Image or Video tabs to schedule background runs.",
+    "STATUS_PENDING": "Queued",
+    "STATUS_RUNNING": "Running",
+    "STATUS_DONE": "Done",
+    "STATUS_ERROR": "Error",
+    "STATUS_CANCELLED": "Cancelled",
+    "SHOW_OUTPUT": "Show Output"
   }
 }

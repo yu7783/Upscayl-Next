@@ -32,6 +32,7 @@ interface IProps {
   selectFolderHandler: () => Promise<void>;
   upscaylHandler: () => Promise<void>;
   roiUpscaleHandler?: () => Promise<void>;
+  enqueueImageJobHandler?: () => Promise<void>;
   batchMode: boolean;
   setBatchMode: React.Dispatch<React.SetStateAction<boolean>>;
   imagePath: string;
@@ -50,6 +51,7 @@ function UpscaylSteps({
   selectFolderHandler,
   upscaylHandler,
   roiUpscaleHandler,
+  enqueueImageJobHandler,
   batchMode,
   setBatchMode,
   imagePath,
@@ -425,6 +427,16 @@ function UpscaylSteps({
                   })
                 : t("APP.SCALE_SELECTION.START_BUTTON_TITLE")}
           </button>
+
+          {enqueueImageJobHandler && (
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={enqueueImageJobHandler}
+            >
+              📋 {t("JOB_QUEUE.ADD_BUTTON")}
+            </button>
+          )}
 
           {roiMode && !batchMode && roiUpscaleHandler && (
             <button

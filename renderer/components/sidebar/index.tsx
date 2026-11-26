@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   activeTabAtom,
@@ -62,11 +62,18 @@ import {
   VideoSessionManifest,
   VideoUpscaylPayload,
 } from "@common/types/types";
+import getFilenameFromPath from "@common/get-file-name";
+import {
+  QueueSnapshot,
+  summarizeQueue,
+} from "@common/job-queue-helpers";
 import { parseTimeInput } from "@common/video-upscayl-helpers";
 import { useToast } from "@/components/ui/use-toast";
 import UpscaylSteps from "./upscayl-tab/upscayl-steps";
 import VideoTab from "./video-tab";
 import SettingsTab from "./settings-tab";
+import ModelManagerDialog from "./model-manager-dialog";
+import JobQueueDrawer from "../main-content/job-queue-drawer";
 import Footer from "../footer";
 import { NewsModal } from "../news-modal";
 import Tabs from "../tabs";
@@ -566,6 +573,192 @@ const Sidebar = ({
     logit("🏁 BATCH_VIDEO_UPSCAYL", String(videoBatchPaths.length));
   };
 
+  const [modelManagerOpen, setModelManagerOpen] = useState(false);
+  const [queueDrawerOpen, setQueueDrawerOpen] = useState(false);
+  const [queueSnapshot, setQueueSnapshot] = useState<QueueSnapshot>({
+    jobs: [],
+    isRunning: false,
+    isPaused: false,
+  });
+
+  useEffect(() => {
+    window.electron
+      .invoke(ELECTRON_COMMANDS.QUEUE_GET)
+      .then((snap: QueueSnapshot) => {
+        if (snap) setQueueSnapshot(snap);
+      })
+      .catch(() => {});
+    window.electron.on(
+      ELECTRON_COMMANDS.QUEUE_UPDATE,
+      (_, snap: QueueSnapshot) => {
+        if (snap) setQueueSnapshot(snap);
+      },
+    );
+  }, []);
+
+  const queueSummary = summarizeQueue(queueSnapshot.jobs);
+
+  const enqueueImageJobHandler = async () => {
+    const mode = resolveUpscaylMode({
+      batchMode,
+      doubleUpscayl,
+      imagePath,
+      batchFolderPath,
+      multiModelMode,
+      multiModelCount: selectedCompareModels.length,
+    });
+    if (mode === "invalid" || !outputPath) {
+      toast({
+        title: t("ERRORS.NO_IMAGE_ERROR.TITLE"),
+        description: !outputPath
+          ? t("APP.SCALE_SELECTION.NO_OUTPUT_FOLDER_ALERT")
+          : t("ERRORS.NO_IMAGE_ERROR.DESCRIPTION"),
+      });
+      return;
+    }
+
+    let label = "";
+    let detail = "";
+    let payload: any;
+
+    if (mode === "batch") {
+      label = getFilenameFromPath(batchFolderPath) || batchFolderPath;
+      detail = `${selectedModelId} · ${scale}x · ${saveImageAs.toUpperCase()}`;
+      payload = {
+        batchFolderPath,
+        outputPath,
+        model: selectedModelId,
+        gpuId: gpuId.length === 0 ? null : gpuId,
+        saveImageAs,
+        scale,
+        noImageProcessing,
+        compression: compression.toString(),
+        customWidth: customWidth > 0 ? customWidth.toString() : null,
+        useCustomWidth,
+        tileSize,
+        ttaMode,
+        copyMetadata,
+        doubleUpscale: doubleUpscayl,
+        threads: threads ?? undefined,
+        faceRestore,
+        faceRestoreStrength,
+      } as BatchUpscaylPayload;
+    } else if (mode === "multi-model") {
+      label = getFilenameFromPath(imagePath);
+      detail = `${selectedCompareModels.length} models · ${scale}x`;
+      payload = {
+        imagePath,
+        outputPath,
+        models: selectedCompareModels,
+        gpuId: gpuId.length === 0 ? null : gpuId,
+        saveImageAs,
+        scale,
+        overwrite,
+        noImageProcessing,
+        compression: compression.toString(),
+        customWidth: customWidth > 0 ? customWidth.toString() : null,
+        useCustomWidth,
+        tileSize,
+        ttaMode,
+        copyMetadata,
+        doubleUpscale: doubleUpscayl,
+        threads: threads ?? undefined,
+        faceRestore,
+        faceRestoreStrength,
+      } as MultiModelUpscaylPayload;
+    } else {
+      label = getFilenameFromPath(imagePath);
+      detail = `${selectedModelId} · ${scale}x${mode === "double" ? " (2x pass)" : ""}`;
+      payload = {
+        imagePath,
+        outputPath,
+        model: selectedModelId,
+        gpuId: gpuId.length === 0 ? null : gpuId,
+        saveImageAs,
+        scale,
+        overwrite,
+        noImageProcessing,
+        compression: compression.toString(),
+        customWidth: customWidth > 0 ? customWidth.toString() : null,
+        useCustomWidth,
+        tileSize,
+        ttaMode,
+        copyMetadata,
+        threads: threads ?? undefined,
+        faceRestore,
+        faceRestoreStrength,
+      };
+    }
+
+    const snap: QueueSnapshot = await window.electron.invoke(
+      ELECTRON_COMMANDS.QUEUE_ADD,
+      {
+        type: mode,
+        label,
+        detail,
+        payload,
+      },
+    );
+    if (snap) setQueueSnapshot(snap);
+    toast({
+      description: t("JOB_QUEUE.ADDED_TOAST", { label }),
+    });
+  };
+
+  const enqueueVideoJobHandler = async () => {
+    if (!videoPath || !outputPath) {
+      toast({
+        description: !videoPath
+          ? t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED")
+          : t("VIDEO_UPSCAYL.NO_OUTPUT_FOLDER"),
+      });
+      return;
+    }
+    const label = getFilenameFromPath(videoPath);
+    const detail = `${selectedModelId} · ${scale}x · ${videoContainer.toUpperCase()}${
+      videoInterpolation > 1 ? ` · ${videoInterpolation}x FPS` : ""
+    }`;
+    const payload: VideoUpscaylPayload = {
+      videoPath,
+      outputPath,
+      model: selectedModelId,
+      gpuId: gpuId.length === 0 ? null : gpuId,
+      saveImageAs,
+      scale,
+      compression: compression.toString(),
+      customWidth: customWidth > 0 ? customWidth.toString() : null,
+      useCustomWidth,
+      tileSize,
+      ttaMode,
+      threads: threads ?? undefined,
+      videoCodec,
+      videoContainer,
+      videoQuality,
+      keepAudio: videoKeepAudio,
+      intermediateFormat: videoIntermediateFormat,
+      useHardwareEncoding: videoUseHwEncode,
+      deduplicateFrames: videoDeduplicateFrames,
+      frameInterpolation: videoInterpolation,
+      interpolationEngine: "auto",
+      trimStartSeconds: parseTimeInput(videoTrimStart),
+      trimEndSeconds: parseTimeInput(videoTrimEnd),
+      resumable: videoResumable,
+    };
+    const snap: QueueSnapshot = await window.electron.invoke(
+      ELECTRON_COMMANDS.QUEUE_ADD,
+      {
+        type: "video",
+        label,
+        detail,
+        payload,
+      },
+    );
+    if (snap) setQueueSnapshot(snap);
+    toast({
+      description: t("JOB_QUEUE.ADDED_TOAST", { label }),
+    });
+  };
+
   return (
     <>
       {/* TOP LOGO WHEN SIDEBAR IS HIDDEN */}
@@ -594,7 +787,13 @@ const Sidebar = ({
 
         <NewsModal />
 
-        <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+        <Tabs
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          onOpenModelManager={() => setModelManagerOpen(true)}
+          onOpenQueue={() => setQueueDrawerOpen(true)}
+          queueActiveCount={queueSummary.pending + queueSummary.running}
+        />
 
         {selectedTab === 0 && (
           <UpscaylSteps
@@ -602,6 +801,7 @@ const Sidebar = ({
             selectFolderHandler={selectFolderHandler}
             upscaylHandler={upscaylHandler}
             roiUpscaleHandler={roiUpscaleHandler}
+            enqueueImageJobHandler={enqueueImageJobHandler}
             batchMode={batchMode}
             setBatchMode={setBatchMode}
             imagePath={imagePath}
@@ -623,6 +823,7 @@ const Sidebar = ({
             selectMultipleVideosHandler={selectMultipleVideosHandler}
             upscaylVideoHandler={upscaylVideoHandler}
             batchVideoHandler={batchVideoHandler}
+            enqueueVideoJobHandler={enqueueVideoJobHandler}
             resumeVideoSessionHandler={resumeVideoSessionHandler}
             discardVideoSessionHandler={discardVideoSessionHandler}
           />
@@ -648,6 +849,18 @@ const Sidebar = ({
         )}
         <Footer />
       </div>
+
+      <ModelManagerDialog
+        open={modelManagerOpen}
+        onClose={() => setModelManagerOpen(false)}
+      />
+
+      <JobQueueDrawer
+        open={queueDrawerOpen}
+        onClose={() => setQueueDrawerOpen(false)}
+        snapshot={queueSnapshot}
+        onRefresh={setQueueSnapshot}
+      />
     </>
   );
 };

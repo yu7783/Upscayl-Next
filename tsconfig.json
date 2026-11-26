@@ -18,6 +18,7 @@
   "include": [
     "./electron/**/*",
     "./common/**/*",
+    "./cli/**/*",
     "./renderer/**/*",
     "scripts/generate-schema.js",
     "scripts/validate-schema.js"

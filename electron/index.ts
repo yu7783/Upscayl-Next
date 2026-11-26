@@ -21,6 +21,21 @@ import { handleTrashMultiModelFiles } from "./commands/multi-model-manage";
 import { handleBlendImages } from "./commands/blend-images";
 import { handleCheckFaceRestore } from "./commands/face-restore";
 import roiUpscayl from "./commands/roi-upscayl";
+import {
+  handleModelManagerDelete,
+  handleModelManagerInstall,
+  handleModelManagerList,
+} from "./commands/model-manager";
+import {
+  handleQueueAdd,
+  handleQueueClear,
+  handleQueueGet,
+  handleQueuePause,
+  handleQueueRemove,
+  handleQueueReorder,
+  handleQueueStart,
+} from "./commands/job-queue";
+import { runCli } from "../cli/upscayl-cli";
 import getModelsList from "./commands/get-models-list";
 import customModelsSelect from "./commands/custom-models-select";
 import imageUpscayl from "./commands/image-upscayl";
@@ -39,7 +54,21 @@ import path from "path";
 // INITIALIZATION
 log.initialize({ preload: true });
 
+const cliFlagIndex = process.argv.indexOf("--cli");
+const isHeadlessCliMode = cliFlagIndex !== -1;
+
 app.on("ready", async () => {
+  if (isHeadlessCliMode) {
+    try {
+      const exitCode = await runCli(process.argv.slice(cliFlagIndex + 1));
+      app.exit(exitCode);
+    } catch (err) {
+      console.error(err);
+      app.exit(1);
+    }
+    return;
+  }
+
   await prepareNext("./renderer");
 
   app.whenReady().then(() => {
@@ -149,6 +178,29 @@ ipcMain.on(ELECTRON_COMMANDS.ROI_UPSCAYL, roiUpscayl);
 ipcMain.handle(ELECTRON_COMMANDS.BLEND_IMAGES, handleBlendImages);
 
 ipcMain.handle(ELECTRON_COMMANDS.CHECK_FACE_RESTORE, handleCheckFaceRestore);
+
+ipcMain.handle(
+  ELECTRON_COMMANDS.MODEL_MANAGER_LIST,
+  handleModelManagerList,
+);
+
+ipcMain.handle(
+  ELECTRON_COMMANDS.MODEL_MANAGER_INSTALL,
+  handleModelManagerInstall,
+);
+
+ipcMain.handle(
+  ELECTRON_COMMANDS.MODEL_MANAGER_DELETE,
+  handleModelManagerDelete,
+);
+
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_GET, handleQueueGet);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_ADD, handleQueueAdd);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_REMOVE, handleQueueRemove);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_REORDER, handleQueueReorder);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_CLEAR, handleQueueClear);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_START, handleQueueStart);
+ipcMain.handle(ELECTRON_COMMANDS.QUEUE_PAUSE, handleQueuePause);
 
 ipcMain.on(ELECTRON_COMMANDS.UPSCAYL_VIDEO, videoUpscayl);
 

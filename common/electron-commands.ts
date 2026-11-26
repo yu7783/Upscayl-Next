@@ -57,6 +57,18 @@ const ELECTRON_COMMANDS = {
   ROI_UPSCAYL_DONE: "ROI Upscaling Done",
   BLEND_IMAGES: "Blend Two Images",
   CHECK_FACE_RESTORE: "Check Face Restore Availability",
+  MODEL_MANAGER_LIST: "Model Manager List Catalog",
+  MODEL_MANAGER_INSTALL: "Model Manager Install Model",
+  MODEL_MANAGER_DELETE: "Model Manager Delete Model",
+  MODEL_MANAGER_PROGRESS: "Model Manager Download Progress",
+  QUEUE_GET: "Job Queue Get State",
+  QUEUE_ADD: "Job Queue Add Job",
+  QUEUE_REMOVE: "Job Queue Remove Job",
+  QUEUE_CLEAR: "Job Queue Clear Finished",
+  QUEUE_START: "Job Queue Start",
+  QUEUE_PAUSE: "Job Queue Pause",
+  QUEUE_REORDER: "Job Queue Reorder Job",
+  QUEUE_UPDATE: "Job Queue State Update",
 } as const;
 
 export { ELECTRON_COMMANDS };

@@ -61,6 +61,7 @@ type VideoTabProps = {
     resumable?: boolean;
   }) => Promise<void>;
   batchVideoHandler: () => Promise<void>;
+  enqueueVideoJobHandler?: () => Promise<void>;
   resumeVideoSessionHandler: (sessionId: string) => void;
   discardVideoSessionHandler: (sessionId: string) => Promise<void>;
 };
@@ -97,6 +98,7 @@ const VideoTab = ({
   selectMultipleVideosHandler,
   upscaylVideoHandler,
   batchVideoHandler,
+  enqueueVideoJobHandler,
   resumeVideoSessionHandler,
   discardVideoSessionHandler,
 }: VideoTabProps) => {
@@ -687,19 +689,30 @@ const VideoTab = ({
           </div>
         )}
 
-        <button
-          className="btn btn-secondary"
-          onClick={startHandler}
-          disabled={isRunning}
-        >
-          {isRunning
-            ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
-            : videoBatchMode
-              ? t("VIDEO_UPSCAYL.BATCH_VIDEO_START", {
-                  count: String(videoBatchPaths.length),
-                })
-              : t("VIDEO_UPSCAYL.START_BUTTON")}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            className="btn btn-secondary flex-1"
+            onClick={startHandler}
+            disabled={isRunning}
+          >
+            {isRunning
+              ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
+              : videoBatchMode
+                ? t("VIDEO_UPSCAYL.BATCH_VIDEO_START", {
+                    count: String(videoBatchPaths.length),
+                  })
+                : t("VIDEO_UPSCAYL.START_BUTTON")}
+          </button>
+          {enqueueVideoJobHandler && !videoBatchMode && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={enqueueVideoJobHandler}
+            >
+              📋 {t("JOB_QUEUE.ADD_BUTTON")}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

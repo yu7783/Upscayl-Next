@@ -512,5 +512,37 @@
     "STRENGTH_LABEL": "修復強度 ({value}%)",
     "STATUS_READY": "GFPGAN 利用可能",
     "STATUS_MISSING": "pip install gfpgan が必要"
+  },
+  "MODEL_MANAGER": {
+    "BUTTON_LABEL": "モデルマネージャ",
+    "TITLE": "アプリ内モデルマネージャ",
+    "DESCRIPTION": "人気のオープンソースAIモデルを検索し、アプリ内から直接ダウンロード・管理できます。",
+    "SEARCH_PLACEHOLDER": "モデル名やタグで検索...",
+    "ALL_TAGS": "すべて",
+    "INSTALLED_BADGE": "導入済み",
+    "INSTALL_BUTTON": "インストール",
+    "INSTALLING_BUTTON": "取得中 {percent}%",
+    "DELETE_BUTTON": "削除",
+    "OPEN_FOLDER": "モデルフォルダを開く",
+    "EMPTY_RESULTS": "条件に一致するモデルが見つかりませんでした。",
+    "INSTALL_SUCCESS": "モデルをインストールしました: {name}",
+    "INSTALL_ERROR": "{name} のインストールに失敗しました: {error}",
+    "DELETE_SUCCESS": "モデルを削除しました: {name}"
+  },
+  "JOB_QUEUE": {
+    "BUTTON_LABEL": "キュー",
+    "TITLE": "ジョブキュー",
+    "ADD_BUTTON": "+ キュー追加",
+    "ADDED_TOAST": "ジョブキューに追加しました: {label}",
+    "START_BUTTON": "キュー開始",
+    "PAUSE_BUTTON": "現在ジョブ後に一時停止",
+    "CLEAR_BUTTON": "完了済みを消去",
+    "EMPTY_STATE": "キューにジョブがありません。画像タブまたは動画タブの「+ キュー追加」から連続処理を予約できます。",
+    "STATUS_PENDING": "待機中",
+    "STATUS_RUNNING": "実行中",
+    "STATUS_DONE": "完了",
+    "STATUS_ERROR": "エラー",
+    "STATUS_CANCELLED": "キャンセル",
+    "SHOW_OUTPUT": "出力を開く"
   }
 }

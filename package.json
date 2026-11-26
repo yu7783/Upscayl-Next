@@ -35,10 +35,14 @@
     "Gnome"
   ],
   "main": "export/electron/index.js",
+  "bin": {
+    "upscayl-next": "./export/cli/upscayl-cli.js"
+  },
   "scripts": {
     "clean": "rimraf dist renderer/.next renderer/out",
     "start": "tsc && electron .",
     "dev": "tsc && electron .",
+    "cli": "node export/cli/upscayl-cli.js",
     "build": "tsc && npm run validate-schema && next build renderer",
     "tsc": "tsc",
     "test": "tsc && node --test \"tests/*.test.cjs\"",
