@@ -52,6 +52,16 @@ if (-not (Test-Path $python)) {
 
 & $python -m pip install --upgrade pip
 
+if ($Cuda -eq "") {
+  try {
+    & nvidia-smi 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      $Cuda = "cu124"
+      Write-Host "NVIDIA GPU detected; selecting CUDA PyTorch ($Cuda)."
+    }
+  } catch {}
+}
+
 if ($Cuda -ne "") {
   Write-Host "Installing CUDA PyTorch from https://download.pytorch.org/whl/$Cuda"
   & $python -m pip install torch torchvision --index-url "https://download.pytorch.org/whl/$Cuda"
@@ -62,10 +72,32 @@ if ($Cuda -ne "") {
 
 & $python -m pip install -r (Join-Path $root "requirements.txt")
 
+$faceReq = Join-Path $root "requirements-face.txt"
+if (Test-Path $faceReq) {
+  Write-Host "Installing face restoration packages (GFPGAN / OpenCV)..."
+  try {
+    & $python -m pip install -r $faceReq
+  } catch {
+    Write-Warning "Face restoration packages (GFPGAN) could not be installed automatically: $_"
+  }
+}
+
+Write-Host "Pre-downloading GFPGANv1.4 weights (best effort)..."
+try {
+  $cacheDir = Join-Path $env:USERPROFILE ".cache\upscayl-next\gfpgan"
+  New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
+  $weightFile = Join-Path $cacheDir "GFPGANv1.4.pth"
+  if (-not (Test-Path $weightFile)) {
+    Invoke-WebRequest -Uri "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth" -OutFile $weightFile -UseBasicParsing
+  }
+} catch {
+  Write-Warning "Could not pre-download GFPGANv1.4.pth (will download on first use): $_"
+}
+
 Write-Host "Verifying installation..."
 & $python -c "import torch, spandrel, onnxruntime; print('torch', torch.__version__, 'cuda', torch.cuda.is_available()); print('spandrel', spandrel.__version__); print('onnxruntime', onnxruntime.__version__)"
+& $python (Join-Path $root "upscayl_native\face_restore.py") --check
 
 Write-Host ""
-Write-Host "Native backend installed. Start Upscayl-Next from source and select a"
-Write-Host "HAT/DAT .pth/.safetensors/.onnx model or a SUPIR checkpoint."
-Write-Host "For SUPIR, clone https://github.com/Fanghua-Yu/SUPIR and set UPSCAYL_SUPIR_REPO."
+Write-Host "Native backend + GFPGAN face restoration installed."
+Write-Host "You can now use HAT/DAT/SUPIR models and Face Restoration (GFPGAN) in Upscayl-Next."

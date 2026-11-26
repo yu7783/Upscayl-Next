@@ -31,12 +31,29 @@ def detect_engines() -> list[str]:
     return engines
 
 
+def _ensure_torchvision_compat() -> None:
+    """Provide `torchvision.transforms.functional_tensor` shim for basicsr on torchvision >= 0.18."""
+    try:
+        import torchvision.transforms.functional_tensor  # type: ignore  # noqa: F401
+    except Exception:
+        try:
+            import types
+            import torchvision.transforms.functional as _F
+
+            mod = types.ModuleType("torchvision.transforms.functional_tensor")
+            mod.rgb_to_grayscale = _F.rgb_to_grayscale  # type: ignore[attr-defined]
+            sys.modules["torchvision.transforms.functional_tensor"] = mod
+        except Exception:
+            pass
+
+
 def restore_with_gfpgan(
     input_path: str,
     output_path: str,
     strength: float,
     model_path: str | None,
 ) -> None:
+    _ensure_torchvision_compat()
     import cv2
     import numpy as np
     from gfpgan import GFPGANer

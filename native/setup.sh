@@ -26,6 +26,12 @@ else
 fi
 
 "$VENV/bin/python" -m pip install -r "$ROOT/requirements.txt"
+if [[ -f "$ROOT/requirements-face.txt" ]]; then
+  echo "Installing face restoration packages (GFPGAN / OpenCV)..."
+  "$VENV/bin/python" -m pip install -r "$ROOT/requirements-face.txt" || \
+    echo "Warning: GFPGAN packages could not be installed automatically." >&2
+fi
 "$VENV/bin/python" -c "import torch, spandrel, onnxruntime; print('torch', torch.__version__, 'cuda', torch.cuda.is_available()); print('spandrel', spandrel.__version__); print('onnxruntime', onnxruntime.__version__)"
+"$VENV/bin/python" "$ROOT/upscayl_native/face_restore.py" --check
 
-echo "Native backend installed. See native/README.md for SUPIR setup."
+echo "Native backend + GFPGAN installed. See native/README.md for SUPIR setup."
