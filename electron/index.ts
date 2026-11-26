@@ -8,8 +8,13 @@ import openFolder, { openFileLocation } from "./commands/open-folder";
 import stop from "./commands/stop";
 import selectFolder from "./commands/select-folder";
 import selectFile from "./commands/select-file";
-import selectVideo from "./commands/select-video";
-import videoUpscayl from "./commands/video-upscayl";
+import selectVideo, { selectMultipleVideos } from "./commands/select-video";
+import videoUpscayl, { resumeVideoSession } from "./commands/video-upscayl";
+import batchVideoUpscayl from "./commands/batch-video-upscayl";
+import {
+  handleDiscardVideoSession,
+  handleListVideoSessions,
+} from "./commands/video-sessions";
 import { handleCheckFfmpeg, handleGetVideoInfo } from "./commands/video-info";
 import multiModelUpscayl from "./commands/multi-model-upscayl";
 import getModelsList from "./commands/get-models-list";
@@ -102,9 +107,18 @@ ipcMain.handle(ELECTRON_COMMANDS.SELECT_FILE, selectFile);
 
 ipcMain.handle(ELECTRON_COMMANDS.SELECT_VIDEO, selectVideo);
 
+ipcMain.handle(ELECTRON_COMMANDS.SELECT_VIDEOS, selectMultipleVideos);
+
 ipcMain.handle(ELECTRON_COMMANDS.CHECK_FFMPEG, handleCheckFfmpeg);
 
 ipcMain.handle(ELECTRON_COMMANDS.GET_VIDEO_INFO, handleGetVideoInfo);
+
+ipcMain.handle(ELECTRON_COMMANDS.LIST_VIDEO_SESSIONS, handleListVideoSessions);
+
+ipcMain.handle(
+  ELECTRON_COMMANDS.DISCARD_VIDEO_SESSION,
+  handleDiscardVideoSession,
+);
 
 ipcMain.on(ELECTRON_COMMANDS.GET_MODELS_LIST, getModelsList);
 
@@ -122,6 +136,10 @@ ipcMain.on(ELECTRON_COMMANDS.DOUBLE_UPSCAYL, doubleUpscayl);
 ipcMain.on(ELECTRON_COMMANDS.MULTI_MODEL_UPSCAYL, multiModelUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.UPSCAYL_VIDEO, videoUpscayl);
+
+ipcMain.on(ELECTRON_COMMANDS.RESUME_VIDEO_SESSION, resumeVideoSession);
+
+ipcMain.on(ELECTRON_COMMANDS.BATCH_VIDEO_UPSCAYL, batchVideoUpscayl);
 
 ipcMain.on(ELECTRON_COMMANDS.PASTE_IMAGE, pasteImage);
 

@@ -11,23 +11,32 @@ import {
   scaleAtom,
   ttaModeAtom,
   useCustomWidthAtom,
+  videoBatchModeAtom,
+  videoBatchPathsAtom,
   videoCodecAtom,
   videoContainerAtom,
   videoDeduplicateFramesAtom,
   videoIntermediateFormatAtom,
+  videoInterpolationAtom,
   videoKeepAudioAtom,
   videoProgressAtom,
   videoQualityAtom,
+  videoResumableAtom,
+  videoTrimEndAtom,
+  videoTrimStartAtom,
   videoUseHwEncodeAtom,
 } from "@/atoms/user-settings-atom";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
+import getFilenameFromPath from "@common/get-file-name";
 import {
   FfmpegStatus,
   VideoCodec,
   VideoContainerFormat,
   VideoIntermediateFormat,
+  VideoInterpolationFactor,
   VideoMediaInfo,
   VideoQualityPreset,
+  VideoSessionManifest,
 } from "@common/types/types";
 import {
   estimateVideoOutputDimensions,
@@ -42,8 +51,17 @@ type VideoTabProps = {
   videoPath: string;
   videoInfo: VideoMediaInfo | null;
   ffmpegStatus: FfmpegStatus | null;
+  videoSessions: VideoSessionManifest[];
   selectVideoHandler: () => Promise<void>;
-  upscaylVideoHandler: () => Promise<void>;
+  selectMultipleVideosHandler: () => Promise<void>;
+  upscaylVideoHandler: (overrides?: {
+    trimStartSeconds?: number | null;
+    trimEndSeconds?: number | null;
+    resumable?: boolean;
+  }) => Promise<void>;
+  batchVideoHandler: () => Promise<void>;
+  resumeVideoSessionHandler: (sessionId: string) => void;
+  discardVideoSessionHandler: (sessionId: string) => Promise<void>;
 };
 
 const FORMAT_PRESETS: Array<{
@@ -73,8 +91,13 @@ const VideoTab = ({
   videoPath,
   videoInfo,
   ffmpegStatus,
+  videoSessions,
   selectVideoHandler,
+  selectMultipleVideosHandler,
   upscaylVideoHandler,
+  batchVideoHandler,
+  resumeVideoSessionHandler,
+  discardVideoSessionHandler,
 }: VideoTabProps) => {
   const t = useAtomValue(translationAtom);
   const logit = useLogger();
@@ -97,6 +120,12 @@ const VideoTab = ({
   const [deduplicateFrames, setDeduplicateFrames] = useAtom(
     videoDeduplicateFramesAtom,
   );
+  const [interpolation, setInterpolation] = useAtom(videoInterpolationAtom);
+  const [resumable, setResumable] = useAtom(videoResumableAtom);
+  const [videoBatchMode, setVideoBatchMode] = useAtom(videoBatchModeAtom);
+  const [videoBatchPaths, setVideoBatchPaths] = useAtom(videoBatchPathsAtom);
+  const [trimStart, setTrimStart] = useAtom(videoTrimStartAtom);
+  const [trimEnd, setTrimEnd] = useAtom(videoTrimEndAtom);
 
   const selectedFormatPreset = useMemo(() => {
     const match = FORMAT_PRESETS.find(
@@ -138,29 +167,59 @@ const VideoTab = ({
     setVideoCodec(preset.codec);
   };
 
-  const startHandler = () => {
+  const validateBeforeRun = () => {
     if (progress.length > 0) {
       toast({
         description: t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE"),
       });
-      return;
+      return false;
     }
     if (ffmpegStatus && !ffmpegStatus.available) {
       toast({
         title: t("VIDEO_UPSCAYL.FFMPEG_MISSING_TITLE"),
         description: t("VIDEO_UPSCAYL.FFMPEG_MISSING_DESCRIPTION"),
       });
+      return false;
+    }
+    if (!outputPath) {
+      toast({ description: t("VIDEO_UPSCAYL.NO_OUTPUT_FOLDER") });
+      return false;
+    }
+    return true;
+  };
+
+  const startHandler = () => {
+    if (!validateBeforeRun()) return;
+    if (videoBatchMode) {
+      if (videoBatchPaths.length === 0) {
+        toast({ description: t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED") });
+        return;
+      }
+      batchVideoHandler();
       return;
     }
     if (!videoPath) {
       toast({ description: t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED") });
       return;
     }
-    if (!outputPath) {
-      toast({ description: t("VIDEO_UPSCAYL.NO_OUTPUT_FOLDER") });
+    upscaylVideoHandler();
+  };
+
+  const quickPreviewHandler = () => {
+    if (!validateBeforeRun()) return;
+    if (!videoPath) {
+      toast({ description: t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED") });
       return;
     }
-    upscaylVideoHandler();
+    const endPreview =
+      videoInfo && videoInfo.duration > 0
+        ? Math.min(5, videoInfo.duration)
+        : 5;
+    upscaylVideoHandler({
+      trimStartSeconds: 0,
+      trimEndSeconds: endPreview,
+      resumable: false,
+    });
   };
 
   const isRunning = progress.length > 0;
@@ -205,41 +264,206 @@ const VideoTab = ({
         </div>
       )}
 
+      {/* Resumable Video Sessions */}
+      {videoSessions.length > 0 && !isRunning && (
+        <div className="rounded-box border border-primary/30 bg-primary/10 p-3 text-xs">
+          <p className="mb-2 font-semibold text-primary">
+            ♻️ {t("VIDEO_UPSCAYL.RESUMABLE_SESSIONS_TITLE")}
+          </p>
+          <div className="flex flex-col gap-2">
+            {videoSessions.map((session) => (
+              <div
+                key={session.sessionId}
+                className="flex flex-col gap-1.5 rounded-btn bg-base-100/80 p-2"
+              >
+                <p
+                  className="truncate font-medium"
+                  title={session.inputVideo}
+                >
+                  {getFilenameFromPath(session.inputVideo)}
+                </p>
+                <p className="text-[11px] text-base-content/70">
+                  {session.completedChunks.length}/{session.totalChunks} chunks ·{" "}
+                  {session.model} · {session.scale}x
+                </p>
+                <div className="flex gap-1.5">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-xs flex-1"
+                    onClick={() => resumeVideoSessionHandler(session.sessionId)}
+                  >
+                    {t("VIDEO_UPSCAYL.RESUME_BUTTON")}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-xs"
+                    onClick={() =>
+                      discardVideoSessionHandler(session.sessionId)
+                    }
+                  >
+                    {t("VIDEO_UPSCAYL.DISCARD_BUTTON")}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {ttaMode && (
         <div className="rounded-btn border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning">
           ⚠️ {t("VIDEO_UPSCAYL.TTA_WARNING")}
         </div>
       )}
 
+      {/* Batch Video Toggle */}
+      <label className="flex cursor-pointer items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          className="toggle toggle-primary toggle-sm"
+          checked={videoBatchMode}
+          onChange={(e) => setVideoBatchMode(e.target.checked)}
+          disabled={isRunning}
+        />
+        <span>{t("VIDEO_UPSCAYL.BATCH_VIDEO_TOGGLE")}</span>
+      </label>
+
       {/* STEP 1: VIDEO SELECTION */}
       <div className="animate-step-in">
         <p className="step-heading">{t("VIDEO_UPSCAYL.SELECT_VIDEO")}</p>
-        <button
-          className="btn btn-primary"
-          onClick={selectVideoHandler}
-          disabled={isRunning}
-        >
-          {t("VIDEO_UPSCAYL.SELECT_VIDEO_BUTTON")}
-        </button>
-        <p className="mt-2 break-all text-xs text-base-content/70">
-          {videoPath || t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED")}
-        </p>
-        {videoInfo && (
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
-            <span className="badge badge-neutral badge-sm">
-              {videoInfo.width}×{videoInfo.height}
-            </span>
-            <span className="badge badge-neutral badge-sm">
-              {videoInfo.fps.toFixed(videoInfo.fps % 1 === 0 ? 0 : 2)} fps
-            </span>
-            {videoInfo.duration > 0 && (
-              <span className="badge badge-neutral badge-sm">
-                {formatVideoDuration(videoInfo.duration)}
-              </span>
+        {videoBatchMode ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <button
+                className="btn btn-primary btn-sm flex-1"
+                onClick={selectMultipleVideosHandler}
+                disabled={isRunning}
+              >
+                {t("VIDEO_UPSCAYL.ADD_VIDEOS_BUTTON")}
+              </button>
+              {videoBatchPaths.length > 0 && (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setVideoBatchPaths([])}
+                  disabled={isRunning}
+                >
+                  {t("VIDEO_UPSCAYL.CLEAR_VIDEOS_BUTTON")}
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-base-content/70">
+              {videoBatchPaths.length > 0
+                ? t("VIDEO_UPSCAYL.BATCH_VIDEOS_COUNT", {
+                    count: String(videoBatchPaths.length),
+                  })
+                : t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED")}
+            </p>
+            {videoBatchPaths.length > 0 && (
+              <div className="flex max-h-32 flex-col gap-1 overflow-y-auto rounded-btn border border-base-content/10 bg-base-200/50 p-2 text-xs">
+                {videoBatchPaths.map((itemPath, idx) => (
+                  <div
+                    key={itemPath}
+                    className="flex items-center justify-between gap-1"
+                  >
+                    <span className="truncate" title={itemPath}>
+                      {idx + 1}. {getFilenameFromPath(itemPath)}
+                    </span>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-xs px-1"
+                      disabled={isRunning}
+                      onClick={() =>
+                        setVideoBatchPaths((prev) =>
+                          prev.filter((p) => p !== itemPath),
+                        )
+                      }
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
+        ) : (
+          <>
+            <button
+              className="btn btn-primary"
+              onClick={selectVideoHandler}
+              disabled={isRunning}
+            >
+              {t("VIDEO_UPSCAYL.SELECT_VIDEO_BUTTON")}
+            </button>
+            <p className="mt-2 break-all text-xs text-base-content/70">
+              {videoPath || t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED")}
+            </p>
+            {videoInfo && (
+              <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                <span className="badge badge-neutral badge-sm">
+                  {videoInfo.width}×{videoInfo.height}
+                </span>
+                <span className="badge badge-neutral badge-sm">
+                  {videoInfo.fps.toFixed(videoInfo.fps % 1 === 0 ? 0 : 2)} fps
+                </span>
+                {videoInfo.duration > 0 && (
+                  <span className="badge badge-neutral badge-sm">
+                    {formatVideoDuration(videoInfo.duration)}
+                  </span>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Trim / Range (single video only) */}
+      {!videoBatchMode && videoPath && (
+        <div className="rounded-box border border-base-content/10 bg-base-200/50 p-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-base-content/70">
+            {t("VIDEO_UPSCAYL.TRIM_TITLE")}
+          </p>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <label className="flex flex-col gap-1">
+              <span className="text-[11px] text-base-content/70">
+                {t("VIDEO_UPSCAYL.TRIM_START")}
+              </span>
+              <input
+                type="text"
+                placeholder="0"
+                className="input input-bordered input-xs w-full"
+                value={trimStart}
+                onChange={(e) => setTrimStart(e.target.value)}
+                disabled={isRunning}
+              />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-[11px] text-base-content/70">
+                {t("VIDEO_UPSCAYL.TRIM_END")}
+              </span>
+              <input
+                type="text"
+                placeholder={
+                  videoInfo && videoInfo.duration > 0
+                    ? formatVideoDuration(videoInfo.duration)
+                    : ""
+                }
+                className="input input-bordered input-xs w-full"
+                value={trimEnd}
+                onChange={(e) => setTrimEnd(e.target.value)}
+                disabled={isRunning}
+              />
+            </label>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline btn-xs mt-2 w-full"
+            onClick={quickPreviewHandler}
+            disabled={isRunning}
+          >
+            ⚡ {t("VIDEO_UPSCAYL.PREVIEW_5S_BUTTON")}
+          </button>
+        </div>
+      )}
 
       {/* STEP 2: MODEL & SCALE */}
       <div className="animate-step-in flex flex-col gap-3">
@@ -316,6 +540,33 @@ const VideoTab = ({
 
             <label className="flex flex-col gap-1 text-xs">
               <span className="text-base-content/80">
+                {t("VIDEO_UPSCAYL.INTERPOLATION_LABEL")}
+              </span>
+              <select
+                className="select select-bordered select-sm w-full"
+                value={String(interpolation)}
+                onChange={(e) =>
+                  setInterpolation(
+                    Number(e.target.value) as VideoInterpolationFactor,
+                  )
+                }
+                disabled={isRunning}
+              >
+                <option value="1">{t("VIDEO_UPSCAYL.INTERPOLATION_OFF")}</option>
+                <option value="2">{t("VIDEO_UPSCAYL.INTERPOLATION_2X")}</option>
+                <option value="4">{t("VIDEO_UPSCAYL.INTERPOLATION_4X")}</option>
+              </select>
+              {interpolation > 1 && (
+                <span className="text-[11px] text-primary">
+                  {ffmpegStatus?.hasRife
+                    ? t("VIDEO_UPSCAYL.INTERPOLATION_RIFE")
+                    : t("VIDEO_UPSCAYL.INTERPOLATION_FFMPEG")}
+                </span>
+              )}
+            </label>
+
+            <label className="flex flex-col gap-1 text-xs">
+              <span className="text-base-content/80">
                 {t("VIDEO_UPSCAYL.INTERMEDIATE_LABEL")}
               </span>
               <select
@@ -365,6 +616,19 @@ const VideoTab = ({
 
             <label className="flex cursor-pointer items-center justify-between text-xs">
               <span className="text-base-content/80">
+                {t("VIDEO_UPSCAYL.RESUMABLE_LABEL")}
+              </span>
+              <input
+                type="checkbox"
+                className="toggle toggle-primary toggle-xs"
+                checked={resumable}
+                onChange={(e) => setResumable(e.target.checked)}
+                disabled={isRunning}
+              />
+            </label>
+
+            <label className="flex cursor-pointer items-center justify-between text-xs">
+              <span className="text-base-content/80">
                 {t("VIDEO_UPSCAYL.KEEP_AUDIO")}
               </span>
               <input
@@ -381,7 +645,7 @@ const VideoTab = ({
 
       {/* STEP 4: START / PROGRESS */}
       <div className="animate-step-in flex flex-col gap-2 pb-4">
-        {videoInfo && estimatedOutput && (
+        {!videoBatchMode && videoInfo && estimatedOutput && (
           <p className="text-xs text-base-content/80">
             {t("APP.SCALE_SELECTION.FROM_TITLE")}
             <span className="font-bold">
@@ -391,6 +655,11 @@ const VideoTab = ({
             <span className="font-bold">
               {estimatedOutput.width}×{estimatedOutput.height}
             </span>
+            {interpolation > 1 && (
+              <span className="ml-1 font-bold text-primary">
+                ({(videoInfo.fps * interpolation).toFixed(0)} fps)
+              </span>
+            )}
           </p>
         )}
 
@@ -422,7 +691,11 @@ const VideoTab = ({
         >
           {isRunning
             ? t("APP.SCALE_SELECTION.IN_PROGRESS_BUTTON_TITLE")
-            : t("VIDEO_UPSCAYL.START_BUTTON")}
+            : videoBatchMode
+              ? t("VIDEO_UPSCAYL.BATCH_VIDEO_START", {
+                  count: String(videoBatchPaths.length),
+                })
+              : t("VIDEO_UPSCAYL.START_BUTTON")}
         </button>
       </div>
     </div>

@@ -279,7 +279,9 @@ function ProgressBar({
       ? t("VIDEO_UPSCAYL.STAGE_EXTRACTING")
       : videoProgress.stage === "upscaling"
         ? t("VIDEO_UPSCAYL.STAGE_UPSCALING")
-        : t("VIDEO_UPSCAYL.STAGE_ENCODING")
+        : videoProgress.stage === "interpolating"
+          ? t("VIDEO_UPSCAYL.STAGE_INTERPOLATING")
+          : t("VIDEO_UPSCAYL.STAGE_ENCODING")
     : "";
 
   return (

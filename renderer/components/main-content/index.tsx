@@ -2,7 +2,7 @@
 import useLogger from "../hooks/use-logger";
 import { useState, useMemo, useEffect } from "react";
 import { ELECTRON_COMMANDS } from "@common/electron-commands";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   activeTabAtom,
   batchModeAtom,
@@ -14,6 +14,8 @@ import {
   batchProgressAtom,
   multiModelProgressAtom,
   videoProgressAtom,
+  videoBatchModeAtom,
+  videoBatchPathsAtom,
 } from "../../atoms/user-settings-atom";
 import { useToast } from "@/components/ui/use-toast";
 import { sanitizePath } from "@common/sanitize-path";
@@ -21,6 +23,7 @@ import getDirectoryFromPath from "@common/get-directory-from-path";
 import { FEATURE_FLAGS } from "@common/feature-flags";
 import { isVideoPath } from "@common/video-formats";
 import {
+  BatchVideoItemResult,
   FfmpegStatus,
   MultiModelResult,
   VideoDoneInfo,
@@ -60,6 +63,7 @@ type MainContentProps = {
   videoPath: string;
   videoInfo: VideoMediaInfo | null;
   videoDoneInfo: VideoDoneInfo | null;
+  batchVideoResults: BatchVideoItemResult[];
   ffmpegStatus: FfmpegStatus | null;
   selectVideoHandler: () => Promise<void>;
   loadVideoPath: (path: string) => Promise<void>;
@@ -82,6 +86,7 @@ const MainContent = ({
   videoPath,
   videoInfo,
   videoDoneInfo,
+  batchVideoResults,
   ffmpegStatus,
   selectVideoHandler,
   loadVideoPath,
@@ -100,6 +105,8 @@ const MainContent = ({
   const batchProgress = useAtomValue(batchProgressAtom);
   const multiModelProgress = useAtomValue(multiModelProgressAtom);
   const videoProgress = useAtomValue(videoProgressAtom);
+  const setVideoBatchMode = useSetAtom(videoBatchModeAtom);
+  const setVideoBatchPaths = useSetAtom(videoBatchPathsAtom);
 
   const viewType = useAtomValue(viewTypeAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
@@ -184,9 +191,32 @@ const MainContent = ({
     const extension = e.dataTransfer.files[0].name.split(".").at(-1) ?? "";
     logit("⤵️ Dropped file: ", JSON.stringify({ type, filePath, extension }));
 
+    const droppedVideoPaths = Array.from(e.dataTransfer.files)
+      .map((f: any) => ({ path: f.path as string, type: f.type as string }))
+      .filter((f) => f.type?.includes("video") || isVideoPath(f.path))
+      .map((f) => f.path);
+
+    if (droppedVideoPaths.length > 1) {
+      logit("🎬 Dropped multiple videos: ", String(droppedVideoPaths.length));
+      setActiveTab(1);
+      setVideoBatchMode(true);
+      setVideoBatchPaths((prev) => {
+        const merged = [...prev];
+        for (const p of droppedVideoPaths) {
+          if (!merged.includes(p)) merged.push(p);
+        }
+        return merged;
+      });
+      if (!FEATURE_FLAGS.APP_STORE_BUILD && !rememberOutputFolder) {
+        setOutputPath(getDirectoryFromPath(droppedVideoPaths[0]));
+      }
+      return;
+    }
+
     if (type.includes("video") || isVideoPath(filePath)) {
       logit("🎬 Dropped video file: ", filePath);
       setActiveTab(1);
+      setVideoBatchMode(false);
       loadVideoPath(filePath);
       return;
     }
@@ -329,7 +359,7 @@ const MainContent = ({
   const showProgressOverlay =
     progress.length > 0 &&
     (isVideoTab
-      ? !videoDoneInfo
+      ? !videoDoneInfo && batchVideoResults.length === 0
       : upscaledImagePath.length === 0 &&
         upscaledBatchFolderPath.length === 0 &&
         !hasMultiModelResults);
@@ -369,6 +399,7 @@ const MainContent = ({
           videoPath={videoPath}
           videoInfo={videoInfo}
           videoDoneInfo={videoDoneInfo}
+          batchVideoResults={batchVideoResults}
           ffmpegStatus={ffmpegStatus}
           selectVideoHandler={selectVideoHandler}
           resetVideoHandler={resetVideoHandler}

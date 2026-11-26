@@ -48,6 +48,8 @@ export type VideoCodec = "h264" | "h265" | "vp9";
 export type VideoContainerFormat = "mp4" | "mkv" | "webm";
 export type VideoQualityPreset = "high" | "balanced" | "compact";
 export type VideoIntermediateFormat = "jpg" | "png";
+export type VideoInterpolationFactor = 1 | 2 | 4;
+export type VideoInterpolationEngine = "auto" | "rife" | "ffmpeg";
 export type HardwareVideoEncoder =
   | "h264_nvenc"
   | "hevc_nvenc"
@@ -81,6 +83,12 @@ export type VideoUpscaylPayload = {
   intermediateFormat?: VideoIntermediateFormat;
   useHardwareEncoding?: boolean;
   deduplicateFrames?: boolean;
+  trimStartSeconds?: number | null;
+  trimEndSeconds?: number | null;
+  resumable?: boolean;
+  resumeSessionId?: string;
+  frameInterpolation?: VideoInterpolationFactor;
+  interpolationEngine?: VideoInterpolationEngine;
 };
 
 export type FfmpegStatus = {
@@ -91,6 +99,8 @@ export type FfmpegStatus = {
   ffprobePath: string | null;
   version: string | null;
   hwEncoders: HardwareVideoEncoder[];
+  hasRife: boolean;
+  rifePath: string | null;
 };
 
 export type VideoMediaInfo = {
@@ -111,6 +121,7 @@ export type VideoProgressStage =
   | "preparing"
   | "extracting"
   | "upscaling"
+  | "interpolating"
   | "encoding";
 
 export type VideoProgressInfo = {
@@ -123,6 +134,7 @@ export type VideoProgressInfo = {
   chunk: number;
   totalChunks: number;
   message: string;
+  sessionId?: string;
 };
 
 export type VideoDoneInfo = {
@@ -137,6 +149,73 @@ export type VideoDoneInfo = {
   container: VideoContainerFormat;
   usedEncoder: string;
   skippedDuplicateFrames: number;
+  interpolationFactor?: VideoInterpolationFactor;
+  interpolationEngineUsed?: string | null;
+  trimmedRange?: { start: number; end: number } | null;
+};
+
+export type VideoSessionManifest = {
+  sessionId: string;
+  inputVideo: string;
+  outputBasePath: string;
+  outputFile: string;
+  model: string;
+  scale: string;
+  useCustomWidth: boolean;
+  customWidth: string;
+  gpuId: string;
+  tileSize: number;
+  ttaMode: boolean;
+  threads?: string;
+  videoCodec: VideoCodec;
+  videoContainer: VideoContainerFormat;
+  videoQuality: VideoQualityPreset;
+  keepAudio: boolean;
+  hasAudio: boolean;
+  intermediateFormat: VideoIntermediateFormat;
+  useHardwareEncoding: boolean;
+  deduplicateFrames: boolean;
+  frameInterpolation: VideoInterpolationFactor;
+  interpolationEngine: VideoInterpolationEngine;
+  trimStartSeconds: number | null;
+  trimEndSeconds: number | null;
+  fps: number;
+  fpsRational: string;
+  duration: number;
+  totalFrames: number;
+  chunkSize: number;
+  totalChunks: number;
+  completedChunks: number[];
+  skippedDuplicateFrames: number;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export type BatchVideoUpscaylPayload = Omit<
+  VideoUpscaylPayload,
+  "videoPath" | "trimStartSeconds" | "trimEndSeconds" | "resumeSessionId"
+> & {
+  videoPaths: string[];
+};
+
+export type BatchVideoItemResult = {
+  videoPath: string;
+  status: "done" | "error";
+  doneInfo?: VideoDoneInfo;
+  error?: string;
+};
+
+export type BatchVideoProgressInfo = {
+  videoIndex: number;
+  totalVideos: number;
+  currentVideoPath: string;
+  completedVideos: number;
+  videoProgress: VideoProgressInfo | null;
+};
+
+export type BatchVideoDonePayload = {
+  results: BatchVideoItemResult[];
+  stopped: boolean;
 };
 
 export type MultiModelUpscaylPayload = {

@@ -248,13 +248,157 @@ export function resolveVideoEncodingProfile({
   };
 }
 
+export type ResolvedTrimRange = {
+  start: number;
+  end: number;
+  duration: number;
+  isTrimmed: boolean;
+};
+
+/**
+ * Parse a user time input such as `"5"`, `"12.5"`, `"01:30"`, or `"1:02:15.5"`
+ * into seconds. Returns null for empty or invalid inputs.
+ */
+export function parseTimeInput(raw?: string | number | null): number | null {
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === "number") {
+    return Number.isFinite(raw) && raw >= 0 ? raw : null;
+  }
+  const text = raw.trim();
+  if (!text) return null;
+
+  if (!text.includes(":")) {
+    const val = Number(text);
+    return Number.isFinite(val) && val >= 0 ? val : null;
+  }
+
+  const parts = text.split(":").map(Number);
+  if (parts.length < 2 || parts.length > 3 || parts.some((p) => !Number.isFinite(p) || p < 0)) {
+    return null;
+  }
+
+  if (parts.length === 2) {
+    return parts[0] * 60 + parts[1];
+  }
+  return parts[0] * 3600 + parts[1] * 60 + parts[2];
+}
+
+/**
+ * Validate and clamp optional start/end trim timestamps against the video
+ * duration. Returns null when no trimming is active.
+ */
+export function resolveVideoTrimRange({
+  startSeconds,
+  endSeconds,
+  duration,
+}: {
+  startSeconds?: number | null;
+  endSeconds?: number | null;
+  duration: number;
+}): ResolvedTrimRange | null {
+  const hasStart =
+    typeof startSeconds === "number" &&
+    Number.isFinite(startSeconds) &&
+    startSeconds > 0;
+  const hasEnd =
+    typeof endSeconds === "number" &&
+    Number.isFinite(endSeconds) &&
+    endSeconds > 0;
+
+  if (!hasStart && !hasEnd) return null;
+
+  const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
+  const start = hasStart
+    ? Math.max(0, safeDuration > 0 ? Math.min(startSeconds!, safeDuration) : startSeconds!)
+    : 0;
+  let end = hasEnd
+    ? safeDuration > 0
+      ? Math.min(endSeconds!, safeDuration)
+      : endSeconds!
+    : safeDuration;
+
+  if (end <= start) {
+    return null;
+  }
+
+  // If the range covers essentially the entire video, treat as untrimmed.
+  if (start === 0 && safeDuration > 0 && Math.abs(end - safeDuration) < 0.05) {
+    return null;
+  }
+
+  return {
+    start,
+    end,
+    duration: end - start,
+    isTrimmed: true,
+  };
+}
+
+/**
+ * Multiply a rational FPS string (e.g. "30000/1001" or "24/1") by an integer
+ * interpolation factor (1, 2, or 4) without losing precision.
+ */
+export function scaleRationalFps(
+  fpsRational: string,
+  factor: 1 | 2 | 4,
+): string {
+  if (factor === 1) return fpsRational;
+  const trimmed = fpsRational.trim();
+  if (trimmed.includes("/")) {
+    const [numStr, denStr] = trimmed.split("/");
+    const num = Number(numStr);
+    const den = Number(denStr);
+    if (Number.isFinite(num) && Number.isFinite(den) && num > 0 && den > 0) {
+      return `${Math.round(num * factor)}/${Math.round(den)}`;
+    }
+  }
+  const numeric = Number(trimmed);
+  if (Number.isFinite(numeric) && numeric > 0) {
+    return (Math.round(numeric * factor * 1000) / 1000).toString();
+  }
+  return `${30 * factor}/1`;
+}
+
+/**
+ * Build CLI arguments for `rife-ncnn-vulkan` to AI-interpolate a directory of
+ * frames to `targetFrameCount`.
+ */
+export function buildRifeArgs({
+  inputDir,
+  outputDir,
+  targetFrameCount,
+  gpuId,
+  format = "jpg",
+}: {
+  inputDir: string;
+  outputDir: string;
+  targetFrameCount: number;
+  gpuId?: string;
+  format?: VideoIntermediateFormat;
+}): string[] {
+  const args = [
+    "-i",
+    inputDir,
+    "-o",
+    outputDir,
+    "-n",
+    String(Math.max(2, Math.round(targetFrameCount))),
+    "-f",
+    `frame_%08d.${format}`,
+  ];
+  if (gpuId && gpuId.trim().length > 0) {
+    args.push("-g", gpuId.trim());
+  }
+  return args;
+}
+
 /**
  * Build FFmpeg arguments to extract CFR frames matching the target rational
  * framerate so VFR inputs remain synchronized with their audio track.
  *
  * Uses multi-threaded decoding (`-threads 0`), optional hardware decoding
- * (`-hwaccel auto`), and fast intermediate compression (`-q:v 1` for JPEG or
- * `-compression_level 1` for PNG).
+ * (`-hwaccel auto`), optional start/duration trimming, and fast intermediate
+ * compression (`-q:v 1` for JPEG or `-compression_level 1` for PNG).
  */
 export function buildVideoExtractArgs({
   inputVideo,
@@ -262,12 +406,16 @@ export function buildVideoExtractArgs({
   fpsRational,
   intermediateFormat = "jpg",
   useHwDecode = true,
+  trimStartSeconds = null,
+  trimDurationSeconds = null,
 }: {
   inputVideo: string;
   outputPattern: string;
   fpsRational: string;
   intermediateFormat?: VideoIntermediateFormat;
   useHwDecode?: boolean;
+  trimStartSeconds?: number | null;
+  trimDurationSeconds?: number | null;
 }): string[] {
   const args: string[] = ["-y", "-threads", "0"];
 
@@ -275,7 +423,25 @@ export function buildVideoExtractArgs({
     args.push("-hwaccel", "auto");
   }
 
-  args.push("-i", inputVideo, "-vf", `fps=${fpsRational}`, "-start_number", "1");
+  if (
+    typeof trimStartSeconds === "number" &&
+    Number.isFinite(trimStartSeconds) &&
+    trimStartSeconds > 0
+  ) {
+    args.push("-ss", trimStartSeconds.toFixed(3));
+  }
+
+  args.push("-i", inputVideo);
+
+  if (
+    typeof trimDurationSeconds === "number" &&
+    Number.isFinite(trimDurationSeconds) &&
+    trimDurationSeconds > 0
+  ) {
+    args.push("-t", trimDurationSeconds.toFixed(3));
+  }
+
+  args.push("-vf", `fps=${fpsRational}`, "-start_number", "1");
 
   if (intermediateFormat === "jpg") {
     // Near-lossless JPEG: ~5-10x faster than PNG with ~8x smaller temp files
@@ -374,10 +540,13 @@ const getHardwareEncoderArgs = (
 
 /**
  * Build FFmpeg arguments to encode upscaled frames (either from stdin
- * `image2pipe` or from a filename pattern) into the final video file.
+ * `image2pipe` or from a filename pattern) into a video file or resumable chunk
+ * segment.
  *
  * - Supports GPU hardware encoding (NVENC / AMF / QSV / VideoToolbox) when
  *   available, falling back to fast multi-threaded software presets.
+ * - Supports optional FFmpeg optical-flow motion interpolation (`minterpolate`)
+ *   when `ffmpegInterpolateFps` is provided.
  * - Pads odd dimensions (`pad=ceil(iw/2)*2:ceil(ih/2)*2`) so `yuv420p`
  *   encoders never fail on odd-sized frames or custom widths.
  */
@@ -394,6 +563,10 @@ export function buildVideoEncodeArgs({
   framesPattern,
   intermediateFormat = "jpg",
   hardwareEncoder = null,
+  trimStartSeconds = null,
+  trimDurationSeconds = null,
+  ffmpegInterpolateFps = null,
+  segmentOnly = false,
 }: {
   fpsRational: string;
   inputVideo: string;
@@ -407,6 +580,10 @@ export function buildVideoEncodeArgs({
   framesPattern?: string;
   intermediateFormat?: VideoIntermediateFormat;
   hardwareEncoder?: HardwareVideoEncoder | null;
+  trimStartSeconds?: number | null;
+  trimDurationSeconds?: number | null;
+  ffmpegInterpolateFps?: string | null;
+  segmentOnly?: boolean;
 }): string[] {
   const profile = resolveVideoEncodingProfile({ codec, container, quality });
   const pipeCodec = intermediateFormat === "jpg" ? "mjpeg" : "png";
@@ -433,14 +610,34 @@ export function buildVideoEncodeArgs({
     );
   }
 
-  const shouldIncludeAudio = keepAudio && hasAudio;
+  const shouldIncludeAudio = !segmentOnly && keepAudio && hasAudio;
   if (shouldIncludeAudio) {
+    if (
+      typeof trimStartSeconds === "number" &&
+      Number.isFinite(trimStartSeconds) &&
+      trimStartSeconds > 0
+    ) {
+      args.push("-ss", trimStartSeconds.toFixed(3));
+    }
+    if (
+      typeof trimDurationSeconds === "number" &&
+      Number.isFinite(trimDurationSeconds) &&
+      trimDurationSeconds > 0
+    ) {
+      args.push("-t", trimDurationSeconds.toFixed(3));
+    }
     args.push("-i", inputVideo, "-map", "0:v:0", "-map", "1:a?");
   } else {
     args.push("-map", "0:v:0", "-an");
   }
 
-  args.push("-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2");
+  const filters = ["pad=ceil(iw/2)*2:ceil(ih/2)*2"];
+  if (ffmpegInterpolateFps) {
+    filters.push(
+      `minterpolate=fps=${ffmpegInterpolateFps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1`,
+    );
+  }
+  args.push("-vf", filters.join(","));
 
   if (hardwareEncoder && profile.codec !== "vp9") {
     args.push(...getHardwareEncoderArgs(hardwareEncoder, profile.quality));
@@ -474,6 +671,77 @@ export function buildVideoEncodeArgs({
   }
 
   args.push("-pix_fmt", "yuv420p");
+
+  if (!segmentOnly && profile.container === "mp4") {
+    args.push("-movflags", "+faststart");
+  }
+
+  if (shouldIncludeAudio) {
+    args.push("-c:a", profile.audioEncoder, "-b:a", profile.audioBitrate);
+  }
+
+  args.push(outputFile);
+  return args;
+}
+
+/**
+ * Build FFmpeg arguments to losslessly concatenate pre-encoded resumable chunk
+ * segments and mux the original (optionally trimmed) audio track.
+ */
+export function buildVideoConcatArgs({
+  concatListPath,
+  inputVideo,
+  outputFile,
+  codec = "h264",
+  container = "mp4",
+  keepAudio = true,
+  hasAudio = true,
+  trimStartSeconds = null,
+  trimDurationSeconds = null,
+}: {
+  concatListPath: string;
+  inputVideo: string;
+  outputFile: string;
+  codec?: VideoCodec;
+  container?: VideoContainerFormat;
+  keepAudio?: boolean;
+  hasAudio?: boolean;
+  trimStartSeconds?: number | null;
+  trimDurationSeconds?: number | null;
+}): string[] {
+  const profile = resolveVideoEncodingProfile({ codec, container });
+  const args: string[] = [
+    "-y",
+    "-f",
+    "concat",
+    "-safe",
+    "0",
+    "-i",
+    concatListPath,
+  ];
+
+  const shouldIncludeAudio = keepAudio && hasAudio;
+  if (shouldIncludeAudio) {
+    if (
+      typeof trimStartSeconds === "number" &&
+      Number.isFinite(trimStartSeconds) &&
+      trimStartSeconds > 0
+    ) {
+      args.push("-ss", trimStartSeconds.toFixed(3));
+    }
+    if (
+      typeof trimDurationSeconds === "number" &&
+      Number.isFinite(trimDurationSeconds) &&
+      trimDurationSeconds > 0
+    ) {
+      args.push("-t", trimDurationSeconds.toFixed(3));
+    }
+    args.push("-i", inputVideo, "-map", "0:v:0", "-map", "1:a?");
+  } else {
+    args.push("-map", "0:v:0", "-an");
+  }
+
+  args.push("-c:v", "copy");
 
   if (profile.container === "mp4") {
     args.push("-movflags", "+faststart");
@@ -600,7 +868,9 @@ export function calculateVideoOverallProgress(
     case "extracting":
       return 0.02 + 0.13 * clamped;
     case "upscaling":
-      return 0.15 + 0.8 * clamped;
+      return 0.15 + 0.72 * clamped;
+    case "interpolating":
+      return 0.87 + 0.08 * clamped;
     case "encoding":
       return 0.95 + 0.05 * clamped;
     default:
@@ -616,6 +886,8 @@ export function buildVideoOutputFilename({
   customWidth,
   container = "mp4",
   codec = "h264",
+  trimRange = null,
+  interpolationFactor = 1,
 }: {
   inputName: string;
   model: string;
@@ -624,10 +896,21 @@ export function buildVideoOutputFilename({
   customWidth: string;
   container?: VideoContainerFormat;
   codec?: VideoCodec;
+  trimRange?: ResolvedTrimRange | null;
+  interpolationFactor?: 1 | 2 | 4;
 }): string {
   const profile = resolveVideoEncodingProfile({ codec, container });
   const scaleLabel = useCustomWidth ? `${customWidth}px` : `${scale}x`;
-  return `${inputName}_upscayl_${model}_${scaleLabel}.${profile.container}`;
+  const parts = [`${inputName}_upscayl_${model}_${scaleLabel}`];
+  if (interpolationFactor > 1) {
+    parts.push(`${interpolationFactor}xfps`);
+  }
+  if (trimRange?.isTrimmed) {
+    parts.push(
+      `${Math.round(trimRange.start)}s-${Math.round(trimRange.end)}s`,
+    );
+  }
+  return `${parts.join("_")}.${profile.container}`;
 }
 
 export function estimateVideoOutputDimensions({

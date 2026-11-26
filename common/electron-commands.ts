@@ -1,6 +1,7 @@
 const ELECTRON_COMMANDS = {
   SELECT_FILE: "Select a File",
   SELECT_VIDEO: "Select a Video",
+  SELECT_VIDEOS: "Select Multiple Videos",
   SELECT_FOLDER: "Select a Folder",
   UPSCAYL: "Upscale the Image",
   UPSCAYL_DONE: "Upscaling Done",
@@ -27,6 +28,12 @@ const ELECTRON_COMMANDS = {
   UPSCAYL_VIDEO_PROGRESS: "Send Video Upscale Progress from Main to Renderer",
   UPSCAYL_VIDEO_PROGRESS_INFO:
     "Send Structured Video Upscale Progress from Main to Renderer",
+  BATCH_VIDEO_UPSCAYL: "Batch Upscale Videos",
+  BATCH_VIDEO_PROGRESS: "Send Batch Video Progress from Main to Renderer",
+  BATCH_VIDEO_DONE: "Batch Video Upscaling Done",
+  LIST_VIDEO_SESSIONS: "List Resumable Video Sessions",
+  RESUME_VIDEO_SESSION: "Resume Video Upscale Session",
+  DISCARD_VIDEO_SESSION: "Discard Video Upscale Session",
   GET_VIDEO_INFO: "Get Video Metadata",
   CHECK_FFMPEG: "Check FFmpeg Availability",
   FFMPEG_VIDEO_DONE: "Ran FFMpeg successfully",

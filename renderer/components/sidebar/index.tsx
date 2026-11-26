@@ -32,14 +32,21 @@ import {
   videoContainerAtom,
   videoDeduplicateFramesAtom,
   videoIntermediateFormatAtom,
+  videoInterpolationAtom,
   videoKeepAudioAtom,
   videoProgressAtom,
   videoQualityAtom,
+  videoResumableAtom,
+  videoTrimEndAtom,
+  videoTrimStartAtom,
   videoUseHwEncodeAtom,
+  videoBatchPathsAtom,
 } from "../../atoms/user-settings-atom";
 import useLogger from "../hooks/use-logger";
 import {
   BatchUpscaylPayload,
+  BatchVideoItemResult,
+  BatchVideoUpscaylPayload,
   DoubleUpscaylPayload,
   FfmpegStatus,
   ImageUpscaylPayload,
@@ -47,8 +54,10 @@ import {
   MultiModelUpscaylPayload,
   VideoDoneInfo,
   VideoMediaInfo,
+  VideoSessionManifest,
   VideoUpscaylPayload,
 } from "@common/types/types";
+import { parseTimeInput } from "@common/video-upscayl-helpers";
 import { useToast } from "@/components/ui/use-toast";
 import UpscaylSteps from "./upscayl-tab/upscayl-steps";
 import VideoTab from "./video-tab";
@@ -79,8 +88,13 @@ const Sidebar = ({
   videoPath,
   videoInfo,
   ffmpegStatus,
+  videoSessions,
   setVideoDoneInfo,
+  setBatchVideoResults,
   selectVideoHandler,
+  selectMultipleVideosHandler,
+  resumeVideoSessionHandler,
+  discardVideoSessionHandler,
 }: {
   setUpscaledImagePath: React.Dispatch<React.SetStateAction<string>>;
   setMultiModelResults: React.Dispatch<React.SetStateAction<MultiModelResult[]>>;
@@ -97,8 +111,15 @@ const Sidebar = ({
   videoPath: string;
   videoInfo: VideoMediaInfo | null;
   ffmpegStatus: FfmpegStatus | null;
+  videoSessions: VideoSessionManifest[];
   setVideoDoneInfo: React.Dispatch<React.SetStateAction<VideoDoneInfo | null>>;
+  setBatchVideoResults: React.Dispatch<
+    React.SetStateAction<BatchVideoItemResult[]>
+  >;
   selectVideoHandler: () => Promise<void>;
+  selectMultipleVideosHandler: () => Promise<void>;
+  resumeVideoSessionHandler: (sessionId: string) => void;
+  discardVideoSessionHandler: (sessionId: string) => Promise<void>;
 }) => {
   const t = useTranslation();
   const logit = useLogger();
@@ -131,6 +152,11 @@ const Sidebar = ({
   const videoIntermediateFormat = useAtomValue(videoIntermediateFormatAtom);
   const videoUseHwEncode = useAtomValue(videoUseHwEncodeAtom);
   const videoDeduplicateFrames = useAtomValue(videoDeduplicateFramesAtom);
+  const videoInterpolation = useAtomValue(videoInterpolationAtom);
+  const videoResumable = useAtomValue(videoResumableAtom);
+  const videoTrimStart = useAtomValue(videoTrimStartAtom);
+  const videoTrimEnd = useAtomValue(videoTrimEndAtom);
+  const videoBatchPaths = useAtomValue(videoBatchPathsAtom);
   const logData = useAtomValue(logAtom);
   const [scale] = useAtom(scaleAtom);
   const setDontShowCloudModal = useSetAtom(dontShowCloudModalAtom);
@@ -309,7 +335,11 @@ const Sidebar = ({
     logit("🏁 UPSCAYL");
   };
 
-  const upscaylVideoHandler = async () => {
+  const upscaylVideoHandler = async (overrides?: {
+    trimStartSeconds?: number | null;
+    trimEndSeconds?: number | null;
+    resumable?: boolean;
+  }) => {
     if (!videoPath) {
       toast({
         title: t("ERRORS.NO_IMAGE_ERROR.TITLE"),
@@ -326,15 +356,27 @@ const Sidebar = ({
       return;
     }
 
+    const parsedTrimStart =
+      overrides?.trimStartSeconds !== undefined
+        ? overrides.trimStartSeconds
+        : parseTimeInput(videoTrimStart);
+    const parsedTrimEnd =
+      overrides?.trimEndSeconds !== undefined
+        ? overrides.trimEndSeconds
+        : parseTimeInput(videoTrimEnd);
+    const useResumable =
+      overrides?.resumable !== undefined ? overrides.resumable : videoResumable;
+
     setUpscaledImagePath("");
     setUpscaledBatchFolderPath("");
     setMultiModelResults([]);
     setMultiModelProgress(null);
     setVideoDoneInfo(null);
+    setBatchVideoResults([]);
     setVideoProgress({
       stage: "preparing",
       stageIndex: 1,
-      totalStages: 3,
+      totalStages: videoInterpolation > 1 ? 4 : 3,
       percent: 0,
       completedFrames: 0,
       totalFrames: videoInfo?.estimatedFrames ?? 0,
@@ -364,6 +406,11 @@ const Sidebar = ({
       intermediateFormat: videoIntermediateFormat,
       useHardwareEncoding: videoUseHwEncode,
       deduplicateFrames: videoDeduplicateFrames,
+      frameInterpolation: videoInterpolation,
+      interpolationEngine: "auto",
+      trimStartSeconds: parsedTrimStart,
+      trimEndSeconds: parsedTrimEnd,
+      resumable: useResumable,
     });
 
     setUserStats((prev) => ({
@@ -372,6 +419,78 @@ const Sidebar = ({
       lastUsedAt: new Date().getTime(),
     }));
     logit("🏁 UPSCAYL_VIDEO");
+  };
+
+  const batchVideoHandler = async () => {
+    if (videoBatchPaths.length === 0) {
+      toast({
+        title: t("ERRORS.NO_IMAGE_ERROR.TITLE"),
+        description: t("VIDEO_UPSCAYL.NO_VIDEO_SELECTED"),
+      });
+      return;
+    }
+
+    if (!outputPath) {
+      toast({
+        title: t("ERRORS.NO_OUTPUT_FOLDER_ERROR.TITLE"),
+        description: t("VIDEO_UPSCAYL.NO_OUTPUT_FOLDER"),
+      });
+      return;
+    }
+
+    setUpscaledImagePath("");
+    setUpscaledBatchFolderPath("");
+    setMultiModelResults([]);
+    setMultiModelProgress(null);
+    setVideoDoneInfo(null);
+    setBatchVideoResults([]);
+    setVideoProgress({
+      stage: "preparing",
+      stageIndex: 1,
+      totalStages: videoInterpolation > 1 ? 4 : 3,
+      percent: 0,
+      completedFrames: 0,
+      totalFrames: 0,
+      chunk: 0,
+      totalChunks: 0,
+      message: t("APP.PROGRESS.WAIT_TITLE"),
+    });
+    setProgress(t("APP.PROGRESS.WAIT_TITLE"));
+
+    window.electron.send<BatchVideoUpscaylPayload>(
+      ELECTRON_COMMANDS.BATCH_VIDEO_UPSCAYL,
+      {
+        videoPaths: videoBatchPaths,
+        outputPath,
+        model: selectedModelId,
+        gpuId: gpuId.length === 0 ? null : gpuId,
+        saveImageAs,
+        scale,
+        compression: compression.toString(),
+        customWidth: customWidth > 0 ? customWidth.toString() : null,
+        useCustomWidth,
+        tileSize,
+        ttaMode,
+        threads: threads ?? undefined,
+        videoCodec,
+        videoContainer,
+        videoQuality,
+        keepAudio: videoKeepAudio,
+        intermediateFormat: videoIntermediateFormat,
+        useHardwareEncoding: videoUseHwEncode,
+        deduplicateFrames: videoDeduplicateFrames,
+        frameInterpolation: videoInterpolation,
+        interpolationEngine: "auto",
+        resumable: videoResumable,
+      },
+    );
+
+    setUserStats((prev) => ({
+      ...prev,
+      totalUpscayls: prev.totalUpscayls + 1,
+      lastUsedAt: new Date().getTime(),
+    }));
+    logit("🏁 BATCH_VIDEO_UPSCAYL", String(videoBatchPaths.length));
   };
 
   return (
@@ -425,8 +544,13 @@ const Sidebar = ({
             videoPath={videoPath}
             videoInfo={videoInfo}
             ffmpegStatus={ffmpegStatus}
+            videoSessions={videoSessions}
             selectVideoHandler={selectVideoHandler}
+            selectMultipleVideosHandler={selectMultipleVideosHandler}
             upscaylVideoHandler={upscaylVideoHandler}
+            batchVideoHandler={batchVideoHandler}
+            resumeVideoSessionHandler={resumeVideoSessionHandler}
+            discardVideoSessionHandler={discardVideoSessionHandler}
           />
         )}
 

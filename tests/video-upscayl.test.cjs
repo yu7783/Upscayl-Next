@@ -9,6 +9,11 @@ const {
   resolveVideoEncodingProfile,
   buildVideoExtractArgs,
   buildVideoEncodeArgs,
+  buildVideoConcatArgs,
+  buildRifeArgs,
+  scaleRationalFps,
+  parseTimeInput,
+  resolveVideoTrimRange,
   planDeduplicatedChunk,
   computeChunkRanges,
   calculateVideoOverallProgress,
@@ -313,4 +318,166 @@ test("formatVideoDuration formats seconds, minutes, and hours", () => {
   assert.equal(formatVideoDuration(0), "0:00");
   assert.equal(formatVideoDuration(65), "1:05");
   assert.equal(formatVideoDuration(3661), "1:01:01");
+});
+
+test("parseTimeInput parses seconds, MM:SS, and HH:MM:SS formats", () => {
+  assert.equal(parseTimeInput(""), null);
+  assert.equal(parseTimeInput("12.5"), 12.5);
+  assert.equal(parseTimeInput("1:30"), 90);
+  assert.equal(parseTimeInput("01:02:03.5"), 3723.5);
+  assert.equal(parseTimeInput("-5"), null);
+  assert.equal(parseTimeInput("invalid"), null);
+});
+
+test("resolveVideoTrimRange clamps to duration and returns null for full video or inverted range", () => {
+  assert.equal(
+    resolveVideoTrimRange({ startSeconds: null, endSeconds: null, duration: 60 }),
+    null,
+  );
+  assert.equal(
+    resolveVideoTrimRange({ startSeconds: 0, endSeconds: 60, duration: 60 }),
+    null,
+  );
+  assert.equal(
+    resolveVideoTrimRange({ startSeconds: 30, endSeconds: 10, duration: 60 }),
+    null,
+  );
+  assert.deepEqual(
+    resolveVideoTrimRange({ startSeconds: 5, endSeconds: 15, duration: 60 }),
+    {
+      start: 5,
+      end: 15,
+      duration: 10,
+      isTrimmed: true,
+    },
+  );
+  assert.deepEqual(
+    resolveVideoTrimRange({ startSeconds: 10, endSeconds: 999, duration: 30 }),
+    {
+      start: 10,
+      end: 30,
+      duration: 20,
+      isTrimmed: true,
+    },
+  );
+});
+
+test("scaleRationalFps multiplies rational and integer frame rates cleanly", () => {
+  assert.equal(scaleRationalFps("30000/1001", 2), "60000/1001");
+  assert.equal(scaleRationalFps("24", 4), "96");
+  assert.equal(scaleRationalFps("30/1", 1), "30/1");
+});
+
+test("buildRifeArgs builds proper rife-ncnn-vulkan command flags", () => {
+  const args = buildRifeArgs({
+    inputDir: "/tmp/in",
+    outputDir: "/tmp/out",
+    targetFrameCount: 120,
+    gpuId: "0",
+    format: "jpg",
+  });
+  assert.ok(args.includes("-i"));
+  assert.ok(args.includes("/tmp/in"));
+  assert.ok(args.includes("-o"));
+  assert.ok(args.includes("/tmp/out"));
+  assert.ok(args.includes("-n"));
+  assert.ok(args.includes("120"));
+  assert.ok(args.includes("-g"));
+  assert.ok(args.includes("0"));
+  assert.ok(args.includes("-f"));
+  assert.ok(args.includes("frame_%08d.jpg"));
+});
+
+test("buildVideoExtractArgs adds fast -ss and -t when trim range is specified", () => {
+  const args = buildVideoExtractArgs({
+    inputVideo: "/videos/clip.mp4",
+    outputPattern: "/tmp/frame_%08d.jpg",
+    fpsRational: "30/1",
+    intermediateFormat: "jpg",
+    trimStartSeconds: 5,
+    trimDurationSeconds: 10,
+  });
+  assert.ok(args.includes("-ss"));
+  assert.ok(args.includes("5.000"));
+  assert.ok(args.includes("-t"));
+  assert.ok(args.includes("10.000"));
+});
+
+test("buildVideoEncodeArgs supports segmentOnly mode, ffmpeg minterpolate, and trimmed audio", () => {
+  const segArgs = buildVideoEncodeArgs({
+    fpsRational: "30/1",
+    inputVideo: "/videos/in.mp4",
+    outputFile: "/tmp/seg_00001.mp4",
+    codec: "h264",
+    container: "mp4",
+    usePipe: true,
+    segmentOnly: true,
+    ffmpegInterpolateFps: "60/1",
+  });
+  assert.ok(segArgs.includes("-an"));
+  assert.equal(segArgs.includes("/videos/in.mp4"), false);
+  const vfIdx = segArgs.indexOf("-vf");
+  assert.ok(vfIdx !== -1);
+  assert.ok(segArgs[vfIdx + 1].includes("minterpolate=fps=60/1"));
+
+  const trimArgs = buildVideoEncodeArgs({
+    fpsRational: "30/1",
+    inputVideo: "/videos/in.mp4",
+    outputFile: "/videos/out.mp4",
+    keepAudio: true,
+    hasAudio: true,
+    usePipe: true,
+    trimStartSeconds: 12,
+    trimDurationSeconds: 5,
+  });
+  assert.ok(trimArgs.includes("-ss"));
+  assert.ok(trimArgs.includes("12.000"));
+  assert.ok(trimArgs.includes("-t"));
+  assert.ok(trimArgs.includes("5.000"));
+});
+
+test("buildVideoConcatArgs stream-copies segments and optionally muxes trimmed audio", () => {
+  const args = buildVideoConcatArgs({
+    concatListPath: "/tmp/concat.txt",
+    inputVideo: "/videos/in.mp4",
+    outputFile: "/videos/final.mp4",
+    codec: "h264",
+    container: "mp4",
+    keepAudio: true,
+    hasAudio: true,
+    trimStartSeconds: 2,
+    trimDurationSeconds: 8,
+  });
+  assert.ok(args.includes("-f"));
+  assert.ok(args.includes("concat"));
+  assert.ok(args.includes("-c:v"));
+  assert.ok(args.includes("copy"));
+  assert.ok(args.includes("-ss"));
+  assert.ok(args.includes("2.000"));
+  assert.ok(args.includes("+faststart"));
+});
+
+test("buildVideoOutputFilename appends interpolation and trim range tags when active", () => {
+  assert.equal(
+    buildVideoOutputFilename({
+      inputName: "clip",
+      model: "upscayl-standard-4x",
+      scale: "2",
+      useCustomWidth: false,
+      customWidth: "",
+      codec: "h264",
+      container: "mp4",
+      interpolationFactor: 2,
+      trimRange: { start: 5, end: 10, duration: 5, isTrimmed: true },
+    }),
+    "clip_upscayl_upscayl-standard-4x_2x_2xfps_5s-10s.mp4",
+  );
+});
+
+test("calculateVideoOverallProgress handles interpolating stage monotonically", () => {
+  const pUp = calculateVideoOverallProgress("upscaling", 1);
+  const pIntMid = calculateVideoOverallProgress("interpolating", 0.5);
+  const pIntEnd = calculateVideoOverallProgress("interpolating", 1);
+  const pEnc = calculateVideoOverallProgress("encoding", 0.5);
+  assert.ok(pUp < pIntMid && pIntMid < pIntEnd && pIntEnd < pEnc);
 });

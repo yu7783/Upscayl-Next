@@ -5,6 +5,7 @@ import {
   VideoCodec,
   VideoContainerFormat,
   VideoIntermediateFormat,
+  VideoInterpolationFactor,
   VideoProgressInfo,
   VideoQualityPreset,
 } from "@common/types/types";
@@ -121,6 +122,19 @@ export const videoDeduplicateFramesAtom = atomWithStorage<boolean>(
   "videoDeduplicateFrames",
   true,
 );
+
+export const videoInterpolationAtom =
+  atomWithStorage<VideoInterpolationFactor>("videoInterpolation", 1);
+
+export const videoResumableAtom = atomWithStorage<boolean>(
+  "videoResumable",
+  true,
+);
+
+export const videoBatchModeAtom = atom<boolean>(false);
+export const videoBatchPathsAtom = atom<string[]>([]);
+export const videoTrimStartAtom = atom<string>("");
+export const videoTrimEndAtom = atom<string>("");
 
 export const rememberOutputFolderAtom = atomWithStorage<boolean>(
   "rememberOutputFolder",

@@ -160,6 +160,32 @@ export function detectHardwareEncoders(
   return working;
 }
 
+export function resolveRifeBinary(): string | null {
+  const fromEnv = process.env.UPSCAYL_RIFE_PATH?.trim();
+  if (fromEnv && fs.existsSync(fromEnv)) {
+    return fromEnv;
+  }
+
+  const binDir = path.dirname(execPath);
+  const bundled = path.join(binDir, `rife-ncnn-vulkan${binExt()}`);
+  if (fs.existsSync(bundled)) {
+    return bundled;
+  }
+
+  try {
+    const check = spawnSync(`rife-ncnn-vulkan${binExt()}`, ["-h"], {
+      encoding: "utf8",
+      windowsHide: true,
+      timeout: 3000,
+    });
+    if (!check.error) {
+      return `rife-ncnn-vulkan${binExt()}`;
+    }
+  } catch {}
+
+  return null;
+}
+
 export function checkFfmpegStatus(): FfmpegStatus {
   const ffmpegBin = resolveMediaBinary("ffmpeg");
   const ffprobeBin = resolveMediaBinary("ffprobe");
@@ -169,6 +195,7 @@ export function checkFfmpegStatus(): FfmpegStatus {
   const hasFfmpeg = ffmpegVersion !== null;
   const hasFfprobe = ffprobeVersion !== null;
   const hwEncoders = hasFfmpeg ? detectHardwareEncoders(ffmpegBin) : [];
+  const rifePath = resolveRifeBinary();
 
   return {
     available: hasFfmpeg && hasFfprobe,
@@ -178,6 +205,8 @@ export function checkFfmpegStatus(): FfmpegStatus {
     ffprobePath: hasFfprobe ? ffprobeBin : null,
     version: ffmpegVersion,
     hwEncoders,
+    hasRife: rifePath !== null,
+    rifePath,
   };
 }
 

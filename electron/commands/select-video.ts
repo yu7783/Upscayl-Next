@@ -52,4 +52,35 @@ const selectVideo = async () => {
   return videoPath;
 };
 
+export const selectMultipleVideos = async (): Promise<string[]> => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ["openFile", "multiSelections"],
+    title: "Select Videos",
+    defaultPath: savedImagePath,
+    message: "Select one or more videos to upscale",
+    filters: [
+      {
+        name: "Videos",
+        extensions: [...videoFormats],
+      },
+    ],
+  });
+
+  if (canceled || !filePaths || filePaths.length === 0) {
+    logit("🚫 Multi-video selection cancelled");
+    return [];
+  }
+
+  const valid = filePaths.filter((videoPath) => {
+    const extension = videoPath.split(".").pop()?.toLowerCase() ?? "";
+    return (videoFormats as readonly string[]).includes(extension);
+  });
+
+  if (valid.length > 0) {
+    setSavedImagePath(valid[0]);
+  }
+  logit(`🎬 Selected ${valid.length} video(s) for batch`);
+  return valid;
+};
+
 export default selectVideo;

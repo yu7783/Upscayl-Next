@@ -11,6 +11,7 @@ import { ELECTRON_COMMANDS } from "@common/electron-commands";
 import getFilenameFromPath from "@common/get-file-name";
 import { sanitizePath } from "@common/sanitize-path";
 import {
+  BatchVideoItemResult,
   FfmpegStatus,
   VideoDoneInfo,
   VideoMediaInfo,
@@ -26,6 +27,7 @@ type VideoWorkspaceProps = {
   videoPath: string;
   videoInfo: VideoMediaInfo | null;
   videoDoneInfo: VideoDoneInfo | null;
+  batchVideoResults: BatchVideoItemResult[];
   ffmpegStatus: FfmpegStatus | null;
   selectVideoHandler: () => Promise<void>;
   resetVideoHandler: () => void;
@@ -50,6 +52,7 @@ const VideoWorkspace = ({
   videoPath,
   videoInfo,
   videoDoneInfo,
+  batchVideoResults,
   ffmpegStatus,
   selectVideoHandler,
   resetVideoHandler,
@@ -117,6 +120,88 @@ const VideoWorkspace = ({
       }
     }
   };
+
+  // Batch video completed state
+  if (batchVideoResults.length > 0 && !videoDoneInfo) {
+    const succeeded = batchVideoResults.filter((r) => r.status === "done").length;
+    return (
+      <div
+        className="flex h-screen w-full flex-col overflow-hidden bg-base-300"
+        onDoubleClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-base-content/10 bg-base-100 px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold">
+              {t("VIDEO_UPSCAYL.BATCH_VIDEO_DONE_TITLE")}
+            </p>
+            <p className="text-xs text-base-content/70">
+              {t("VIDEO_UPSCAYL.BATCH_VIDEO_SUMMARY", {
+                succeeded: String(succeeded),
+                total: String(batchVideoResults.length),
+              })}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-xs"
+            onClick={resetVideoHandler}
+          >
+            {t("VIDEO_UPSCAYL.RESET_VIDEO")}
+          </button>
+        </div>
+        <div className="flex-1 space-y-2 overflow-y-auto p-4">
+          {batchVideoResults.map((item, idx) => (
+            <div
+              key={`${item.videoPath}-${idx}`}
+              className={`flex items-center justify-between gap-3 rounded-box border px-4 py-3 text-xs ${
+                item.status === "done"
+                  ? "border-success/30 bg-base-100"
+                  : "border-error/40 bg-error/10"
+              }`}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">
+                  {item.status === "done" ? "✅ " : "❌ "}
+                  {getFilenameFromPath(
+                    item.doneInfo?.outputPath || item.videoPath,
+                  )}
+                </p>
+                {item.doneInfo && (
+                  <p className="mt-1 text-[11px] text-base-content/70">
+                    {item.doneInfo.container.toUpperCase()} /{" "}
+                    {item.doneInfo.usedEncoder || item.doneInfo.codec} ·{" "}
+                    {formatBytes(item.doneInfo.fileSize)} ·{" "}
+                    {(item.doneInfo.durationMs / 1000).toFixed(1)}s
+                    {item.doneInfo.interpolationFactor &&
+                    item.doneInfo.interpolationFactor > 1
+                      ? ` · ${item.doneInfo.interpolationFactor}x FPS`
+                      : ""}
+                  </p>
+                )}
+                {item.error && (
+                  <p className="mt-1 text-[11px] text-error">{item.error}</p>
+                )}
+              </div>
+              {item.doneInfo && (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-xs shrink-0"
+                  onClick={() =>
+                    window.electron.send(
+                      ELECTRON_COMMANDS.OPEN_FILE_LOCATION,
+                      item.doneInfo.outputPath,
+                    )
+                  }
+                >
+                  {t("VIDEO_UPSCAYL.SHOW_IN_FOLDER")}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // Empty state: no video chosen yet
   if (!videoPath && !videoDoneInfo) {
@@ -314,6 +399,21 @@ const VideoWorkspace = ({
             <span className="badge badge-neutral badge-sm">
               {videoDoneInfo.totalFrames} frames
             </span>
+            {videoDoneInfo.interpolationFactor &&
+              videoDoneInfo.interpolationFactor > 1 && (
+                <span className="badge badge-primary badge-sm">
+                  ✨ {videoDoneInfo.interpolationFactor}x FPS
+                  {videoDoneInfo.interpolationEngineUsed
+                    ? ` (${videoDoneInfo.interpolationEngineUsed})`
+                    : ""}
+                </span>
+              )}
+            {videoDoneInfo.trimmedRange && (
+              <span className="badge badge-secondary badge-sm">
+                ✂️ {formatVideoDuration(videoDoneInfo.trimmedRange.start)}–
+                {formatVideoDuration(videoDoneInfo.trimmedRange.end)}
+              </span>
+            )}
             {videoDoneInfo.skippedDuplicateFrames > 0 && (
               <span className="badge badge-success badge-sm">
                 ⚡{" "}
