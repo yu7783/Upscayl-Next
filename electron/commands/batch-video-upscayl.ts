@@ -44,7 +44,7 @@ const batchVideoUpscayl = async (_event, payload: BatchVideoUpscaylPayload) => {
       if (!mainWindow || mainWindow.isDestroyed()) return;
       const overallFraction = (i + itemFraction) / videoPaths.length;
       const info: BatchVideoProgressInfo = {
-        videoIndex: i,
+        videoIndex: i + 1,
         totalVideos: videoPaths.length,
         currentVideoPath: videoPath,
         completedVideos: results.filter((r) => r.status === "done").length,

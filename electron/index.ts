@@ -220,7 +220,7 @@ ipcMain.handle("get-gpu-info", async () => {
 });
 
 ipcMain.handle("get-app-version", () => {
-  return `${app.getVersion()} ${
+  return `${app.getVersion()} (Sirius) ${
     FEATURE_FLAGS.APP_STORE_BUILD ? "MAC-APP-STORE" : "FOSS"
   }`;
 });

@@ -50,12 +50,15 @@ const ModelManagerDialog = ({ open, onClose }: ModelManagerDialogProps) => {
   }, [open]);
 
   useEffect(() => {
-    window.electron.on(
+    const unsub = window.electron.on(
       ELECTRON_COMMANDS.MODEL_MANAGER_PROGRESS,
       (_, info: ModelManagerProgressInfo) => {
         setInstallProgress(info);
       },
     );
+    return () => {
+      if (typeof unsub === "function") unsub();
+    };
   }, []);
 
   const tags = useMemo(() => getCatalogTags(entries), [entries]);

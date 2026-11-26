@@ -126,6 +126,10 @@ const MainContent = ({
   const [roiRect, setRoiRect] = useAtom(roiRectAtom);
   const [singleBlendOpen, setSingleBlendOpen] = useState(false);
 
+  useEffect(() => {
+    setSingleBlendOpen(false);
+  }, [imagePath, upscaledImagePath]);
+
   const viewType = useAtomValue(viewTypeAtom);
   const rememberOutputFolder = useAtomValue(rememberOutputFolderAtom);
   const [zoomAmount, setZoomAmount] = useState("100");

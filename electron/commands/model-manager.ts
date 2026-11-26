@@ -108,10 +108,21 @@ function downloadFileWithRedirects(
         let downloaded = 0;
         const tmpPath = `${destPath}.download.tmp`;
         const fileStream = fs.createWriteStream(tmpPath);
+        const cleanupTmp = () => {
+          try {
+            if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+          } catch {}
+        };
 
         res.on("data", (chunk: Buffer) => {
           downloaded += chunk.length;
           onProgress(downloaded, total);
+        });
+
+        res.on("error", (err) => {
+          fileStream.destroy();
+          cleanupTmp();
+          reject(err);
         });
 
         res.pipe(fileStream);
@@ -122,15 +133,14 @@ function downloadFileWithRedirects(
               fs.renameSync(tmpPath, destPath);
               resolve();
             } catch (err) {
+              cleanupTmp();
               reject(err);
             }
           });
         });
 
         fileStream.on("error", (err) => {
-          try {
-            if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
-          } catch {}
+          cleanupTmp();
           reject(err);
         });
       },
@@ -142,6 +152,8 @@ function downloadFileWithRedirects(
     });
   });
 }
+
+let activeInstallId: string | null = null;
 
 export async function handleModelManagerList(): Promise<ModelManagerListResponse> {
   const modelsDir = resolveManagedModelsDir();
@@ -155,6 +167,11 @@ export async function handleModelManagerInstall(
   _event: unknown,
   modelId: string,
 ): Promise<ModelManagerListResponse> {
+  if (activeInstallId) {
+    throw new Error(
+      `Another model installation is already in progress (${activeInstallId}).`,
+    );
+  }
   const entry: CatalogModelEntry | undefined = MODEL_CATALOG.find(
     (m) => m.id === modelId,
   );
@@ -162,48 +179,53 @@ export async function handleModelManagerInstall(
     throw new Error(`Unknown catalog model: ${modelId}`);
   }
 
+  activeInstallId = entry.id;
   const modelsDir = resolveManagedModelsDir();
   const mainWindow = getMainWindow();
 
   logit(`⬇️ Installing model "${entry.name}" into ${modelsDir}`);
 
-  for (let i = 0; i < entry.files.length; i += 1) {
-    const file = entry.files[i];
-    const dest = path.join(modelsDir, file.filename);
-    await downloadFileWithRedirects(
-      file.url,
-      dest,
-      (downloadedBytes, totalBytes) => {
-        if (!mainWindow || mainWindow.isDestroyed()) return;
-        const fileFraction =
-          totalBytes > 0 ? Math.min(1, downloadedBytes / totalBytes) : 0;
-        const overallPercent = Math.round(
-          ((i + fileFraction) / entry.files.length) * 100,
-        );
-        const info: ModelManagerProgressInfo = {
-          modelId: entry.id,
-          fileIndex: i + 1,
-          totalFiles: entry.files.length,
-          currentFile: file.filename,
-          downloadedBytes,
-          totalBytes,
-          percent: overallPercent,
-        };
-        mainWindow.webContents.send(
-          ELECTRON_COMMANDS.MODEL_MANAGER_PROGRESS,
-          info,
-        );
-      },
-    );
+  try {
+    for (let i = 0; i < entry.files.length; i += 1) {
+      const file = entry.files[i];
+      const dest = path.join(modelsDir, file.filename);
+      await downloadFileWithRedirects(
+        file.url,
+        dest,
+        (downloadedBytes, totalBytes) => {
+          if (!mainWindow || mainWindow.isDestroyed()) return;
+          const fileFraction =
+            totalBytes > 0 ? Math.min(1, downloadedBytes / totalBytes) : 0;
+          const overallPercent = Math.round(
+            ((i + fileFraction) / entry.files.length) * 100,
+          );
+          const info: ModelManagerProgressInfo = {
+            modelId: entry.id,
+            fileIndex: i + 1,
+            totalFiles: entry.files.length,
+            currentFile: file.filename,
+            downloadedBytes,
+            totalBytes,
+            percent: overallPercent,
+          };
+          mainWindow.webContents.send(
+            ELECTRON_COMMANDS.MODEL_MANAGER_PROGRESS,
+            info,
+          );
+        },
+      );
+    }
+
+    await refreshRendererCustomModels(modelsDir);
+    logit(`✅ Installed model "${entry.name}"`);
+
+    return {
+      modelsDir,
+      entries: getCatalogWithStatus(modelsDir),
+    };
+  } finally {
+    activeInstallId = null;
   }
-
-  await refreshRendererCustomModels(modelsDir);
-  logit(`✅ Installed model "${entry.name}"`);
-
-  return {
-    modelsDir,
-    entries: getCatalogWithStatus(modelsDir),
-  };
 }
 
 export async function handleModelManagerDelete(

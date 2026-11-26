@@ -346,8 +346,8 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
   return result;
 }
 
-export function formatCliHelp(version = "1.3.1"): string {
-  return `Upscayl-Next CLI v${version}
+export function formatCliHelp(version = "2.0.0"): string {
+  return `Upscayl-Next CLI v${version} (Sirius)
 
 Usage:
   upscayl-next <command> [options]

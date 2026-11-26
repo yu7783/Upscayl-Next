@@ -1,7 +1,7 @@
 import { IpcRenderer } from "electron";
 
 export interface IElectronAPI {
-  on: (command, func?) => IpcRenderer;
+  on: (command, func?) => (() => void) | IpcRenderer;
   off: (command, func?) => IpcRenderer;
   send: <T>(command, func?: T) => IpcRenderer;
   invoke: (command, func?) => any;

@@ -408,12 +408,14 @@ const Sidebar = ({
     logit("✂️ ROI_UPSCAYL", JSON.stringify({ roiRect, targetModels }));
   };
 
-  if (registerImageActions) {
-    registerImageActions({
-      runFullUpscale: upscaylHandler,
-      runRoiUpscale: roiUpscaleHandler,
-    });
-  }
+  useEffect(() => {
+    if (registerImageActions) {
+      registerImageActions({
+        runFullUpscale: upscaylHandler,
+        runRoiUpscale: roiUpscaleHandler,
+      });
+    }
+  });
 
   const upscaylVideoHandler = async (overrides?: {
     trimStartSeconds?: number | null;
@@ -588,12 +590,15 @@ const Sidebar = ({
         if (snap) setQueueSnapshot(snap);
       })
       .catch(() => {});
-    window.electron.on(
+    const unsub = window.electron.on(
       ELECTRON_COMMANDS.QUEUE_UPDATE,
       (_, snap: QueueSnapshot) => {
         if (snap) setQueueSnapshot(snap);
       },
     );
+    return () => {
+      if (typeof unsub === "function") unsub();
+    };
   }, []);
 
   const queueSummary = summarizeQueue(queueSnapshot.jobs);

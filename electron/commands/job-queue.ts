@@ -291,24 +291,63 @@ async function executeJob(job: QueueJob): Promise<string> {
         modelId in MODELS ? modelsPath : (savedCustomModelsPath ?? modelsPath);
 
       await runWithTileRetry(payload.tileSize, async (tileSize) => {
-        await runBinaryPromise(
-          getSingleImageArguments({
-            inputDir,
-            fileNameWithExt,
-            outFile,
-            modelsPath: resolvedModels,
-            model: modelId,
-            scale: payload.scale,
-            gpuId: payload.gpuId,
-            saveImageAs: payload.saveImageAs,
-            customWidth,
-            compression: payload.compression,
-            tileSize,
-            ttaMode: payload.ttaMode,
-            threads: payload.threads?.trim() || undefined,
-          }),
-          (pct) => updateProgress(((i + pct / 100) / models.length) * 100),
-        );
+        if (payload.doubleUpscale) {
+          await runBinaryPromise(
+            getDoubleUpscaleArguments({
+              inputDir,
+              fullfileName: fileNameWithExt,
+              outFile,
+              modelsPath: resolvedModels,
+              model: modelId,
+              scale: payload.scale,
+              customWidth,
+              gpuId: payload.gpuId,
+              saveImageAs: payload.saveImageAs,
+              tileSize,
+              threads: payload.threads?.trim() || "2:2:2",
+            }),
+            (pct) =>
+              updateProgress(((i + (pct / 100) * 0.5) / models.length) * 100),
+          );
+          await runBinaryPromise(
+            getDoubleUpscaleSecondPassArguments({
+              outFile,
+              modelsPath: resolvedModels,
+              model: modelId,
+              gpuId: payload.gpuId,
+              saveImageAs: payload.saveImageAs,
+              scale: payload.scale,
+              customWidth,
+              compression: payload.compression,
+              tileSize,
+              ttaMode: payload.ttaMode,
+              threads: payload.threads?.trim() || "2:2:2",
+            }),
+            (pct) =>
+              updateProgress(
+                ((i + 0.5 + (pct / 100) * 0.5) / models.length) * 100,
+              ),
+          );
+        } else {
+          await runBinaryPromise(
+            getSingleImageArguments({
+              inputDir,
+              fileNameWithExt,
+              outFile,
+              modelsPath: resolvedModels,
+              model: modelId,
+              scale: payload.scale,
+              gpuId: payload.gpuId,
+              saveImageAs: payload.saveImageAs,
+              customWidth,
+              compression: payload.compression,
+              tileSize,
+              ttaMode: payload.ttaMode,
+              threads: payload.threads?.trim() || undefined,
+            }),
+            (pct) => updateProgress(((i + pct / 100) / models.length) * 100),
+          );
+        }
       });
 
       if (payload.faceRestore && fs.existsSync(outFile)) {
@@ -361,6 +400,32 @@ async function executeJob(job: QueueJob): Promise<string> {
       updateProgress,
     );
   });
+
+  if (payload.faceRestore || payload.copyMetadata) {
+    try {
+      const files = fs
+        .readdirSync(outputFolderPath, { withFileTypes: true })
+        .filter((e) => e.isFile())
+        .map((e) => e.name);
+      for (const file of files) {
+        if (stopped) break;
+        const outFile = path.join(outputFolderPath, file);
+        if (payload.faceRestore) {
+          await runFaceRestore(outFile, payload.faceRestoreStrength);
+        }
+        if (payload.copyMetadata) {
+          const orig = path.join(inputDir, file);
+          if (fs.existsSync(orig)) {
+            try {
+              await copyMetadata(orig, outFile);
+            } catch {}
+          }
+        }
+      }
+    } catch (err) {
+      logit("⚠️ Post-processing warning in queued batch job: ", err);
+    }
+  }
 
   return outputFolderPath;
 }

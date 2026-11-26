@@ -237,7 +237,9 @@ const VideoWorkspace = ({
           {t("VIDEO_UPSCAYL.SELECT_VIDEO_BUTTON")}
         </button>
 
-        <p className="badge badge-primary text-sm">Upscayl-Next v{version}</p>
+        <p className="badge badge-primary text-sm">
+          Upscayl-Next {version ? (version.startsWith("v") ? version : `v${version}`) : "v2.0.0"} · Sirius
+        </p>
       </div>
     );
   }

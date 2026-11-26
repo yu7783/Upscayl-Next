@@ -163,7 +163,18 @@ test("compiled CLI executes --help, models --search, and blend end-to-end", asyn
     encoding: "utf8",
   });
   assert.equal(helpRun.status, 0);
-  assert.ok(helpRun.stdout.includes("Upscayl-Next CLI"));
+  assert.ok(helpRun.stdout.includes("Upscayl-Next CLI v2.0.0 (Sirius)"));
+
+  const versionRun = spawnSync(process.execPath, [cliEntry, "--version"], {
+    encoding: "utf8",
+  });
+  assert.equal(versionRun.status, 0);
+  assert.ok(versionRun.stdout.includes("v2.0.0 (Sirius)"));
+
+  const badRun = spawnSync(process.execPath, [cliEntry, "unknowncmd"], {
+    encoding: "utf8",
+  });
+  assert.equal(badRun.status, 2);
 
   const modelsRun = spawnSync(
     process.execPath,

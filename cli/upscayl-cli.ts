@@ -30,9 +30,9 @@ const readPackageVersion = (): string => {
   try {
     const pkgPath = path.resolve(__dirname, "..", "..", "package.json");
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
-    return pkg.version || "1.3.1";
+    return pkg.version || "2.0.0";
   } catch {
-    return "1.3.1";
+    return "2.0.0";
   }
 };
 
@@ -165,7 +165,7 @@ export async function runCli(argv: string[]): Promise<number> {
   }
 
   if (parsed.command === "version") {
-    console.log(`upscayl-next ${version}`);
+    console.log(`upscayl-next v${version} (Sirius)`);
     return 0;
   }
 
