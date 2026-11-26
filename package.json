@@ -223,6 +223,13 @@
     },
     "nsis": {
       "include": "build/installer.nsh",
+      "displayLanguageSelector": true,
+      "installerLanguages": [
+        "ja_JP",
+        "en_US",
+        "zh_CN",
+        "ko_KR"
+      ],
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
       "allowElevation": true,

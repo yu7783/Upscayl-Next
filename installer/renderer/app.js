@@ -1,21 +1,41 @@
 /* Upscayl-Next modern installer UI */
 
 const $ = (id) => document.getElementById(id);
-const STEP_ORDER = ["welcome", "options", "download", "install", "finish"];
+const STEP_ORDER = [
+  "language",
+  "welcome",
+  "options",
+  "download",
+  "install",
+  "finish",
+];
 
 const state = {
+  lang:
+    typeof window.detectInstallerLanguage === "function"
+      ? window.detectInstallerLanguage(navigator.language)
+      : "ja",
   defaults: null,
   release: null,
   installDir: "",
-  currentStep: "welcome",
+  currentStep: "language",
   installing: false,
   doneHandled: false,
   installed: null,
 };
 
+const tr = (key, vars) =>
+  typeof window.translateInstaller === "function"
+    ? window.translateInstaller(state.lang, key, vars)
+    : key;
+
 const els = {
   panels: Array.from(document.querySelectorAll(".panel")),
   railSteps: Array.from(document.querySelectorAll(".rail-step")),
+  langSelect: $("lang-select"),
+  langCards: Array.from(document.querySelectorAll(".lang-card")),
+  langContinue: $("lang-continue-btn"),
+  welcomeLede: $("welcome-lede"),
   start: $("start-btn"),
   releaseLink: $("release-link"),
   welcomeVersion: $("welcome-version"),
@@ -60,9 +80,65 @@ function setStatus(text) {
   if (els.statusText) els.statusText.textContent = text;
 }
 
+function stepStatusText(step) {
+  const map = {
+    language: tr("statusLanguage"),
+    welcome: tr("statusWelcome"),
+    options: tr("statusOptions"),
+    download: tr("statusDownload"),
+    install: tr("statusInstall"),
+    finish: tr("statusFinish"),
+  };
+  return map[step] || tr("statusPreparing");
+}
+
+function applyLanguage(lang) {
+  state.lang =
+    window.INSTALLER_TRANSLATIONS && window.INSTALLER_TRANSLATIONS[lang]
+      ? lang
+      : "en";
+
+  document.documentElement.lang = tr("langCode");
+
+  if (els.langSelect) {
+    els.langSelect.value = state.lang;
+  }
+
+  els.langCards.forEach((card) => {
+    const selected = card.dataset.lang === state.lang;
+    card.classList.toggle("selected", selected);
+    card.setAttribute("aria-checked", selected ? "true" : "false");
+  });
+
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    const key = node.getAttribute("data-i18n");
+    if (key) {
+      node.textContent = tr(key);
+    }
+  });
+
+  if (els.welcomeLede) {
+    els.welcomeLede.innerHTML = tr("welcomeLede");
+  }
+  if (els.min) els.min.setAttribute("aria-label", tr("winMin"));
+  if (els.close) els.close.setAttribute("aria-label", tr("winClose"));
+  if (els.errorClose) els.errorClose.setAttribute("aria-label", tr("winClose"));
+
+  // Refresh dynamic release / finish strings in the newly selected language
+  if (state.release) {
+    renderReleaseChip(state.release);
+  } else if (els.welcomeVersion) {
+    els.welcomeVersion.textContent = tr("welcomeChecking");
+  }
+  if (state.installed) {
+    renderFinishSummary(state.installed);
+  }
+  setStatus(stepStatusText(state.currentStep));
+}
+
 function showError(message) {
   if (!els.errorBanner) return;
-  els.errorText.textContent = message || "処理に失敗しました。";
+  els.errorText.textContent = message || tr("errGeneric");
   els.errorBanner.classList.remove("hidden");
 }
 
@@ -83,15 +159,7 @@ function go(step) {
     rail.classList.toggle("active", index === currentIndex);
     rail.classList.toggle("done", index < currentIndex);
   });
-  setStatus(
-    {
-      welcome: "ようこそ",
-      options: "インストール設定",
-      download: "ダウンロード中",
-      install: "インストール中",
-      finish: "完了",
-    }[step],
-  );
+  setStatus(stepStatusText(step));
 }
 
 function formatBytes(bytes) {
@@ -112,11 +180,11 @@ function formatSpeed(bytesPerSecond) {
 }
 
 function formatEta(seconds) {
-  if (!Number.isFinite(seconds) || seconds <= 0) return "まもなく";
-  if (seconds < 60) return `${Math.ceil(seconds)} 秒`;
+  if (!Number.isFinite(seconds) || seconds <= 0) return tr("etaSoon");
+  if (seconds < 60) return tr("etaSec", { s: Math.ceil(seconds) });
   const minutes = Math.floor(seconds / 60);
   const rest = Math.ceil(seconds % 60);
-  return `${minutes} 分 ${rest} 秒`;
+  return tr("etaMinSec", { m: minutes, s: rest });
 }
 
 function appendLog(element, line) {
@@ -151,22 +219,25 @@ function resetProgress() {
     ? `v${state.release.version}`
     : "—";
   els.downloadBar.style.width = "0%";
-  els.downloadSub.textContent =
-    "GitHub から最新のポータブル版を取得します。";
+  els.downloadSub.textContent = tr("downloadSub");
   els.downloadLog.textContent = "";
   els.installLog.textContent = "";
   els.installLines.forEach((line) => line.classList.remove("active", "done"));
-  els.installSub.textContent = "ファイルを展開しています…";
+  els.installSub.textContent = tr("installSub");
+}
+
+function renderReleaseChip(release) {
+  const published = release.publishedAt
+    ? new Date(release.publishedAt).toLocaleDateString(tr("dateLocale"))
+    : "";
+  els.welcomeVersion.textContent = published
+    ? tr("welcomeLatestDate", { version: release.version, date: published })
+    : tr("welcomeLatest", { version: release.version });
 }
 
 function setRelease(release) {
   state.release = release;
-  const published = release.publishedAt
-    ? new Date(release.publishedAt).toLocaleDateString("ja-JP")
-    : "";
-  els.welcomeVersion.textContent = published
-    ? `最新版 v${release.version} · ${published}`
-    : `最新版 v${release.version}`;
+  renderReleaseChip(release);
   els.downloadVersion.textContent = `v${release.version}`;
   els.statusRight.textContent = `Upscayl-Next v${release.version}`;
   els.start.disabled = false;
@@ -182,7 +253,7 @@ function updateInstallEnabled() {
 }
 
 async function loadRelease() {
-  els.welcomeVersion.textContent = "最新リリースを確認しています…";
+  els.welcomeVersion.textContent = tr("welcomeChecking");
   els.start.disabled = true;
   try {
     const result = await window.installer.getLatestRelease();
@@ -190,25 +261,24 @@ async function loadRelease() {
       throw new Error(result.error);
     }
     setRelease(result.release);
-    setStatus("最新版を確認しました");
+    if (state.currentStep === "welcome") {
+      setStatus(tr("statusReleaseChecked"));
+    }
   } catch (error) {
-    els.welcomeVersion.textContent =
-      "最新リリースを取得できませんでした。接続を確認してください。";
-    showError(
-      `${error.message} GitHub のリリースページから手動でダウンロードすることもできます。`,
-    );
-    setStatus("リリース取得エラー");
+    els.welcomeVersion.textContent = tr("welcomeLoadError");
+    showError(tr("errReleaseManual", { message: error.message }));
+    setStatus(tr("statusReleaseError"));
   }
 }
 
 async function startInstall() {
   if (state.installing) return;
   if (!state.release) {
-    showError("最新リリースの取得が完了していません。少し待ってから再試行してください。");
+    showError(tr("errReleaseWait"));
     return;
   }
   if (!els.acceptLicense.checked) {
-    showError("AGPL-3.0ライセンスとクレジットへの同意が必要です。");
+    showError(tr("errAcceptLicense"));
     return;
   }
 
@@ -218,7 +288,7 @@ async function startInstall() {
   updateInstallEnabled();
   resetProgress();
   go("download");
-  setStatus("ダウンロードを開始しています…");
+  setStatus(tr("statusDownloadStarting"));
 
   const options = {
     installDir: state.installDir,
@@ -226,6 +296,7 @@ async function startInstall() {
     startMenuShortcut: els.startMenuShortcut.checked,
     installBackend: els.installBackend.checked,
     acceptLicense: els.acceptLicense.checked,
+    language: state.lang,
   };
 
   try {
@@ -234,7 +305,7 @@ async function startInstall() {
       state.doneHandled = true;
       state.installing = false;
       updateInstallEnabled();
-      showError(result.error || "インストールに失敗しました。");
+      showError(result.error || tr("errInstallFailed"));
       go("options");
     }
   } catch (error) {
@@ -242,12 +313,11 @@ async function startInstall() {
       state.doneHandled = true;
       state.installing = false;
       updateInstallEnabled();
-      showError(error.message || "インストールに失敗しました。");
+      showError(error.message || tr("errInstallFailed"));
       go("options");
     }
   }
 }
-
 
 const RING_LENGTH = 465;
 
@@ -287,35 +357,32 @@ function onProgress(progress) {
     case "verify":
       go("install");
       setInstallLine(0, "active");
-      els.installSub.textContent = "ダウンロードを検証しています…";
+      els.installSub.textContent = tr("phaseVerify");
       break;
     case "extract":
       go("install");
       setInstallLine(0, "active");
-      els.installSub.textContent =
-        "アプリケーションファイルを展開しています…";
+      els.installSub.textContent = tr("phaseExtract");
       break;
     case "copy":
       go("install");
       setInstallLine(0, "active");
-      els.installSub.textContent = "Upscayl-Next をインストールしています…";
+      els.installSub.textContent = tr("phaseCopy");
       break;
     case "shortcuts":
       go("install");
       setInstallLine(1, "active");
-      els.installSub.textContent = "ショートカットを作成しています…";
+      els.installSub.textContent = tr("phaseShortcuts");
       break;
     case "uninstaller":
       go("install");
       setInstallLine(2, "active");
-      els.installSub.textContent = "アンインストーラーを登録しています…";
+      els.installSub.textContent = tr("phaseUninstaller");
       break;
     case "backend":
       go("install");
       setInstallLine(3, "active");
-      els.installSub.textContent =
-        progress.message ||
-        "オプションのAIバックエンドをインストールしています…";
+      els.installSub.textContent = progress.message || tr("phaseBackend");
       break;
     case "done":
       els.installLines.forEach((line) => line.classList.add("done"));
@@ -362,6 +429,20 @@ function launchConfetti() {
   }, 2400);
 }
 
+function renderFinishSummary(result) {
+  els.finishMessage.textContent = tr("finishReady", { version: result.version });
+  const backend =
+    result.backend && result.backend.ok
+      ? tr("finishBackendOk")
+      : result.backend
+        ? tr("finishBackendWarn", { message: result.backend.message })
+        : tr("finishBackendSkip");
+  els.finishMeta.innerHTML =
+    `<span>${escapeHtml(tr("finishMetaVersion"))}: <strong>v${escapeHtml(result.version)}</strong></span>` +
+    `<span>${escapeHtml(tr("finishMetaDir"))}: <strong>${escapeHtml(result.installDir)}</strong></span>` +
+    `<span>${escapeHtml(backend)}</span>`;
+}
+
 function onDone(result) {
   if (state.doneHandled) return;
   state.doneHandled = true;
@@ -369,34 +450,44 @@ function onDone(result) {
   updateInstallEnabled();
 
   if (!result || !result.success) {
-    showError(
-      (result && result.error) ||
-        "インストールに失敗しました。ネットワーク接続を確認して再試行してください。",
-    );
-    setStatus("インストール失敗");
+    showError((result && result.error) || tr("errInstallRetry"));
+    setStatus(tr("statusInstallFailed"));
     go("options");
     return;
   }
 
   state.installed = result;
-  els.finishMessage.textContent = `Upscayl-Next v${result.version} の準備ができました。`;
-  const backend =
-    result.backend && result.backend.ok
-      ? "AIバックエンド: インストール済み"
-      : result.backend
-        ? `AIバックエンド: 未完了（${result.backend.message}）`
-        : "AIバックエンド: スキップ";
-  els.finishMeta.innerHTML =
-    `<span>バージョン: <strong>v${escapeHtml(result.version)}</strong></span>` +
-    `<span>インストール先: <strong>${escapeHtml(result.installDir)}</strong></span>` +
-    `<span>${escapeHtml(backend)}</span>`;
+  renderFinishSummary(result);
   els.launch.disabled = false;
   els.openFolder.disabled = false;
   go("finish");
-  setStatus("インストール完了");
+  setStatus(tr("statusInstallDone"));
   launchConfetti();
 }
 
+els.langCards.forEach((card) => {
+  card.addEventListener("click", () => {
+    applyLanguage(card.dataset.lang);
+  });
+  card.addEventListener("dblclick", () => {
+    applyLanguage(card.dataset.lang);
+    hideError();
+    go("welcome");
+  });
+});
+
+if (els.langSelect) {
+  els.langSelect.addEventListener("change", (event) => {
+    applyLanguage(event.target.value);
+  });
+}
+
+if (els.langContinue) {
+  els.langContinue.addEventListener("click", () => {
+    hideError();
+    go("welcome");
+  });
+}
 
 els.start.addEventListener("click", () => {
   hideError();
@@ -435,9 +526,9 @@ els.launch.addEventListener("click", async () => {
   if (!installDir) return;
   const result = await window.installer.launchApp(installDir);
   if (!result.success) {
-    showError(result.error || "Upscayl-Next を起動できませんでした。");
+    showError(result.error || tr("errLaunch"));
   } else {
-    setStatus("Upscayl-Next を起動しました");
+    setStatus(tr("statusLaunched"));
   }
 });
 
@@ -447,7 +538,7 @@ els.openFolder.addEventListener("click", async () => {
   if (!installDir) return;
   const result = await window.installer.openFolder(installDir);
   if (!result.success) {
-    showError(result.error || "フォルダを開けませんでした。");
+    showError(result.error || tr("errOpenFolder"));
   }
 });
 
@@ -464,7 +555,8 @@ window.installer.onLog((line) => {
 window.installer.onDone(onDone);
 
 async function init() {
-  go("welcome");
+  applyLanguage(state.lang);
+  go("language");
   try {
     const defaults = await window.installer.getDefaults();
     state.defaults = defaults;
@@ -472,11 +564,10 @@ async function init() {
     els.installDir.value = defaults.defaultInstallDir;
     els.statusRight.textContent = `Installer v${defaults.installerVersion}`;
   } catch (error) {
-    showError("インストーラーの初期化に失敗しました。");
+    showError(tr("errInit"));
   }
   updateInstallEnabled();
   await loadRelease();
 }
 
 init();
-

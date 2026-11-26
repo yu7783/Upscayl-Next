@@ -1434,3 +1434,130 @@ button {
   }
 }
 
+
+/* Language selector in titlebar and STEP 1 language picker */
+.titlebar-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  margin-right: 6px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 12px;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-lang select {
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+.titlebar-lang select option {
+  background: #171329;
+  color: var(--text);
+}
+
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0 auto;
+}
+
+.lang-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease,
+    background 160ms ease, box-shadow 160ms ease;
+}
+
+.lang-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.55);
+  background: rgba(42, 34, 72, 0.85);
+}
+
+.lang-card.selected {
+  border-color: var(--violet);
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.24),
+    rgba(236, 72, 153, 0.14)
+  );
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.5),
+    0 14px 30px rgba(109, 61, 245, 0.22);
+}
+
+.lang-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #ddd6fe;
+  flex-shrink: 0;
+}
+
+.lang-card.selected .lang-badge {
+  background: var(--violet);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.lang-names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lang-names strong {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+.lang-names small {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.lang-check {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0;
+  transform: scale(0.7);
+  background: var(--violet);
+  color: #ffffff;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.lang-card.selected .lang-check {
+  opacity: 1;
+  transform: scale(1);
+}
